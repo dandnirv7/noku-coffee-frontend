@@ -1,51 +1,20 @@
 "use client";
 
-import AboutSection from "@/components/landing/AboutSection";
-import HeroSection from "@/components/landing/HeroSection";
-import OrderSection from "@/components/landing/OrderSection";
-import ProductList from "@/components/landing/ProductList";
+import { ReactNode } from "react";
 import Navbar from "@/components/layout/landing/Navbar";
 import { Badge } from "@/components/ui/badge";
-import { Award, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import Link from "next/link";
 
-interface FooterColumns {
-  title: string;
-  links: string[];
+interface LandingLayoutProps {
+  children: ReactNode;
 }
 
-const awards: string[] = [
-  "Specialty Coffee Assn",
-  "Organic Certified",
-  "Fair Trade",
-  `Best Roaster ${new Date().getFullYear() - 1}`,
-];
-
-const footerColumns: FooterColumns[] = [
-  {
-    title: "Produk",
-    links: [
-      "Semua Produk",
-      "Biji Kopi",
-      "Peralatan",
-      "Aksesoris",
-      "Promo Bundle",
-    ],
-  },
-  {
-    title: "Tentang",
-    links: ["Cerita Kami", "Karir", "Blog"],
-  },
-  {
-    title: "Bantuan",
-    links: ["FAQ", "Pengiriman", "Pengembalian", "Syarat & Ketentuan"],
-  },
-];
-
-export default function LandingPage() {
+export default function LandingLayout({ children }: LandingLayoutProps) {
   return (
     <div className="min-h-screen font-sans antialiased bg-background text-foreground selection:bg-primary selection:text-white">
-      <div className="relative overflow-hidden bg-[#1F2933] py-2.5 px-4 text-center text-sm font-medium text-white">
+      {/* Promo Banner */}
+      <div className="relative overflow-hidden bg-[#1F2933] py-2.5 text-center text-sm font-medium text-white px-4">
         <div className="absolute inset-0 opacity-10 -translate-x-1/2 skew-x-12 bg-primary" />
         <div className="flex relative z-10 flex-wrap gap-2 justify-center items-center">
           <Badge className="bg-primary text-[10px] text-white">Promo</Badge>
@@ -53,35 +22,23 @@ export default function LandingPage() {
             Diskon <span className="font-bold text-primary">30%</span> untuk
             pembelian pertama!
           </p>
-          <button className="ml-1 font-bold underline transition-colors cursor-pointer decoration-background hover:decoration-primary hover:text-primary">
+          <button className="ml-1 font-bold underline transition-colors cursor-pointer decoration-primary hover:text-primary">
             <Link href="/login">Klaim</Link>
           </button>
         </div>
       </div>
 
+      {/* Navbar */}
       <Navbar />
 
-      <HeroSection id="hero" />
-      <div className="py-10 bg-white border-y border-border">
-        <div className="container flex flex-wrap gap-8 justify-center items-center px-4 mx-auto opacity-60 grayscale transition-all hover:grayscale-0 md:justify-between">
-          {awards.map((b, i) => (
-            <div
-              key={i}
-              className="flex gap-2 items-center text-lg font-bold cursor-default"
-            >
-              <Award size={24} /> {b}
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Main Content */}
+      <main className="px-4">{children}</main>
 
-      <AboutSection id="about" />
-      <ProductList id="products" />
-      <OrderSection id="order" />
-
-      <footer className="pt-16 pb-12 border-t border-border bg-surface">
-        <div className="container px-4 mx-auto md:px-6">
+      {/* Footer */}
+      <footer className="px-4 pt-16 pb-12 border-t border-border bg-surface">
+        <div className="container mx-auto md:px-6">
           <div className="grid grid-cols-1 gap-12 mb-16 md:grid-cols-5">
+            {/* Branding */}
             <div className="space-y-6 md:col-span-2">
               <div className="flex gap-2 items-center">
                 <div className="flex justify-center items-center w-8 h-8 text-white rounded bg-primary">
@@ -102,7 +59,29 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {footerColumns.map((col, idx) => (
+            {/* Footer Links */}
+            {[
+              {
+                title: "Produk",
+                links: [
+                  "Semua Produk",
+                  "Biji Kopi",
+                  "Peralatan",
+                  "Aksesoris",
+                  "Promo Bundle",
+                ],
+              },
+              { title: "Tentang", links: ["Cerita Kami", "Karir", "Blog"] },
+              {
+                title: "Bantuan",
+                links: [
+                  "FAQ",
+                  "Pengiriman",
+                  "Pengembalian",
+                  "Syarat & Ketentuan",
+                ],
+              },
+            ].map((col, idx) => (
               <div key={idx}>
                 <h4 className="mb-6 font-bold text-foreground">{col.title}</h4>
                 <ul className="space-y-4 text-sm text-muted">
