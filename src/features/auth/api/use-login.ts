@@ -1,0 +1,33 @@
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { authClient } from "../lib/auth-client";
+import { LoginData } from "../lib/auth-schema";
+
+export const useLogin = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationFn: async (data: LoginData) => {
+      const res = await authClient.signIn.email({
+        email: data.email,
+        password: data.password,
+        callbackURL: "/dashboard",
+      });
+
+      if (res.error) {
+        throw new Error(res.error.message || "Gagal masuk");
+      }
+
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success("Berhasil masuk! Selamat datang kembali.");
+      router.push("/dashboard");
+      router.refresh();
+    },
+    onError: (error: any) => {
+      toast.error(error.message);
+    },
+  });
+};
