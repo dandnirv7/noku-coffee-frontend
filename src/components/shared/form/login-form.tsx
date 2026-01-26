@@ -101,6 +101,7 @@ export default function LoginForm() {
               className="pl-10"
             />
             <Button
+              type="button"
               variant="ghost"
               size="icon"
               onClick={() => setIsVisible((prevState) => !prevState)}
