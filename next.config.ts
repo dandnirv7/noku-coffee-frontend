@@ -25,6 +25,11 @@ const nextConfig: NextConfig = {
         hostname: "coldcrafters.com",
         pathname: "/cdn/shop/files/**",
       },
+      {
+        protocol: "https",
+        hostname: "qsdlsjidmrzdpctnfuet.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
     ],
   },
 };
