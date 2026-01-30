@@ -1,49 +1,42 @@
 "use client";
 
-import { useState } from "react";
-
-import { EyeIcon, EyeOffIcon, Lock, Mail } from "lucide-react";
+import { EyeIcon, EyeOffIcon, Loader2, Lock, Mail } from "lucide-react";
+import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useLogin } from "@/features/auth/api/use-login";
-import { authClient } from "@/features/auth/lib/auth-client";
-import { LoginData, loginSchema } from "@/features/auth/lib/auth-schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { RegisterData } from "@/features/auth/lib/auth-schema";
 
-export default function LoginForm() {
-  const [isVisible, setIsVisible] = useState(false);
+interface RegisterFormProps {
+  form: ReturnType<typeof useForm<RegisterData>>;
+  onSubmit: (data: RegisterData) => void;
+  onGoogleLogin: () => void;
+  isPending: boolean;
+  isVisible: boolean;
+  setIsVisible: (isVisible: boolean) => void;
+}
 
-  const { mutate: login, isPending } = useLogin();
-
+export default function RegisterForm({
+  form,
+  onSubmit,
+  onGoogleLogin,
+  isPending,
+  isVisible,
+  setIsVisible,
+}: RegisterFormProps) {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginData>({
-    resolver: zodResolver(loginSchema),
-  });
-
-  const onSubmit = (data: LoginData) => {
-    login(data);
-  };
-
-  const handleGoogleLogin = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/dashboard",
-    });
-  };
+  } = form;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <Button
-        variant="ghost"
-        className="gap-3 justify-center w-full h-12 text-sm font-bold rounded-full border border-border"
-        onClick={handleGoogleLogin}
+        variant="outline"
+        className="gap-3 w-full h-12 font-bold rounded-full"
+        onClick={onGoogleLogin}
         disabled={isPending}
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -52,25 +45,34 @@ export default function LoginForm() {
             fill="currentColor"
           />
         </svg>
-        Masuk dengan Google
+        Daftar dengan Google
       </Button>
 
       <div className="relative">
         <div className="flex absolute inset-0 items-center">
-          <span className="w-full border-t border-border" />
+          <span className="w-full border-t" />
         </div>
         <div className="flex relative justify-center text-xs uppercase">
           <span className="px-2 bg-background text-muted-foreground">
-            Atau lanjut dengan email
+            Atau daftar manual
           </span>
         </div>
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-1">
-          <Label htmlFor="email" className="leading-5">
-            Email
-            <span className="-ml-1 text-red-500">*</span>
+          <Label htmlFor="name">
+            Nama Lengkap <span className="-ml-1 text-red-500">*</span>
+          </Label>
+          <Input {...register("name")} placeholder="Masukkan Nama Lengkap" />
+          {errors.name && (
+            <p className="text-xs text-red-500">{errors.name.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-1">
+          <Label htmlFor="email">
+            Email <span className="-ml-1 text-red-500">*</span>
           </Label>
           <div className="relative">
             <Mail className="absolute left-3 top-2.5 text-muted h-4 w-4" />
@@ -104,7 +106,7 @@ export default function LoginForm() {
               type="button"
               variant="ghost"
               size="icon"
-              onClick={() => setIsVisible((prevState) => !prevState)}
+              onClick={() => setIsVisible(!isVisible)}
               className="absolute inset-y-0 right-0 rounded-l-none text-muted-foreground focus-visible:ring-ring/50 hover:bg-transparent"
             >
               {isVisible ? <EyeOffIcon /> : <EyeIcon />}
@@ -118,21 +120,17 @@ export default function LoginForm() {
           )}
         </div>
 
-        <div className="flex gap-y-2 justify-between items-center">
-          <Link href="/reset-password" className="hover:underline">
-            <span className="text-sm text-muted-foreground">
-              Lupa Kata Sandi?
-            </span>
-          </Link>
-        </div>
-
         <Button
           size="lg"
           className="w-full rounded-full"
           type="submit"
           disabled={isPending}
         >
-          Masuk
+          {isPending ? (
+            <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+          ) : (
+            "Daftar Sekarang"
+          )}
         </Button>
       </form>
     </div>
