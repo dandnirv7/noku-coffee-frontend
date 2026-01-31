@@ -6,57 +6,52 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { toRupiah } from "@/lib/utils";
-import { useQueryStates } from "nuqs";
-import { useState } from "react";
-import { searchParamsSchema } from "../lib/search-params";
+import { useProductCategories } from "../api/category-products";
+import { useSearchFilters } from "../hooks/use-search-filters";
 
-const mockCategories = [
-  "Single Origin",
-  "House Blend",
-  "Bundling Packages",
-  "Merchandise",
-  "Manual Brew Gear",
-];
+type ProductType = "BEAN" | "GEAR" | "BUNDLE";
 
-const mockOrigins = [
-  "Aceh Gayo",
-  "Bali Kintamani",
-  "Flores Bajawa",
-  "Toraja Sapan",
-  "Guatemala",
-  "Ethiopia",
-];
+const typeLabels: Record<ProductType, string> = {
+  BEAN: "Biji Kopi",
+  GEAR: "Peralatan",
+  BUNDLE: "Paket Bundling",
+};
 
 export function SearchProductFilterPanel() {
-  const [params, setParams] = useQueryStates(searchParamsSchema, {
-    shallow: true,
-    history: "replace",
-  });
+  const { data: categories } = useProductCategories();
 
-  const toggleArrayItem = (key: "category" | "origin", item: string) => {
-    const current = params[key];
-    const next = current.includes(item)
-      ? current.filter((i) => i !== item)
-      : [...current, item];
-
-    setParams({
-      [key]: next,
-    });
-  };
+  const {
+    params,
+    handleCategoryToggle,
+    handleTypeToggle,
+    handlePriceChange,
+    reset,
+  } = useSearchFilters();
 
   return (
     <div className="p-4 space-y-4 w-full rounded-lg border border-border">
-      <h2 className="text-lg font-bold tracking-tight">Filter Produk</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-bold tracking-tight">Filter Produk</h2>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={reset}
+          className="text-xs font-medium hover:text-primary"
+        >
+          Reset
+        </Button>
+      </div>
       <Separator />
 
       <Accordion
         type="multiple"
-        defaultValue={["category", "price", "origin"]}
+        defaultValue={["category", "price"]}
         className="w-full"
       >
         <AccordionItem value="category" className="border-b-0">
@@ -65,18 +60,18 @@ export function SearchProductFilterPanel() {
           </AccordionTrigger>
           <AccordionContent>
             <div className="pt-1 space-y-3">
-              {mockCategories.map((item) => (
-                <div key={item} className="flex items-center space-x-2">
+              {categories?.data.data.map((item) => (
+                <div key={item.id} className="flex items-center pl-1 space-x-2">
                   <Checkbox
-                    id={`cat-${item}`}
-                    checked={params.category.includes(item)}
-                    onCheckedChange={() => toggleArrayItem("category", item)}
+                    id={`cat-${item.slug}`}
+                    checked={params.category?.includes(item.slug) ?? false}
+                    onCheckedChange={() => handleCategoryToggle(item.slug)}
                   />
                   <Label
-                    htmlFor={`cat-${item}`}
+                    htmlFor={`cat-${item.slug}`}
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    {item}
+                    {item.name}
                   </Label>
                 </div>
               ))}
@@ -94,42 +89,44 @@ export function SearchProductFilterPanel() {
                 defaultValue={[0, 1000000]}
                 max={1000000}
                 step={10000}
-                value={[params.minPrice, params.maxPrice]}
-                onValueChange={([min, max]) =>
-                  setParams({ minPrice: min, maxPrice: max })
+                value={[params.minPrice ?? 0, params.maxPrice ?? 1000000]}
+                onValueChange={(values) =>
+                  handlePriceChange(values[0], values[1])
                 }
                 className="my-4"
               />
               <div className="flex justify-between items-center">
                 <span className="px-2 py-1 text-xs font-medium rounded border text-muted-foreground">
-                  {toRupiah(params.minPrice)}
+                  {toRupiah(params.minPrice ?? 0)}
                 </span>
                 <span className="px-2 py-1 text-xs font-medium rounded border text-muted-foreground">
-                  {toRupiah(params.maxPrice)}
+                  {toRupiah(params.maxPrice ?? 1000000)}
                 </span>
               </div>
             </div>
           </AccordionContent>
         </AccordionItem>
+      </Accordion>
 
-        <AccordionItem value="origin" className="border-b-0">
+      <Accordion type="multiple" defaultValue={["category", "price", "type"]}>
+        <AccordionItem value="type" className="border-b-0">
           <AccordionTrigger className="py-3 text-sm font-bold hover:no-underline">
-            Origin (Asal)
+            Jenis Produk
           </AccordionTrigger>
           <AccordionContent>
-            <div className="pt-1 space-y-3">
-              {mockOrigins.map((item) => (
-                <div key={item} className="flex items-center space-x-2">
+            <div className="pt-1 pl-1 space-y-3">
+              {Object.entries(typeLabels).map(([key, label]) => (
+                <div key={key} className="flex items-center space-x-2">
                   <Checkbox
-                    id={`orig-${item}`}
-                    checked={params.origin.includes(item)}
-                    onCheckedChange={() => toggleArrayItem("origin", item)}
+                    id={`type-${key}`}
+                    checked={params.type === key}
+                    onCheckedChange={() => handleTypeToggle(key)}
                   />
                   <Label
-                    htmlFor={`orig-${item}`}
-                    className="text-sm font-medium leading-none"
+                    htmlFor={`type-${key}`}
+                    className="text-sm font-medium leading-none cursor-pointer"
                   >
-                    {item}
+                    {label}
                   </Label>
                 </div>
               ))}
