@@ -10,31 +10,55 @@ import {
 import { Product } from "@/features/product/lib/products-schema";
 import { getProductBadges } from "@/lib/product-badges";
 import { cn, toRupiah } from "@/lib/utils";
-import { Heart, Minus, Plus, Star } from "lucide-react";
+import { AlertCircle, Heart, Minus, Plus, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Badge } from "../ui/badge";
 
 interface ProductCardProps {
   product: Product;
   viewMode?: "grid" | "list";
+  onAddToCart?: (item: { productId: string; quantity: number }) => void;
+  onDelete?: (item: { productId: string }) => void;
+  onToggleWishlist?: (productId: string) => void;
+  onUpdateQuantity?: (data: { productId: string; quantity: number }) => void;
+  onRemoveFromCart?: (productId: string) => void;
+  cartQuantity?: number;
+  isInWishlist?: boolean;
+  isWishlist?: boolean;
 }
 
-export function ProductCard({ product, viewMode = "grid" }: ProductCardProps) {
-  const [quantity, setQuantity] = useState(0);
-  const [isWishlist, setIsWishlist] = useState(false);
+export function ProductCard({
+  product,
+  viewMode = "grid",
+  onAddToCart,
+  onDelete,
+  onToggleWishlist,
+  onUpdateQuantity,
+  onRemoveFromCart,
+  cartQuantity = 0,
+  isInWishlist = false,
+  isWishlist = false,
+}: ProductCardProps) {
   const isListView = viewMode === "list";
+
+  const pathname = usePathname();
 
   const productHref = `/products/${product.slug}`;
 
   const badges = getProductBadges(product);
+
+  const stock = product.stock ?? 0;
+  const isOutOfStock = stock === 0;
+  const isLowStock = stock > 0 && stock <= 5;
 
   return (
     <Card
       className={cn(
         "overflow-hidden gap-0 p-0 bg-white rounded-xl border-none shadow-sm transition-all group hover:shadow-md",
         isListView ? "flex flex-row" : "flex flex-col h-full",
+        isOutOfStock && "opacity-60",
       )}
     >
       <CardHeader className={cn("p-4", isListView && "w-40 md:w-60 shrink-0")}>
@@ -48,21 +72,48 @@ export function ProductCard({ product, viewMode = "grid" }: ProductCardProps) {
             />
           </Link>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-3 right-3 z-10 rounded-full backdrop-blur-md bg-white/70 hover:bg-white"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsWishlist(!isWishlist);
-            }}
-          >
-            <Heart
-              size={20}
-              className={cn(isWishlist && "fill-red-500 text-red-500")}
-            />
-          </Button>
+          {isOutOfStock && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+              <Badge
+                variant="destructive"
+                className="text-xs font-semibold rounded-md"
+              >
+                Stok Habis
+              </Badge>
+            </div>
+          )}
+
+          {isLowStock && !isOutOfStock && (
+            <div className="absolute top-3 left-3 z-10">
+              <Badge
+                variant="outline"
+                className="text-xs border-orange-500 text-orange-600 bg-white/90 rounded-md"
+              >
+                Stok Terbatas
+              </Badge>
+            </div>
+          )}
+
+          {!pathname.includes("cart") && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "absolute top-3 right-3 z-10 rounded-full backdrop-blur-md bg-white/70 hover:bg-white",
+                isInWishlist && "bg-white",
+              )}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onToggleWishlist?.(product.id);
+              }}
+            >
+              <Heart
+                size={20}
+                className={cn(isInWishlist && "fill-red-500 text-red-500")}
+              />
+            </Button>
+          )}
         </div>
       </CardHeader>
 
@@ -103,7 +154,7 @@ export function ProductCard({ product, viewMode = "grid" }: ProductCardProps) {
 
           {!isListView && (
             <div className="flex flex-wrap gap-2 mt-2">
-              {badges.map((badge, index) => (
+              {badges.slice(0, 3).map((badge, index) => (
                 <Badge
                   key={`${badge.key}-${index}`}
                   variant={badge.variant ?? "default"}
@@ -112,6 +163,15 @@ export function ProductCard({ product, viewMode = "grid" }: ProductCardProps) {
                   {badge.value}
                 </Badge>
               ))}
+
+              {badges.length > 3 && (
+                <Badge
+                  variant="outline"
+                  className="px-3 py-1 text-[10px] font-medium rounded-md"
+                >
+                  +{badges.length - 3} lainnya
+                </Badge>
+              )}
             </div>
           )}
 
@@ -119,52 +179,106 @@ export function ProductCard({ product, viewMode = "grid" }: ProductCardProps) {
             className={cn(
               "mt-3 text-xs leading-relaxed text-muted-foreground",
               isListView ? "line-clamp-3" : "line-clamp-2",
+              pathname?.includes("cart") && "hidden",
             )}
           >
             {product.description}
           </p>
         </CardContent>
 
-        <CardFooter className="p-4 pt-0 mt-auto">
+        <CardFooter className="p-4 pt-0 mt-auto ">
           <div
             className={cn(
               "flex items-center justify-between w-full gap-4",
+              pathname?.includes("cart") && "flex-col items-start",
               isListView && "max-w-xs flex-col items-start",
             )}
           >
-            <p className="text-xl font-black tracking-tighter text-slate-900">
-              {toRupiah(product.price)}
-            </p>
+            <div className="flex flex-col gap-1">
+              <p className="text-xl font-black tracking-tighter text-slate-900">
+                {toRupiah(product.price)}
+              </p>
+              {!pathname?.includes("cart") && (
+                <div className="flex items-center gap-1">
+                  {isOutOfStock ? (
+                    <span className="text-xs text-red-600 font-medium flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      Stok Habis
+                    </span>
+                  ) : isLowStock ? (
+                    <span className="text-xs text-orange-600 font-medium">
+                      Tersisa {stock} item
+                    </span>
+                  ) : (
+                    <span className="text-xs text-gray-500">Stok: {stock}</span>
+                  )}
+                </div>
+              )}
+            </div>
 
-            <div className={cn("flex-1 max-w-40", isListView && "w-full")}>
-              {quantity === 0 ? (
-                <Button
-                  className="w-full h-10 font-bold rounded-lg transition-all active:scale-95"
-                  onClick={() => setQuantity(1)}
-                  disabled={product.stock === 0}
-                >
-                  {product.stock === 0 ? "Habis" : "+ Keranjang"}
-                </Button>
+            <div
+              className={cn(
+                "flex-1 max-w-40",
+                isListView && "w-full",
+                pathname?.includes("cart") && "max-w-none w-full",
+              )}
+            >
+              {cartQuantity === 0 ? (
+                <div className="flex flex-col gap-2 w-full">
+                  <Button
+                    className="w-full h-10 font-bold rounded-lg transition-all active:scale-95"
+                    onClick={() =>
+                      onAddToCart?.({ productId: product.id, quantity: 1 })
+                    }
+                    disabled={isOutOfStock}
+                  >
+                    {isOutOfStock ? "Stok Habis" : "+ Keranjang"}
+                  </Button>
+                  {pathname?.includes("cart") && (
+                    <Button
+                      variant="outline"
+                      className="w-full h-10 font-bold rounded-lg transition-all active:scale-95"
+                      onClick={() => onDelete?.({ productId: product.id })}
+                    >
+                      {isWishlist
+                        ? "Hapus dari Wishlist"
+                        : "Hapus dari Keranjang"}
+                    </Button>
+                  )}
+                </div>
               ) : (
                 <div className="flex justify-between items-center px-1 h-10 rounded-lg border bg-primary/5 border-primary/10">
                   <Button
                     variant="ghost"
                     size="icon"
                     className="w-8 h-8 text-primary"
-                    onClick={() => setQuantity((q) => Math.max(0, q - 1))}
+                    onClick={() => {
+                      if (cartQuantity === 1) {
+                        onRemoveFromCart?.(product.id);
+                      } else {
+                        onUpdateQuantity?.({
+                          productId: product.id,
+                          quantity: cartQuantity - 1,
+                        });
+                      }
+                    }}
                   >
                     <Minus size={14} />
                   </Button>
                   <span className="text-sm font-bold text-primary">
-                    {quantity}
+                    {cartQuantity}
                   </span>
                   <Button
                     variant="ghost"
                     size="icon"
                     className="w-8 h-8 text-primary"
                     onClick={() =>
-                      setQuantity((q) => Math.min(product.stock, q + 1))
+                      onUpdateQuantity?.({
+                        productId: product.id,
+                        quantity: Math.min(product.stock, cartQuantity + 1),
+                      })
                     }
+                    disabled={cartQuantity >= product.stock}
                   >
                     <Plus size={14} />
                   </Button>

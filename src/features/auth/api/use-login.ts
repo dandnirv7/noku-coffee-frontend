@@ -12,7 +12,7 @@ export const useLogin = () => {
       const res = await authClient.signIn.email({
         email: data.email,
         password: data.password,
-        callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/search`,
+        callbackURL: `/search`,
       });
 
       if (res.error) {
