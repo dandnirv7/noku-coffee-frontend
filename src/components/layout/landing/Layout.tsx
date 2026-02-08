@@ -1,10 +1,10 @@
 "use client";
 
-import { ReactNode } from "react";
-import Navbar from "@/components/layout/landing/Navbar";
-import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
 import Link from "next/link";
+import { ReactNode } from "react";
+import Navbar from "./Navbar";
+import { Badge } from "@/components/ui/badge";
 
 interface LandingLayoutProps {
   children: ReactNode;
