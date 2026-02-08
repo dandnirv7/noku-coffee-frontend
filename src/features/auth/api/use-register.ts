@@ -13,7 +13,7 @@ export const useRegister = () => {
         email: data.email,
         password: data.password,
         name: data.name,
-        callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/login`,
+        callbackURL: `/login`,
       });
 
       if (res.error) throw new Error("Gagal melakukan registrasi");
