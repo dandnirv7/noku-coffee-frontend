@@ -1,46 +1,43 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { EyeIcon, EyeOffIcon, Loader2, Lock, Mail } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { EyeIcon, EyeOffIcon, Lock, Mail } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRegister } from "@/features/auth/api/use-register";
-import { authClient } from "@/features/auth/lib/auth-client";
-import { RegisterData, registerSchema } from "@/features/auth/lib/auth-schema";
+import { LoginData } from "@/features/auth/lib/auth-schema";
+import Link from "next/link";
+import { UseFormReturn } from "react-hook-form";
 
-export default function RegisterForm() {
-  const [isVisible, setIsVisible] = useState(false);
+interface LoginFormProps {
+  form: UseFormReturn<LoginData>;
+  onSubmit: (data: LoginData) => void;
+  onGoogleLogin: () => void;
+  isPending: boolean;
+  isVisible: boolean;
+  setIsVisible: (isVisible: boolean) => void;
+}
 
-  const { mutate: registerUser, isPending } = useRegister();
+export default function LoginForm({
+  form,
+  onSubmit,
+  onGoogleLogin,
+  isPending,
+  isVisible,
+  setIsVisible,
+}: LoginFormProps) {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterData>({
-    resolver: zodResolver(registerSchema),
-  });
-
-  const onSubmit = (data: RegisterData) => {
-    registerUser(data);
-  };
-
-  const handleGoogleLogin = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/dashboard",
-    });
-  };
+  } = form;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Button
-        variant="outline"
-        className="gap-3 w-full h-12 font-bold rounded-full"
-        onClick={handleGoogleLogin}
+        variant="ghost"
+        className="gap-3 justify-center w-full h-12 text-sm font-bold rounded-full border border-border"
+        onClick={onGoogleLogin}
         disabled={isPending}
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -49,34 +46,25 @@ export default function RegisterForm() {
             fill="currentColor"
           />
         </svg>
-        Daftar dengan Google
+        Masuk dengan Google
       </Button>
 
       <div className="relative">
         <div className="flex absolute inset-0 items-center">
-          <span className="w-full border-t" />
+          <span className="w-full border-t border-border" />
         </div>
         <div className="flex relative justify-center text-xs uppercase">
           <span className="px-2 bg-background text-muted-foreground">
-            Atau daftar manual
+            Atau lanjut dengan email
           </span>
         </div>
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-1">
-          <Label htmlFor="name">
-            Nama Lengkap <span className="-ml-1 text-red-500">*</span>
-          </Label>
-          <Input {...register("name")} placeholder="Masukkan Nama Lengkap" />
-          {errors.name && (
-            <p className="text-xs text-red-500">{errors.name.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-1">
-          <Label htmlFor="email">
-            Email <span className="-ml-1 text-red-500">*</span>
+          <Label htmlFor="email" className="leading-5">
+            Email
+            <span className="-ml-1 text-red-500">*</span>
           </Label>
           <div className="relative">
             <Mail className="absolute left-3 top-2.5 text-muted h-4 w-4" />
@@ -91,31 +79,45 @@ export default function RegisterForm() {
           )}
         </div>
 
-        <div className="space-y-1">
-          <Label htmlFor="password">
-            Kata Sandi <span className="-ml-1 text-red-500">*</span>
+        <div className="space-y-1 w-full">
+          <Label htmlFor="password" className="leading-5">
+            Kata Sandi
+            <span className="-ml-1 text-red-500">*</span>
           </Label>
           <div className="relative">
-            <Lock className="absolute left-3 top-2.5 text-muted h-4 w-4" />
+            <div>
+              <Lock className="absolute left-3 top-2.5 text-muted h-4 w-4" />
+            </div>
             <Input
               {...register("password")}
               type={isVisible ? "text" : "password"}
-              placeholder="••••••••"
+              placeholder="••••••••••••••••"
               className="pl-10"
             />
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              className="absolute top-0 right-0 hover:bg-transparent"
               onClick={() => setIsVisible(!isVisible)}
+              className="absolute inset-y-0 right-0 rounded-l-none text-muted-foreground focus-visible:ring-ring/50 hover:bg-transparent"
             >
-              {isVisible ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
+              {isVisible ? <EyeOffIcon /> : <EyeIcon />}
+              <span className="sr-only">
+                {isVisible ? "Hide password" : "Show password"}
+              </span>
             </Button>
           </div>
           {errors.password && (
             <p className="text-xs text-red-500">{errors.password.message}</p>
           )}
+        </div>
+
+        <div className="flex gap-y-2 justify-between items-center">
+          <Link href="/reset-password" className="hover:underline">
+            <span className="text-sm text-muted-foreground">
+              Lupa Kata Sandi?
+            </span>
+          </Link>
         </div>
 
         <Button
@@ -124,11 +126,7 @@ export default function RegisterForm() {
           type="submit"
           disabled={isPending}
         >
-          {isPending ? (
-            <Loader2 className="mr-2 w-4 h-4 animate-spin" />
-          ) : (
-            "Daftar Sekarang"
-          )}
+          Masuk
         </Button>
       </form>
     </div>

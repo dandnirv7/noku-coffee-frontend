@@ -1,1 +1,1 @@
-export { default } from "@/features/auth/login";
+export { default, generateMetadata } from "@/features/auth/pages/login-page";
