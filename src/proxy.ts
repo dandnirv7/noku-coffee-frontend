@@ -2,10 +2,23 @@ import { AUTH_ROUTES, PROTECTED_ROUTES } from "@/features/auth/lib/routes";
 import { NextRequest, NextResponse } from "next/server";
 import { authClient } from "@/features/auth/lib/auth-client";
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const { data: session } = await authClient.getSession();
+  let session = null;
+  try {
+    const res = await authClient.getSession({
+      fetchOptions: {
+        headers: {
+          cookie: request.headers.get("cookie") || "",
+        },
+      },
+    });
+    session = res.data;
+  } catch (error) {
+    console.error("Auth Check Failed:", error);
+    session = null;
+  }
 
   const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
     pathname.startsWith(route),

@@ -2,25 +2,30 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { authClient } from "../lib/auth-client";
 import { RegisterData } from "../lib/auth-schema";
+import { useRouter } from "next/navigation";
 
 export const useRegister = () => {
+  const router = useRouter();
+
   return useMutation({
     mutationFn: async (data: RegisterData) => {
       const res = await authClient.signUp.email({
         email: data.email,
         password: data.password,
         name: data.name,
-        callbackURL: "/login",
+        callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/login`,
       });
 
-      if (res.error) throw new Error(res.error.message);
+      if (res.error) throw new Error("Gagal melakukan registrasi");
       return res.data;
     },
     onSuccess: () => {
       toast.success("Registrasi berhasil! Cek email untuk verifikasi.");
+      router.push("/login");
+      router.refresh();
     },
-    onError: (error: any) => {
-      toast.error(error.message || "Gagal melakukan registrasi");
+    onError: () => {
+      toast.error("Gagal melakukan registrasi");
     },
   });
 };

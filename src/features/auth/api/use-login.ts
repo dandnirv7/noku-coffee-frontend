@@ -12,22 +12,22 @@ export const useLogin = () => {
       const res = await authClient.signIn.email({
         email: data.email,
         password: data.password,
-        callbackURL: "/dashboard",
+        callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/search`,
       });
 
       if (res.error) {
-        throw new Error(res.error.message || "Gagal masuk");
+        throw new Error("Gagal masuk");
       }
 
       return res.data;
     },
     onSuccess: () => {
       toast.success("Berhasil masuk! Selamat datang kembali.");
-      router.push("/dashboard");
+      router.push("/search");
       router.refresh();
     },
-    onError: (error: any) => {
-      toast.error(error.message);
+    onError: () => {
+      toast.error("Gagal masuk");
     },
   });
 };
