@@ -2,7 +2,7 @@
 
 import { ProductCard } from "@/components/shared/product-card";
 import { cn } from "@/lib/utils";
-import { Activity, useMemo } from "react";
+import { useMemo } from "react";
 import { useSearchProducts } from "../api/search-products";
 import { useSearchFilters } from "../hooks/use-search-filters";
 import { SearchProductError } from "./search-product-error";
@@ -12,6 +12,15 @@ import { SearchProductListingTopBar } from "./search-product-listing-topbar";
 import { FilterPanelSkeleton } from "./skeleton/search-product-filter-panel-skeleton";
 import { SearchProductListingTopBarSkeleton } from "./skeleton/search-product-listing-topbar-skeleton";
 import { SearchProductEmpty } from "./search-product-empty";
+import { useCreateCart } from "@/features/cart/api/create-cart";
+import { useGetCart } from "@/features/cart/api/get-cart";
+import { useUpdateQuantity } from "@/features/cart/api/update-quantity";
+import { useDeleteItem } from "@/features/cart/api/delete-item";
+import {
+  useToggleWishlist,
+  useWishlist,
+} from "@/features/cart/api/use-wishlist";
+import { toast } from "sonner";
 
 const SearchProductList = () => {
   const { params, reset } = useSearchFilters();
@@ -19,15 +28,86 @@ const SearchProductList = () => {
   const { data, isLoading, isError, refetch, isPlaceholderData } =
     useSearchProducts(params);
 
+  const { data: cartData } = useGetCart();
+  const { data: wishlistData } = useWishlist();
+
+  const { mutate: createCart } = useCreateCart({
+    mutationConfig: {
+      onSuccess: () => {
+        toast.success("Produk berhasil ditambahkan ke keranjang");
+      },
+    },
+  });
+
+  const { mutate: updateQuantity } = useUpdateQuantity({
+    mutationConfig: {
+      onSuccess: () => {
+        toast.success("Jumlah berhasil diperbarui");
+      },
+    },
+  });
+
+  const { mutate: deleteItem } = useDeleteItem({
+    mutationConfig: {
+      onSuccess: () => {
+        toast.success("Dihapus dari keranjang");
+      },
+    },
+  });
+
+  const { mutate: toggleWishlist } = useToggleWishlist({
+    mutationConfig: {
+      onSuccess: (data) => {
+        toast.success(
+          data.data.isAdded
+            ? "Ditambahkan ke wishlist"
+            : "Dihapus dari wishlist",
+        );
+      },
+    },
+  });
+
+  const getCartQuantity = (productId: string) => {
+    const item = cartData?.data.items.find((i) => i.productId === productId);
+    return item?.quantity ?? 0;
+  };
+
+  const isInWishlist = (productId: string) => {
+    return (
+      wishlistData?.data.some((item) => item.productId === productId) ?? false
+    );
+  };
+
+  const handleToggleWishlist = (productId: string) => {
+    toggleWishlist(productId);
+  };
+
+  const handleUpdateQuantity = (data: {
+    productId: string;
+    quantity: number;
+  }) => {
+    updateQuantity(data);
+  };
+
+  const handleRemoveFromCart = (productId: string) => {
+    deleteItem({ productId });
+  };
+
   const renderedProducts = useMemo(() => {
     return data?.data.data.map((product) => (
       <ProductCard
         key={product.id}
         product={product}
         viewMode={params.viewMode}
+        onAddToCart={(item) => createCart(item)}
+        onToggleWishlist={handleToggleWishlist}
+        onUpdateQuantity={handleUpdateQuantity}
+        onRemoveFromCart={handleRemoveFromCart}
+        cartQuantity={getCartQuantity(product.id)}
+        isInWishlist={isInWishlist(product.id)}
       />
     ));
-  }, [data?.data.data, params.viewMode]);
+  }, [data?.data.data, params.viewMode, cartData, wishlistData]);
 
   if (isLoading) {
     return (
