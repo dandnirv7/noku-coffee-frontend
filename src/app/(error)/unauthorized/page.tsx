@@ -2,8 +2,15 @@
 
 import { ErrorDisplay } from "@/components/shared/error-display";
 import { Lock } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 export default function UnauthorizedPage() {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
+  const loginUrl = callbackUrl
+    ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}`
+    : "/login";
+
   return (
     <ErrorDisplay
       Icon={Lock}
@@ -11,7 +18,7 @@ export default function UnauthorizedPage() {
       title="Masuk Diperlukan"
       message="Silakan masuk ke akun Anda untuk mengakses riwayat pesanan, keranjang belanja, atau halaman profil Anda."
       actionText="Masuk ke Akun"
-      actionUrl="/login"
+      actionUrl={loginUrl}
     />
   );
 }

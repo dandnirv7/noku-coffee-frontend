@@ -3,6 +3,7 @@ export const PROTECTED_ROUTES = [
   "/profile",
   "/orders",
   "/settings",
+  "/cart",
 ];
 
 export const AUTH_ROUTES = ["/login", "/register", "/forgot-password"];

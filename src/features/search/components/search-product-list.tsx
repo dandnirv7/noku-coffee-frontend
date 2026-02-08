@@ -12,10 +12,10 @@ import { SearchProductListingTopBar } from "./search-product-listing-topbar";
 import { FilterPanelSkeleton } from "./skeleton/search-product-filter-panel-skeleton";
 import { SearchProductListingTopBarSkeleton } from "./skeleton/search-product-listing-topbar-skeleton";
 import { SearchProductEmpty } from "./search-product-empty";
-import { useCreateCart } from "@/features/cart/api/create-cart";
-import { useGetCart } from "@/features/cart/api/get-cart";
-import { useUpdateQuantity } from "@/features/cart/api/update-quantity";
-import { useDeleteItem } from "@/features/cart/api/delete-item";
+import { useCreateCart } from "@/features/cart/api/use-create-cart";
+import { useGetCart } from "@/features/cart/api/use-get-cart";
+import { useUpdateQuantity } from "@/features/cart/api/use-update-quantity";
+import { useDeleteItem } from "@/features/cart/api/use-delete-item";
 import {
   useToggleWishlist,
   useWishlist,
