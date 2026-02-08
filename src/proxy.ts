@@ -27,7 +27,9 @@ export default async function proxy(request: NextRequest) {
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
 
   if (isProtectedRoute && !session) {
-    return NextResponse.redirect(new URL("/unauthorized", request.url));
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   if (isAuthRoute && session) {
