@@ -8,18 +8,6 @@ export type ProductBadge = {
 
 export function getProductBadges(product: Product): ProductBadge[] {
   return [
-    product.category?.name && {
-      key: "category",
-      value: product.category.name,
-      variant: "secondary",
-    },
-
-    ...(product.type?.map((type) => ({
-      key: "type",
-      value: type,
-      variant: "secondary" as const,
-    })) ?? []),
-
     product.origin && {
       key: "origin",
       value: product.origin,

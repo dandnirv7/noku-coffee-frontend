@@ -1,7 +1,8 @@
 "use client";
 
-import { Search, LayoutGrid, List } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { DebouncedInput } from "@/components/shared/debounced-input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -9,51 +10,43 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Label } from "@/components/ui/label";
-import { useQueryStates } from "nuqs";
-import { searchParamsSchema } from "../lib/search-params";
-import { DebouncedInput } from "@/components/shared/debounced-input";
+import { LayoutGrid, List } from "lucide-react";
+import { useSearchFilters } from "../hooks/use-search-filters";
+
+const sortOptions: { value: string; label: string }[] = [
+  { value: "name_asc", label: "A - Z" },
+  { value: "name_desc", label: "Z - A" },
+  { value: "price_asc", label: "Harga Terendah" },
+  { value: "price_desc", label: "Harga Tertinggi" },
+];
 
 export function SearchProductListingTopBar() {
-  const [params, setParams] = useQueryStates(searchParamsSchema, {
-    shallow: true,
-    history: "replace",
-  });
+  const { params, updateSearch, updateSort, updateViewMode } =
+    useSearchFilters();
 
   return (
     <div className="flex flex-col gap-4 pb-4 mb-6 border-b md:flex-row md:items-center md:justify-between">
       <div className="relative w-full md:max-w-full">
         <DebouncedInput
-          value={params.q}
-          onChange={(val) => setParams({ q: val || null })}
+          value={params.search}
+          onChange={updateSearch}
           placeholder="Cari produk kopi favoritmu..."
         />
       </div>
 
       <div className="flex gap-3 items-center w-full md:w-auto">
-        <Label>Urutkan</Label>
-        <Select
-          defaultValue={params.sortBy}
-          onValueChange={(value: string) =>
-            setParams({
-              sortBy: value as
-                | "relevance"
-                | "price-asc"
-                | "price-desc"
-                | "rating-desc",
-            })
-          }
-        >
+        <Label className="hidden sm:inline">Urutkan</Label>
+        <Select value={params.sort} onValueChange={updateSort}>
           <SelectTrigger className="w-[180px] rounded-lg">
             <SelectValue placeholder="Urutkan" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="relevance">Paling Relevan</SelectItem>
-            <SelectItem value="price-asc">Harga Terendah</SelectItem>
-            <SelectItem value="price-desc">Harga Tertinggi</SelectItem>
-            <SelectItem value="rating-desc">Rating Tertinggi</SelectItem>
+            {sortOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
@@ -61,10 +54,10 @@ export function SearchProductListingTopBar() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setParams({ viewMode: "grid" })}
+            onClick={() => updateViewMode("grid")}
             className={cn(
               "rounded-md px-2 h-8",
-              params.viewMode === "grid" && "bg-white shadow-sm",
+              params.viewMode === "grid" && "bg-white shadow-sm hover:bg-white",
             )}
           >
             <LayoutGrid className="w-4 h-4" />
@@ -72,10 +65,10 @@ export function SearchProductListingTopBar() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setParams({ viewMode: "list" })}
+            onClick={() => updateViewMode("list")}
             className={cn(
               "rounded-md px-2 h-8",
-              params.viewMode === "list" && "bg-white shadow-sm",
+              params.viewMode === "list" && "bg-white shadow-sm hover:bg-white",
             )}
           >
             <List className="w-4 h-4" />
