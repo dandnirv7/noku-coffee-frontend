@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { CartSummary } from "../lib/cart-schema";
 import { PromoCode } from "../lib/promo-codes";
+import { toast } from "sonner";
 
 interface OrderSummaryProps {
   summary: CartSummary;
@@ -32,9 +33,10 @@ export function OrderSummary({
 }: OrderSummaryProps) {
   const [promoCode, setPromoCode] = useState("");
 
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session } = authClient.useSession();
 
-  const addressId = session?.user?.address?.[0]?.id;
+  const addressId = (session?.user as unknown as { address?: { id: string }[] })
+    ?.address?.[0]?.id;
 
   const handleApplyPromo = async () => {
     if (onApplyPromo) {
@@ -52,6 +54,13 @@ export function OrderSummary({
   };
 
   const handleCheckout = () => {
+    if (!addressId) {
+      toast.error("Alamat pengiriman belum tersedia", {
+        description:
+          "Silakan tambahkan alamat pengiriman di profil Anda terlebih dahulu.",
+      });
+      return;
+    }
     onCheckout?.(addressId);
   };
 
