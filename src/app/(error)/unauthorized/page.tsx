@@ -1,10 +1,11 @@
 "use client";
 
+import { Suspense } from "react";
 import { ErrorDisplay } from "@/components/shared/error-display";
 import { Lock } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
-export default function UnauthorizedPage() {
+function UnauthorizedContent() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
   const loginUrl = callbackUrl
@@ -20,5 +21,13 @@ export default function UnauthorizedPage() {
       actionText="Masuk ke Akun"
       actionUrl={loginUrl}
     />
+  );
+}
+
+export default function UnauthorizedPage() {
+  return (
+    <Suspense fallback={null}>
+      <UnauthorizedContent />
+    </Suspense>
   );
 }
