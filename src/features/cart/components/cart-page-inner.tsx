@@ -1,6 +1,5 @@
 "use client";
 
-import { getSession } from "better-auth/api";
 import { useCartPageState } from "../hooks/use-cart-page-state";
 import { CartEmpty } from "./cart-empty";
 import { CartError } from "./cart-error";

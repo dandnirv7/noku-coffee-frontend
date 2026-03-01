@@ -7,10 +7,27 @@ import { authClient } from "@/features/auth/lib/auth-client";
 import { toRupiah } from "@/lib/utils";
 import { CheckCircle2, Loader2, Package, TicketPercent, X } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-import { CartSummary } from "../lib/cart-schema";
 import { PromoCode } from "../lib/promo-codes";
-import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { AddressForm } from "@/features/user/components/address-form";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { CartSummary } from "../lib/cart-schema";
+import { useState } from "react";
 
 interface OrderSummaryProps {
   summary: CartSummary;
@@ -32,11 +49,23 @@ export function OrderSummary({
   isCheckingOut = false,
 }: OrderSummaryProps) {
   const [promoCode, setPromoCode] = useState("");
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const { data: session } = authClient.useSession();
 
-  const addressId = (session?.user as unknown as { address?: { id: string }[] })
-    ?.address?.[0]?.id;
+  type AddressType = {
+    id: string;
+    isDefault: boolean;
+    label: string;
+    streetLine1: string;
+  };
+  const addresses =
+    (session?.user as unknown as { address?: AddressType[] })?.address || [];
+
+  const defaultAddress = addresses.find((a) => a.isDefault);
+  const activeAddress = defaultAddress || addresses[0];
+  const addressId = activeAddress?.id;
 
   const handleApplyPromo = async () => {
     if (onApplyPromo) {
@@ -54,13 +83,16 @@ export function OrderSummary({
   };
 
   const handleCheckout = () => {
-    if (!addressId) {
-      toast.error("Alamat pengiriman belum tersedia", {
-        description:
-          "Silakan tambahkan alamat pengiriman di profil Anda terlebih dahulu.",
-      });
+    if (addresses.length === 0) {
+      setIsAddressModalOpen(true);
       return;
     }
+
+    if (!defaultAddress) {
+      setIsConfirmModalOpen(true);
+      return;
+    }
+
     onCheckout?.(addressId);
   };
 
@@ -198,6 +230,54 @@ export function OrderSummary({
           <Package size={12} /> Gratis ongkir untuk pembelian di atas Rp500rb
         </p>
       </div>
+
+      <Dialog open={isAddressModalOpen} onOpenChange={setIsAddressModalOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Tambah Alamat Pengiriman</DialogTitle>
+            <DialogDescription>
+              Anda belum memiliki alamat pengiriman. Silakan isi form berikut
+              untuk melanjutkan checkout.
+            </DialogDescription>
+          </DialogHeader>
+          <AddressForm
+            isFirstAddress={addresses.length === 0}
+            onCancel={() => setIsAddressModalOpen(false)}
+            onSuccess={() => {
+              setIsAddressModalOpen(false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog
+        open={isConfirmModalOpen}
+        onOpenChange={setIsConfirmModalOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Gunakan Alamat Ini?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Anda belum mengatur alamat utama. Apakah Anda ingin mengirim
+              pesanan ini ke alamat:
+              <br />
+              <br />
+              <strong>{activeAddress?.label}</strong>
+              <br />
+              {activeAddress?.streetLine1}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Pilih Alamat Lain</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-[#FF7A3D] hover:bg-[#E56A32]"
+              onClick={() => onCheckout?.(addressId!)}
+            >
+              Ya, Gunakan Alamat Ini
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
