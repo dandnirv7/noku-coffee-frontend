@@ -2,7 +2,10 @@ import { authClient } from "@/features/auth/lib/auth-client";
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL:
+    typeof window !== "undefined"
+      ? "/api"
+      : process.env.NEXT_PUBLIC_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
