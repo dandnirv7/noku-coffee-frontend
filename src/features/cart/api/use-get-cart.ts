@@ -1,11 +1,7 @@
 import { api } from "@/lib/axios";
-import {
-  CartItem,
-  CartItemSchema,
-  CartResponseSchema,
-} from "../lib/cart-schema";
-import { queryOptions, useQuery } from "@tanstack/react-query";
 import { QueryConfig } from "@/lib/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
+import { CartItem, CartResponseSchema } from "../lib/cart-schema";
 
 export const getCart = async () => {
   const { data } = await api.get<CartItem[]>("/cart");
