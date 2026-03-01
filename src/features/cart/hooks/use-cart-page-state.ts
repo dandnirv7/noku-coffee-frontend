@@ -1,20 +1,21 @@
 import { useMemo } from "react";
 import { useGetCart } from "../api/use-get-cart";
-import { useCartCalculations } from "./use-cart-calculations";
+import { calculateCartSummary } from "./use-cart-calculations";
 import { usePromoLogic } from "./use-promo-logic";
 import { useCartHandlers } from "./use-cart-handlers";
 import { useWishlistOperations } from "./use-wishlist-operations";
 
 export function useCartPageState() {
   const { data: cartData, isLoading, isError, error, refetch } = useGetCart();
-  const cartItems = cartData?.data.items || [];
+
+  const cartItems = useMemo(() => cartData?.data.items || [], [cartData]);
 
   const itemCount = cartItems.length;
 
   const { wishlistData, isLoadingWishlist } = useWishlistOperations();
 
   const initialSummary = useMemo(
-    () => useCartCalculations(cartItems, null),
+    () => calculateCartSummary(cartItems, null),
     [cartItems],
   );
 
@@ -30,7 +31,7 @@ export function useCartPageState() {
   });
 
   const summary = useMemo(
-    () => useCartCalculations(cartItems, appliedPromo),
+    () => calculateCartSummary(cartItems, appliedPromo),
     [cartItems, appliedPromo],
   );
 
