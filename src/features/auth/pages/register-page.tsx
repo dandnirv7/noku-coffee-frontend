@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import RegisterPageInner from "../components/register-page-inner";
+import { Suspense } from "react";
 
 export const generateMetadata = (): Metadata => ({
   title: "Daftar - Noku Coffee",
@@ -16,5 +17,9 @@ export const generateMetadata = (): Metadata => ({
 });
 
 export default function RegisterPage() {
-  return <RegisterPageInner />;
+  return (
+    <Suspense fallback={null}>
+      <RegisterPageInner />
+    </Suspense>
+  );
 }

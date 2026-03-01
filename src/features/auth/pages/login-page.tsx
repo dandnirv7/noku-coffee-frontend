@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import LoginPageInner from "@/features/auth/components/login-page-inner";
+import { Suspense } from "react";
 
 export const generateMetadata = (): Metadata => ({
   title: "Masuk - Noku Coffee",
@@ -16,5 +17,9 @@ export const generateMetadata = (): Metadata => ({
 });
 
 export default function LoginPage() {
-  return <LoginPageInner />;
+  return (
+    <Suspense fallback={null}>
+      <LoginPageInner />
+    </Suspense>
+  );
 }
