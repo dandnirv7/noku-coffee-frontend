@@ -40,7 +40,8 @@ export function ProductCard({
   cartQuantity = 0,
   isInWishlist = false,
   isWishlist = false,
-}: ProductCardProps) {
+  dealBadge,
+}: ProductCardProps & { dealBadge?: React.ReactNode }) {
   const isListView = viewMode === "list";
 
   const pathname = usePathname();
@@ -61,6 +62,7 @@ export function ProductCard({
         isOutOfStock && "opacity-60",
       )}
     >
+      {dealBadge}
       <CardHeader className={cn("p-4", isListView && "w-40 md:w-60 shrink-0")}>
         <div className="overflow-hidden relative rounded-lg aspect-square bg-muted">
           <Link href={productHref} className="block w-full h-full">
