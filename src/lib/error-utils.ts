@@ -1,3 +1,5 @@
+import axios from "axios";
+
 interface NestJSValidationError {
   statusCode: number;
   message: string | string[];
@@ -13,10 +15,6 @@ interface PrismaError {
   message?: string;
 }
 
-interface GenericError {
-  message: string;
-}
-
 export function extractErrorMessage(error: unknown): string {
   if (!error) {
     return "Terjadi kesalahan yang tidak diketahui";
@@ -26,8 +24,10 @@ export function extractErrorMessage(error: unknown): string {
     return error;
   }
 
-  if (error instanceof Error) {
-    return error.message || "Terjadi kesalahan";
+  if (axios.isAxiosError(error)) {
+    if (error.response?.data) {
+      return extractErrorMessage(error.response.data);
+    }
   }
 
   if (typeof error === "object") {
@@ -62,6 +62,10 @@ export function extractErrorMessage(error: unknown): string {
     if ("data" in err && typeof err.data === "object" && err.data) {
       return extractErrorMessage(err.data);
     }
+  }
+
+  if (error instanceof Error) {
+    return error.message || "Terjadi kesalahan";
   }
 
   return "Terjadi kesalahan yang tidak diketahui";

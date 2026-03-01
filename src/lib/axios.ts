@@ -1,3 +1,4 @@
+import { authClient } from "@/features/auth/lib/auth-client";
 import axios from "axios";
 
 export const api = axios.create({
@@ -9,4 +10,14 @@ export const api = axios.create({
     "ngrok-skip-browser-warning": "true",
   },
   withCredentials: true,
+});
+
+api.interceptors.request.use(async (config) => {
+  const { data: session } = await authClient.getSession();
+
+  if (session?.session?.token) {
+    config.headers.Authorization = `Bearer ${session.session.token}`;
+  }
+
+  return config;
 });

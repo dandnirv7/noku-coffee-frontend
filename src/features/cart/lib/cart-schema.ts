@@ -6,9 +6,9 @@ export const ProductSchema = z.object({
   slug: z.string(),
   description: z.string().nullable(),
 
-  price: z.coerce.number(),
+  price: z.number(),
   sku: z.string(),
-  type: z.array(z.string()),
+  type: z.array(z.enum(["BEAN", "GEAR", "BUNDLE"])),
   images: z.array(z.string()),
 
   origin: z.string().nullable(),
@@ -18,7 +18,7 @@ export const ProductSchema = z.object({
 
   stock: z.number(),
 
-  categoryId: z.string().optional(),
+  categoryId: z.string(),
   category: z
     .object({
       name: z.string(),
@@ -37,9 +37,7 @@ export const CartItemSchema = z.object({
   quantity: z.number().int().positive(),
   createdAt: z.string(),
   updatedAt: z.string(),
-  product: ProductSchema.extend({
-    categoryId: z.string(),
-  }),
+  product: ProductSchema,
 });
 
 export type CartItem = z.infer<typeof CartItemSchema>;
