@@ -30,13 +30,21 @@ export function WishlistCarouselClient({
   useEffect(() => {
     if (!api) return;
 
-    setCanScrollPrev(api.canScrollPrev());
-    setCanScrollNext(api.canScrollNext());
-
-    api.on("select", () => {
+    const updateScrollState = () => {
       setCanScrollPrev(api.canScrollPrev());
       setCanScrollNext(api.canScrollNext());
-    });
+    };
+
+    const timer = setTimeout(updateScrollState, 0);
+
+    api.on("reInit", updateScrollState);
+    api.on("select", updateScrollState);
+
+    return () => {
+      clearTimeout(timer);
+      api.off("reInit", updateScrollState);
+      api.off("select", updateScrollState);
+    };
   }, [api]);
 
   if (items.length === 0) {
@@ -77,8 +85,10 @@ export function WishlistCarouselClient({
                       product={item.product}
                       viewMode="grid"
                       onAddToCart={(item) => onAddToCart(item)}
-                      isWishlist={true}
-                      onDelete={(item) => onRemoveFromWishlist(item.productId)}
+                      isInWishlist={true}
+                      onToggleWishlist={(productId) =>
+                        onRemoveFromWishlist(productId)
+                      }
                     />
                   </CarouselItem>
                 ))}
