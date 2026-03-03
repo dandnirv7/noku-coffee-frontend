@@ -36,10 +36,10 @@ export default function AuthWrapper({
   const isImageLeft = imagePosition === "left";
 
   return (
-    <div className="min-h-[calc(100vh-80px)] grid md:grid-cols-2 bg-background animate-fade-in">
+    <div className="min-h-[calc(100vh-80px)] grid lg:grid-cols-2 bg-background animate-fade-in">
       <div
         className={clsx(
-          "hidden overflow-hidden relative md:block bg-primary/10",
+          "hidden overflow-hidden relative lg:block bg-primary/10",
           isImageLeft ? "order-1" : "order-2",
         )}
       >
@@ -62,7 +62,7 @@ export default function AuthWrapper({
 
       <div
         className={clsx(
-          "flex justify-center items-center p-6 md:p-12",
+          "flex justify-center items-center p-6 md:p-10 lg:p-12",
           isImageLeft ? "order-2" : "order-1",
         )}
       >

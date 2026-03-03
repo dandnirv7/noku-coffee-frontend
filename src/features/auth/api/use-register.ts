@@ -16,16 +16,21 @@ export const useRegister = () => {
         callbackURL: `/login`,
       });
 
-      if (res.error) throw new Error("Gagal melakukan registrasi");
+      if (res.error) {
+        const msg = res.error.message ?? "Gagal melakukan registrasi";
+        throw new Error(msg);
+      }
       return res.data;
     },
     onSuccess: () => {
-      toast.success("Registrasi berhasil! Cek email untuk verifikasi.");
+      toast.success("Registrasi berhasil! Silakan masuk dengan akun Anda.");
       router.push("/login");
       router.refresh();
     },
-    onError: () => {
-      toast.error("Gagal melakukan registrasi");
+    onError: (err) => {
+      toast.error(
+        err instanceof Error ? err.message : "Gagal melakukan registrasi",
+      );
     },
   });
 };
