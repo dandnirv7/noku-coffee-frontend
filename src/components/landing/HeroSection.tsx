@@ -8,7 +8,7 @@ export default function HeroSection({ id }: { id: string }) {
       id={id}
       className="overflow-hidden relative pt-16 pb-24 md:pt-24 md:pb-32"
     >
-      <div className="absolute top-0 right-0 w-1/3 h-full transform translate-x-20 -skew-x-12 bg-orange-50/50 -z-10" />
+      <div className="absolute top-0 right-0 w-1/3 h-full md:translate-x-20 -skew-x-12 bg-orange-50/50 -z-10" />
       <div className="absolute left-10 top-20 w-64 h-64 rounded-full blur-3xl bg-primary/5 -z-10" />
 
       <div className="container px-4 mx-auto md:px-6">

@@ -4,6 +4,7 @@ import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { ReactNode } from "react";
 import Navbar from "./Navbar";
+import BottomNav from "./BottomNav";
 import { Badge } from "@/components/ui/badge";
 
 interface LandingLayoutProps {
@@ -13,7 +14,6 @@ interface LandingLayoutProps {
 export default function LandingLayout({ children }: LandingLayoutProps) {
   return (
     <div className="min-h-screen font-sans antialiased bg-background text-foreground selection:bg-primary selection:text-white">
-      {/* Promo Banner */}
       <div className="relative overflow-hidden bg-[#1F2933] py-2.5 text-center text-sm font-medium text-white px-4">
         <div className="absolute inset-0 opacity-10 -translate-x-1/2 skew-x-12 bg-primary" />
         <div className="flex relative z-10 flex-wrap gap-2 justify-center items-center">
@@ -28,17 +28,15 @@ export default function LandingLayout({ children }: LandingLayoutProps) {
         </div>
       </div>
 
-      {/* Navbar */}
       <Navbar />
 
-      {/* Main Content */}
-      <main className="px-4">{children}</main>
+      <main className="px-4 pb-16 md:pb-0">{children}</main>
 
-      {/* Footer */}
+      <BottomNav />
+
       <footer className="px-4 pt-16 pb-12 border-t border-border bg-surface">
         <div className="container mx-auto md:px-6">
           <div className="grid grid-cols-1 gap-12 mb-16 md:grid-cols-5">
-            {/* Branding */}
             <div className="space-y-6 md:col-span-2">
               <div className="flex gap-2 items-center">
                 <div className="flex justify-center items-center w-8 h-8 text-white rounded bg-primary">
@@ -59,7 +57,6 @@ export default function LandingLayout({ children }: LandingLayoutProps) {
               </div>
             </div>
 
-            {/* Footer Links */}
             {[
               {
                 title: "Produk",

@@ -92,20 +92,19 @@ export default function ProductList({ id }: { id?: string }) {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {products.map((product) => (
             <Card
               key={product.id}
-              className="flex relative flex-col p-4 h-full shadow-sm transition-all group border-border hover:shadow-lg"
+              className="overflow-hidden gap-0 p-0 bg-white rounded-xl border-none shadow-sm transition-all group hover:shadow-md flex flex-col h-full"
             >
-              {product.tag && (
-                <Badge className="absolute top-4 left-4 z-10 bg-primary">
-                  {product.tag}
-                </Badge>
-              )}
-
-              <div className="flex overflow-hidden relative justify-center items-center mb-5 rounded-xl transition-all aspect-square bg-neutral-100 group-hover:shadow-inner">
-                <div className="absolute inset-0 opacity-5 bg-pattern" />
+              {/* Image area */}
+              <div className="relative overflow-hidden aspect-square bg-neutral-100">
+                {product.tag && (
+                  <Badge className="absolute top-3 left-3 z-10 bg-primary text-[10px]">
+                    {product.tag}
+                  </Badge>
+                )}
                 <Image
                   height={600}
                   width={600}
@@ -113,25 +112,29 @@ export default function ProductList({ id }: { id?: string }) {
                   alt={product.name}
                   className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-x-4 bottom-4 transition-transform duration-300 translate-y-full group-hover:translate-y-0">
-                  <Button className="w-full bg-white border shadow-lg text-foreground hover:bg-primary hover:text-white border-border">
-                    <Link href={`/products/${product.slug}`}>+ Keranjang</Link>
-                  </Button>
-                </div>
               </div>
 
-              <div className="flex flex-col flex-1">
-                <div className="flex gap-2 items-center mb-2 text-xs font-medium text-muted">
-                  <span className="uppercase">
-                    {product.roast || product.category}
-                  </span>
-                  <span className="w-1 h-1 rounded-full bg-border" />
-                  <span>{product.weight || product.material}</span>
-                </div>
-                <h3 className="mb-1 text-lg font-bold transition-colors cursor-pointer text-foreground group-hover:text-primary">
-                  {product.name}
-                </h3>
-                <div className="flex gap-1 items-center mb-4">
+              {/* Content */}
+              <div className="flex flex-col flex-1 p-4">
+                <p className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground/60 mb-1">
+                  {product.roast || product.category}
+                  {(product.weight || product.material) && (
+                    <span className="ml-1 font-normal">
+                      · {product.weight || product.material}
+                    </span>
+                  )}
+                </p>
+
+                <Link
+                  href={`/products/${product.slug}`}
+                  className="block group/title"
+                >
+                  <h3 className="text-base font-black tracking-tighter leading-tight uppercase transition-colors group-hover/title:text-primary line-clamp-2 mb-2">
+                    {product.name}
+                  </h3>
+                </Link>
+
+                <div className="flex gap-1 items-center mb-3">
                   {[1, 2, 3, 4, 5].map((s) => (
                     <Star
                       key={s}
@@ -148,14 +151,27 @@ export default function ProductList({ id }: { id?: string }) {
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center pt-4 mt-auto border-t border-border/50">
-                  <span className="text-lg font-bold text-foreground">
+                <div className="flex justify-between items-center mt-auto pt-3 border-t border-border/50">
+                  <span className="text-lg font-black tracking-tighter text-slate-900">
                     {toRupiah(product.price)}
                   </span>
                 </div>
+
+                <Button
+                  asChild
+                  className="w-full mt-3 h-10 font-bold rounded-lg"
+                >
+                  <Link href={`/products/${product.slug}`}>+ Keranjang</Link>
+                </Button>
               </div>
             </Card>
           ))}
+        </div>
+
+        <div className="flex justify-center mt-8 md:hidden">
+          <Button variant="outline" asChild>
+            <Link href="/products">Lihat Katalog Lengkap</Link>
+          </Button>
         </div>
       </div>
     </section>

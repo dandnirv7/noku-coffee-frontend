@@ -4,6 +4,7 @@ import AboutSection from "@/components/landing/AboutSection";
 import HeroSection from "@/components/landing/HeroSection";
 import OrderSection from "@/components/landing/OrderSection";
 import ProductList from "@/components/landing/ProductList";
+import BottomNav from "@/components/layout/landing/BottomNav";
 import Navbar from "@/components/layout/landing/Navbar";
 import { Badge } from "@/components/ui/badge";
 import { Award, MapPin } from "lucide-react";
@@ -44,7 +45,7 @@ const footerColumns: FooterColumns[] = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen font-sans antialiased bg-background text-foreground selection:bg-primary selection:text-white">
+    <div className="min-h-screen overflow-x-hidden font-sans antialiased bg-background text-foreground selection:bg-primary selection:text-white pb-16 md:pb-0">
       <div className="relative overflow-hidden bg-[#1F2933] py-2.5 px-4 text-center text-sm font-medium text-white">
         <div className="absolute inset-0 opacity-10 -translate-x-1/2 skew-x-12 bg-primary" />
         <div className="flex relative z-10 flex-wrap gap-2 justify-center items-center">
@@ -123,6 +124,7 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+      <BottomNav />
     </div>
   );
 }

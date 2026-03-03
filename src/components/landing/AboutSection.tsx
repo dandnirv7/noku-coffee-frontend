@@ -16,7 +16,7 @@ export default function AboutSection({ id }: { id?: string }) {
               />
               <div className="absolute bottom-0 left-0 p-8 w-full to-transparent bg-linear-to-t from-black/80">
                 <p className="font-serif text-lg italic text-white">
-                  "Quality over quantity, always."
+                  &quot;Quality over quantity, always.&quot;
                 </p>
               </div>
             </div>

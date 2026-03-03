@@ -1,12 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import { authClient } from "@/features/auth/lib/auth-client";
 import { useCartCount } from "@/features/cart/hooks/use-cart-count";
 import { cn } from "@/lib/utils";
@@ -15,7 +9,6 @@ import {
   ChevronDown,
   Heart,
   LogOut,
-  Menu,
   Package,
   Settings,
   ShoppingBag,
@@ -32,23 +25,12 @@ const menuItems = [
 ];
 
 export default function Navbar() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const pathname = usePathname();
 
   const { data: session, isPending } = authClient.useSession();
 
   const { count: cartCount, isLoading: isLoadingCart } = useCartCount();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 80);
-    };
-    handleScroll();
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -69,7 +51,6 @@ export default function Navbar() {
     const el = document.getElementById(id);
     if (!el) return;
     el.scrollIntoView({ behavior: "smooth", block: "start" });
-    setIsMobileMenuOpen(false);
   };
 
   const router = useRouter();
@@ -77,7 +58,6 @@ export default function Navbar() {
   const handleLogout = async () => {
     await authClient.signOut();
     setIsProfileOpen(false);
-    setIsMobileMenuOpen(false);
     router.refresh();
     router.push("/");
   };
@@ -124,6 +104,7 @@ export default function Navbar() {
           </div>
         )}
 
+        {/* Right-side actions — desktop only */}
         <div className="flex gap-2 items-center">
           {isPending ? (
             <div className="hidden gap-2 md:flex">
@@ -132,6 +113,7 @@ export default function Navbar() {
             </div>
           ) : session?.user ? (
             <>
+              {/* Bell */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -142,6 +124,7 @@ export default function Navbar() {
                 <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full border-2 border-background" />
               </Button>
 
+              {/* Cart */}
               <Button
                 asChild
                 variant="ghost"
@@ -159,6 +142,7 @@ export default function Navbar() {
                 </Link>
               </Button>
 
+              {/* Profile dropdown */}
               <div className="relative hidden md:block" data-profile-dropdown>
                 <Button
                   variant="outline"
@@ -251,16 +235,6 @@ export default function Navbar() {
                   </div>
                 )}
               </div>
-
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden"
-                aria-label="Open menu"
-                onClick={() => setIsMobileMenuOpen(true)}
-              >
-                <Menu className="w-6 h-6" />
-              </Button>
             </>
           ) : (
             <>
@@ -274,154 +248,10 @@ export default function Navbar() {
               <Button asChild className="hidden md:inline-flex">
                 <Link href="/register">Daftar</Link>
               </Button>
-
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden"
-                aria-label="Open menu"
-                onClick={() => setIsMobileMenuOpen(true)}
-              >
-                <Menu className="w-6 h-6" />
-              </Button>
             </>
           )}
         </div>
       </div>
-
-      <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-        <SheetContent side="right" className="w-72">
-          <SheetHeader>
-            <SheetTitle>Menu</SheetTitle>
-          </SheetHeader>
-
-          <div className="flex flex-col gap-4 mt-6">
-            {session?.user ? (
-              <>
-                <div className="flex items-center gap-3 p-4 bg-muted rounded-2xl">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                    {session.user.name?.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm leading-none truncate">
-                      {session.user.name}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground mt-1 truncate">
-                      {session.user.email}
-                    </p>
-                  </div>
-                </div>
-
-                {pathname === "/" && (
-                  <nav className="flex flex-col gap-1">
-                    {menuItems.map((item) => (
-                      <Button
-                        key={item.id}
-                        variant="ghost"
-                        onClick={() => scrollTo(item.id)}
-                        className="justify-start font-normal"
-                      >
-                        {item.label}
-                      </Button>
-                    ))}
-                  </nav>
-                )}
-
-                <div className="border-t border-border my-2" />
-
-                <nav className="flex flex-col gap-1">
-                  <Button
-                    asChild
-                    variant="ghost"
-                    className="justify-start font-normal"
-                  >
-                    <Link href="/cart">
-                      <ShoppingBag className="w-4 h-4 mr-3" />
-                      Keranjang
-                      {!isLoadingCart && cartCount > 0 && (
-                        <span className="ml-auto bg-primary text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-full">
-                          {cartCount}
-                        </span>
-                      )}
-                    </Link>
-                  </Button>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    className="justify-start font-normal"
-                  >
-                    <Link href="/notifications">
-                      <Bell className="w-4 h-4 mr-3" />
-                      Notifikasi
-                    </Link>
-                  </Button>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    className="justify-start font-normal"
-                  >
-                    <Link href="/orders">
-                      <Package className="w-4 h-4 mr-3" />
-                      Pesanan Saya
-                    </Link>
-                  </Button>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    className="justify-start font-normal"
-                  >
-                    <Link href="/favorites">
-                      <Heart className="w-4 h-4 mr-3" />
-                      Favorit
-                    </Link>
-                  </Button>
-                </nav>
-
-                <div className="border-t border-border my-2" />
-
-                <Button
-                  variant="ghost"
-                  onClick={handleLogout}
-                  className="justify-start font-normal text-destructive hover:text-destructive hover:bg-destructive/10"
-                >
-                  <LogOut className="w-4 h-4 mr-3" />
-                  Keluar Akun
-                </Button>
-              </>
-            ) : (
-              <>
-                {pathname === "/" && (
-                  <nav className="flex flex-col gap-1">
-                    {menuItems.map((item) => (
-                      <Button
-                        key={item.id}
-                        variant="ghost"
-                        onClick={() => scrollTo(item.id)}
-                        className="justify-start font-normal"
-                      >
-                        {item.label}
-                      </Button>
-                    ))}
-                  </nav>
-                )}
-
-                <div className="border-t border-border my-2" />
-
-                <Button
-                  asChild
-                  variant="ghost"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <Link href="/login">Masuk</Link>
-                </Button>
-                <Button asChild onClick={() => setIsMobileMenuOpen(false)}>
-                  <Link href="/register">Daftar</Link>
-                </Button>
-              </>
-            )}
-          </div>
-        </SheetContent>
-      </Sheet>
     </nav>
   );
 }
