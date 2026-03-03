@@ -10,18 +10,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { AlertCircle, Heart, Minus, Plus, Trash2 } from "lucide-react";
+import { AlertCircle, Heart, Loader2, Minus, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState, useRef } from "react";
 import { CartItem as CartItemType } from "../lib/cart-schema";
 import { ProductCartMeta } from "./product-cart-meta";
 
 interface CartItemProps {
   item: CartItemType;
-  onMoveToWishlist?: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
-  onDeleteItem: (productId: string) => void;
+  onMoveToWishlist?: (productId: string) => Promise<void>;
+  updateQuantity: (productId: string, quantity: number) => Promise<void>;
+  onDeleteItem: (productId: string) => Promise<void>;
+  isPending: boolean;
 }
 
 export function CartItem({
@@ -29,43 +30,66 @@ export function CartItem({
   onMoveToWishlist,
   updateQuantity,
   onDeleteItem,
+  isPending,
 }: CartItemProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { product, quantity } = item;
   const stock = product.stock ?? 0;
-  const imageSrc =
-    product.images?.length > 0 ? product.images[0] : "/placeholder-product.png";
+  const imageSrc = product.images?.[0] || "/placeholder-product.png";
 
   const isOutOfStock = stock === 0;
   const isLowStock = stock > 0 && stock <= 5;
-  const isOverStock = quantity > stock;
   const canIncrement = quantity < stock;
 
-  useEffect(() => {
-    if (isOverStock && stock > 0) {
-      updateQuantity(item.productId, stock);
+  const lockRef = useRef(false);
+
+  const handleIncrement = async () => {
+    if (lockRef.current || isPending) return;
+    lockRef.current = true;
+    try {
+      const nextQty = Math.min(quantity + 1, stock);
+      await updateQuantity(item.productId, nextQty);
+    } finally {
+      lockRef.current = false;
     }
-  }, [isOverStock, stock, item.productId, updateQuantity]);
-
-  const handleDeleteClick = () => {
-    setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    onDeleteItem(item.productId);
-    setIsDeleteModalOpen(false);
+  const handleDecrement = async () => {
+    if (lockRef.current || isPending) return;
+    lockRef.current = true;
+    try {
+      const nextQty = Math.max(quantity - 1, 1);
+      await updateQuantity(item.productId, nextQty);
+    } finally {
+      lockRef.current = false;
+    }
   };
 
-  const handleCancelDelete = () => {
-    setIsDeleteModalOpen(false);
+  const handleConfirmDelete = async () => {
+    if (lockRef.current || isPending) return;
+    lockRef.current = true;
+    try {
+      await onDeleteItem(item.productId);
+      setIsDeleteModalOpen(false);
+    } finally {
+      lockRef.current = false;
+    }
+  };
+
+  const handleMoveToWishlist = async () => {
+    if (!onMoveToWishlist || lockRef.current || isPending) return;
+    lockRef.current = true;
+    try {
+      await onMoveToWishlist(item.productId);
+    } finally {
+      lockRef.current = false;
+    }
   };
 
   return (
     <>
       <div
-        className={`flex flex-col sm:flex-row gap-4 ${
-          isOutOfStock ? "opacity-60" : ""
-        }`}
+        className={`flex flex-col sm:flex-row gap-4 ${isOutOfStock ? "opacity-60" : ""}`}
       >
         <div className="w-full sm:w-24 h-24 rounded-lg overflow-hidden shrink-0 relative">
           <Image
@@ -110,7 +134,6 @@ export function CartItem({
                 </span>
               </div>
 
-              {/* Stock Status Badges */}
               <div className="flex items-center gap-2 mt-2">
                 {isOutOfStock && (
                   <Badge
@@ -143,8 +166,8 @@ export function CartItem({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => updateQuantity(item.productId, quantity - 1)}
-                  disabled={quantity <= 1}
+                  onClick={handleDecrement}
+                  disabled={quantity <= 1 || isPending}
                   className="h-8 w-8 p-0 disabled:opacity-50"
                 >
                   <Minus className="h-3 w-3" />
@@ -157,16 +180,9 @@ export function CartItem({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => updateQuantity(item.productId, quantity + 1)}
-                  disabled={!canIncrement || isOutOfStock}
+                  onClick={handleIncrement}
+                  disabled={!canIncrement || isOutOfStock || isPending}
                   className="h-8 w-8 p-0 disabled:opacity-50"
-                  title={
-                    !canIncrement && !isOutOfStock
-                      ? `Stok maksimal: ${stock}`
-                      : isOutOfStock
-                        ? "Stok habis"
-                        : ""
-                  }
                 >
                   <Plus className="h-3 w-3" />
                 </Button>
@@ -180,20 +196,30 @@ export function CartItem({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={handleDeleteClick}
-                  className="bg-primary/20 text-primary h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
+                  onClick={() => setIsDeleteModalOpen(true)}
+                  disabled={isPending}
+                  className="bg-primary/20 text-primary h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600 disabled:opacity-50"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  {isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
                 </Button>
 
                 {onMoveToWishlist && (
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => onMoveToWishlist(item.productId)}
-                    className="bg-primary/20 text-primary h-8 w-8 p-0"
+                    onClick={handleMoveToWishlist}
+                    disabled={isPending}
+                    className="bg-primary/20 text-primary h-8 w-8 p-0 disabled:opacity-50"
                   >
-                    <Heart className="h-4 w-4" />
+                    {isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Heart className="h-4 w-4" />
+                    )}
                   </Button>
                 )}
               </div>
@@ -218,7 +244,8 @@ export function CartItem({
             <Button
               type="button"
               variant="outline"
-              onClick={handleCancelDelete}
+              onClick={() => setIsDeleteModalOpen(false)}
+              disabled={isPending}
             >
               Batal
             </Button>
@@ -226,8 +253,16 @@ export function CartItem({
               type="button"
               variant="destructive"
               onClick={handleConfirmDelete}
+              disabled={isPending}
             >
-              Hapus
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Menghapus...
+                </>
+              ) : (
+                "Hapus"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

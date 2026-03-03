@@ -10,49 +10,78 @@ import {
 import { Product } from "@/features/product/lib/products-schema";
 import { getProductBadges } from "@/lib/product-badges";
 import { cn, toRupiah } from "@/lib/utils";
-import { AlertCircle, Heart, Minus, Plus, Star } from "lucide-react";
+import { AlertCircle, Heart, Loader2, Minus, Plus, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { Badge } from "../ui/badge";
 
 interface ProductCardProps {
   product: Product;
   viewMode?: "grid" | "list";
   onAddToCart?: (item: { productId: string; quantity: number }) => void;
-  onDelete?: (item: { productId: string }) => void;
   onToggleWishlist?: (productId: string) => void;
   onUpdateQuantity?: (data: { productId: string; quantity: number }) => void;
   onRemoveFromCart?: (productId: string) => void;
   cartQuantity?: number;
   isInWishlist?: boolean;
-  isWishlist?: boolean;
+  isAddingToCart?: boolean;
+  isUpdatingQuantity?: boolean;
+  isTogglingWishlist?: boolean;
 }
 
 export function ProductCard({
   product,
   viewMode = "grid",
   onAddToCart,
-  onDelete,
   onToggleWishlist,
   onUpdateQuantity,
   onRemoveFromCart,
   cartQuantity = 0,
   isInWishlist = false,
-  isWishlist = false,
+  isAddingToCart = false,
+  isUpdatingQuantity = false,
+  isTogglingWishlist = false,
   dealBadge,
 }: ProductCardProps & { dealBadge?: React.ReactNode }) {
-  const isListView = viewMode === "list";
+  const [localAction, setLocalAction] = useState<
+    "adding" | "updating" | "toggling" | null
+  >(null);
 
+  const [prevProps, setPrevProps] = useState({
+    adding: isAddingToCart,
+    updating: isUpdatingQuantity,
+    toggling: isTogglingWishlist,
+  });
+
+  if (
+    isAddingToCart !== prevProps.adding ||
+    isUpdatingQuantity !== prevProps.updating ||
+    isTogglingWishlist !== prevProps.toggling
+  ) {
+    setPrevProps({
+      adding: isAddingToCart,
+      updating: isUpdatingQuantity,
+      toggling: isTogglingWishlist,
+    });
+    if (!isAddingToCart && localAction === "adding") setLocalAction(null);
+    if (!isUpdatingQuantity && localAction === "updating") setLocalAction(null);
+    if (!isTogglingWishlist && localAction === "toggling") setLocalAction(null);
+  }
+
+  const isActuallyAdding = isAddingToCart || localAction === "adding";
+  const isActuallyUpdating = isUpdatingQuantity || localAction === "updating";
+  const isActuallyToggling = isTogglingWishlist || localAction === "toggling";
   const pathname = usePathname();
-
-  const productHref = `/products/${product.slug}`;
-
-  const badges = getProductBadges(product);
-
+  const isListView = viewMode === "list";
   const stock = product.stock ?? 0;
   const isOutOfStock = stock === 0;
   const isLowStock = stock > 0 && stock <= 5;
+  const addDisabled = isOutOfStock || isActuallyAdding;
+
+  const badges = getProductBadges(product);
+  const productHref = `/products/${product.slug}`;
 
   return (
     <Card
@@ -91,6 +120,7 @@ export function ProductCard({
                 variant="outline"
                 className="text-xs border-orange-500 text-orange-600 bg-white/90 rounded-md"
               >
+                <AlertCircle className="h-3 w-3 inline mr-1" />
                 Stok Terbatas
               </Badge>
             </div>
@@ -101,27 +131,33 @@ export function ProductCard({
               variant="ghost"
               size="icon"
               className={cn(
-                "absolute top-3 right-3 z-10 rounded-full backdrop-blur-md bg-white/70 hover:bg-white",
+                "absolute top-3 right-3 z-10 rounded-full backdrop-blur-md bg-white/70 hover:bg-white disabled:opacity-50",
                 isInWishlist && "bg-white",
               )}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                if (isActuallyToggling) return;
+                setLocalAction("toggling");
                 onToggleWishlist?.(product.id);
+                setTimeout(() => setLocalAction(null), 1000);
               }}
+              disabled={isActuallyToggling}
             >
-              <Heart
-                size={20}
-                className={cn(isInWishlist && "fill-red-500 text-red-500")}
-              />
+              {isActuallyToggling ? (
+                <Loader2 size={20} className="animate-spin text-slate-600" />
+              ) : (
+                <Heart
+                  size={20}
+                  className={cn(isInWishlist && "fill-red-500 text-red-500")}
+                />
+              )}
             </Button>
           )}
         </div>
       </CardHeader>
 
-      <div
-        className={cn("flex flex-col flex-1", isListView && " py-4 md:py-6")}
-      >
+      <div className={cn("flex flex-col flex-1", isListView && "py-4 md:py-6")}>
         <CardContent className="p-4 pt-0">
           <p
             className={cn(
@@ -165,7 +201,6 @@ export function ProductCard({
                   {badge.value}
                 </Badge>
               ))}
-
               {badges.length > 3 && (
                 <Badge
                   variant="outline"
@@ -188,7 +223,7 @@ export function ProductCard({
           </p>
         </CardContent>
 
-        <CardFooter className="p-4 pt-0 mt-auto ">
+        <CardFooter className="p-4 pt-0 mt-auto">
           <div
             className={cn(
               "flex items-center justify-between w-full gap-4",
@@ -204,12 +239,11 @@ export function ProductCard({
                 <div className="flex items-center gap-1">
                   {isOutOfStock ? (
                     <span className="text-xs text-red-600 font-medium flex items-center gap-1">
-                      <AlertCircle className="h-3 w-3" />
-                      Stok Habis
+                      <AlertCircle className="h-3 w-3" /> Stok Habis
                     </span>
                   ) : isLowStock ? (
-                    <span className="text-xs text-orange-600 font-medium">
-                      Tersisa {stock} item
+                    <span className="text-xs text-orange-600 font-medium flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" /> Tersisa {stock} item
                     </span>
                   ) : (
                     <span className="text-xs text-gray-500">Stok: {stock}</span>
@@ -226,61 +260,88 @@ export function ProductCard({
               )}
             >
               {cartQuantity === 0 ? (
-                <div className="flex flex-col gap-2 w-full">
-                  <Button
-                    className="w-full h-10 font-bold rounded-lg transition-all active:scale-95"
-                    onClick={() =>
-                      onAddToCart?.({ productId: product.id, quantity: 1 })
-                    }
-                    disabled={isOutOfStock}
-                  >
-                    {isOutOfStock ? "Stok Habis" : "+ Keranjang"}
-                  </Button>
-                  {pathname?.includes("cart") && (
-                    <Button
-                      variant="outline"
-                      className="w-full h-10 font-bold rounded-lg transition-all active:scale-95"
-                      onClick={() => onDelete?.({ productId: product.id })}
-                    >
-                      {isWishlist
-                        ? "Hapus dari Wishlist"
-                        : "Hapus dari Keranjang"}
-                    </Button>
+                <Button
+                  className="w-full h-10 font-bold rounded-lg transition-all active:scale-95"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (addDisabled) return;
+                    setLocalAction("adding");
+                    onAddToCart?.({ productId: product.id, quantity: 1 });
+                    setTimeout(() => setLocalAction(null), 1000);
+                  }}
+                  disabled={addDisabled}
+                >
+                  {isActuallyAdding ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Menambahkan...
+                    </>
+                  ) : isOutOfStock ? (
+                    "Stok Habis"
+                  ) : (
+                    "+ Keranjang"
                   )}
-                </div>
+                </Button>
               ) : (
                 <div className="flex justify-between items-center px-1 h-10 rounded-lg border bg-primary/5 border-primary/10">
                   <Button
                     variant="ghost"
                     size="icon"
                     className="w-8 h-8 text-primary"
-                    onClick={() => {
-                      if (cartQuantity === 1) {
-                        onRemoveFromCart?.(product.id);
-                      } else {
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (
+                        cartQuantity <= 0 ||
+                        isActuallyAdding ||
+                        isActuallyUpdating
+                      )
+                        return;
+                      setLocalAction("updating");
+                      if (cartQuantity === 1) onRemoveFromCart?.(product.id);
+                      else
                         onUpdateQuantity?.({
                           productId: product.id,
                           quantity: cartQuantity - 1,
                         });
-                      }
+                      setTimeout(() => setLocalAction(null), 1000);
                     }}
+                    disabled={
+                      cartQuantity <= 0 ||
+                      isActuallyAdding ||
+                      isActuallyUpdating
+                    }
                   >
                     <Minus size={14} />
                   </Button>
+
                   <span className="text-sm font-bold text-primary">
                     {cartQuantity}
                   </span>
+
                   <Button
                     variant="ghost"
                     size="icon"
                     className="w-8 h-8 text-primary"
-                    onClick={() =>
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (
+                        cartQuantity >= product.stock ||
+                        isActuallyAdding ||
+                        isActuallyUpdating
+                      )
+                        return;
+                      setLocalAction("updating");
                       onUpdateQuantity?.({
                         productId: product.id,
                         quantity: Math.min(product.stock, cartQuantity + 1),
-                      })
+                      });
+                      setTimeout(() => setLocalAction(null), 1000);
+                    }}
+                    disabled={
+                      cartQuantity >= product.stock ||
+                      isActuallyAdding ||
+                      isActuallyUpdating
                     }
-                    disabled={cartQuantity >= product.stock}
                   >
                     <Plus size={14} />
                   </Button>

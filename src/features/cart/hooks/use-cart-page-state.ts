@@ -10,11 +10,14 @@ export function useCartPageState() {
 
   const cartItems = useMemo(() => cartData?.data.items || [], [cartData]);
 
-  const itemCount = cartItems.length;
+  const itemCount = useMemo(
+    () => cartItems.reduce((acc, item) => acc + item.quantity, 0),
+    [cartItems],
+  );
 
   const { wishlistData, isLoadingWishlist } = useWishlistOperations();
 
-  const initialSummary = useMemo(
+  const baseSummary = useMemo(
     () => calculateCartSummary(cartItems, null),
     [cartItems],
   );
@@ -26,8 +29,8 @@ export function useCartPageState() {
     applyPromo,
     removePromo,
   } = usePromoLogic({
-    subtotal: initialSummary.subtotal,
-    shipping: initialSummary.shipping,
+    subtotal: baseSummary.subtotal,
+    shipping: baseSummary.shipping,
   });
 
   const summary = useMemo(

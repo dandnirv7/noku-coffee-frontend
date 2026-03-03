@@ -6,7 +6,7 @@ import { useToggleWishlist, useWishlist } from "../api/use-wishlist";
 export function useWishlistOperations() {
   const { data: wishlistData, isLoading: isLoadingWishlist } = useWishlist();
 
-  const { mutate: toggleWishlist, isPending: isTogglingWishlist } =
+  const { mutateAsync: toggleWishlist, isPending: isTogglingWishlist } =
     useToggleWishlist({
       mutationConfig: {
         onSuccess: (data) => {
@@ -26,7 +26,7 @@ export function useWishlistOperations() {
       },
     });
 
-  const { mutate: addToCart, isPending: isAddingToCart } = useCreateCart({
+  const { mutateAsync: addToCart, isPending: isAddingToCart } = useCreateCart({
     mutationConfig: {
       onSuccess: () => {
         toast.success("Item berhasil ditambahkan ke keranjang");

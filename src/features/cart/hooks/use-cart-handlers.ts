@@ -4,35 +4,43 @@ import { useWishlistOperations } from "./use-wishlist-operations";
 export function useCartHandlers() {
   const { updateQuantity, deleteItem, clearCart, checkoutProduct, isCheckout } =
     useCartMutations();
+
   const { moveToWishlist, addToCartFromWishlist, toggleWishlist } =
     useWishlistOperations();
 
-  const handleUpdateQuantity = (productId: string, quantity: number) => {
-    updateQuantity({ productId, quantity });
+  const handleUpdateQuantity = async (
+    productId: string,
+    quantity: number,
+  ): Promise<void> => {
+    await updateQuantity({ productId, quantity });
   };
 
-  const handleDeleteItem = (productId: string) => {
-    deleteItem({ productId });
+  const handleDeleteItem = async (productId: string): Promise<void> => {
+    await deleteItem({ productId });
   };
 
-  const handleClearCart = () => {
-    clearCart();
+  const handleClearCart = async (): Promise<void> => {
+    await clearCart();
   };
 
-  const handleMoveToWishlist = (productId: string) => {
-    moveToWishlist(productId, handleDeleteItem);
+  const handleMoveToWishlist = async (productId: string): Promise<void> => {
+    await moveToWishlist(productId, handleDeleteItem);
+    await deleteItem({ productId });
   };
 
-  const handleAddToCart = (item: { productId: string; quantity: number }) => {
-    addToCartFromWishlist(item);
+  const handleAddToCart = async (item: {
+    productId: string;
+    quantity: number;
+  }): Promise<void> => {
+    await addToCartFromWishlist(item);
   };
 
-  const handleRemoveFromWishlist = (productId: string) => {
-    toggleWishlist(productId);
+  const handleRemoveFromWishlist = async (productId: string): Promise<void> => {
+    await toggleWishlist(productId);
   };
 
-  const handleCheckout = (addressId: string) => {
-    checkoutProduct({ addressId });
+  const handleCheckout = async (addressId: string): Promise<void> => {
+    await checkoutProduct({ addressId });
   };
 
   return {

@@ -17,10 +17,10 @@ import { CartItem as CartItemType } from "../lib/cart-schema";
 
 interface CartItemsListProps {
   items: CartItemType[];
-  onClearCart: () => void;
-  onMoveToWishlist?: (productId: string) => void;
-  onUpdateQuantity: (productId: string, quantity: number) => void;
-  onDeleteItem: (productId: string) => void;
+  onClearCart: () => Promise<void>;
+  onMoveToWishlist?: (productId: string) => Promise<void>;
+  onUpdateQuantity: (productId: string, quantity: number) => Promise<void>;
+  onDeleteItem: (productId: string) => Promise<void>;
 }
 
 export function CartItemsList({
@@ -30,19 +30,45 @@ export function CartItemsList({
   onUpdateQuantity,
   onDeleteItem,
 }: CartItemsListProps) {
-  const [isClearCartModalOpen, setIsClearCartModalOpen] = useState(false);
+  const [pendingItemId, setPendingItemId] = useState<string | null>(null);
+  const [isClearingCart, setIsClearingCart] = useState(false);
 
-  const handleClearCartClick = () => {
-    setIsClearCartModalOpen(true);
+  const handleDeleteItem = async (productId: string) => {
+    try {
+      setPendingItemId(productId);
+      await onDeleteItem(productId);
+    } finally {
+      setPendingItemId(null);
+    }
   };
 
-  const handleConfirmClearCart = () => {
-    onClearCart();
-    setIsClearCartModalOpen(false);
+  const handleMoveToWishlist = async (productId: string) => {
+    if (!onMoveToWishlist) return;
+    try {
+      setPendingItemId(productId);
+      await onMoveToWishlist(productId);
+    } finally {
+      setPendingItemId(null);
+    }
   };
 
-  const handleCancelClearCart = () => {
-    setIsClearCartModalOpen(false);
+  const handleUpdateQuantity = async (productId: string, quantity: number) => {
+    try {
+      setPendingItemId(productId);
+      await onUpdateQuantity(productId, quantity);
+    } finally {
+      setPendingItemId(null);
+    }
+  };
+
+  const handleConfirmClearCart = async () => {
+    try {
+      setIsClearingCart(true);
+      await onClearCart();
+      setIsClearingCart(false);
+    } catch {
+      setIsClearingCart(false);
+    }
   };
 
   return (
@@ -52,9 +78,10 @@ export function CartItemsList({
           <CardContent key={item.id}>
             <CartItem
               item={item}
-              updateQuantity={onUpdateQuantity}
-              onDeleteItem={onDeleteItem}
-              onMoveToWishlist={onMoveToWishlist}
+              updateQuantity={handleUpdateQuantity}
+              onDeleteItem={handleDeleteItem}
+              onMoveToWishlist={handleMoveToWishlist}
+              isPending={pendingItemId === item.productId}
             />
             <Separator className="bg-gray-200 mt-4" />
           </CardContent>
@@ -63,33 +90,29 @@ export function CartItemsList({
           <Button
             variant="link"
             className="w-auto underline underline-offset-4 underline-primary"
-            onClick={handleClearCartClick}
+            onClick={() => setIsClearingCart(true)}
+            disabled={isClearingCart}
           >
-            Hapus semua dari keranjang
+            {isClearingCart ? "Menghapus..." : "Hapus semua dari keranjang"}
           </Button>
         </CardFooter>
       </Card>
 
-      <Dialog
-        open={isClearCartModalOpen}
-        onOpenChange={setIsClearCartModalOpen}
-      >
+      <Dialog open={isClearingCart} onOpenChange={setIsClearingCart}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Hapus Semua Item?</DialogTitle>
             <DialogDescription>
-              Apakah Anda yakin ingin menghapus{" "}
-              <span className="font-semibold text-gray-900">
-                semua item ({items.length} item)
-              </span>{" "}
-              dari keranjang belanja?
+              Apakah Anda yakin ingin menghapus semua item ({items.length}) dari
+              keranjang?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
             <Button
               type="button"
               variant="outline"
-              onClick={handleCancelClearCart}
+              onClick={() => setIsClearingCart(false)}
+              disabled={isClearingCart}
             >
               Batal
             </Button>
@@ -97,8 +120,9 @@ export function CartItemsList({
               type="button"
               variant="destructive"
               onClick={handleConfirmClearCart}
+              disabled={isClearingCart}
             >
-              Hapus Semua
+              {isClearingCart ? "Menghapus..." : "Hapus Semua"}
             </Button>
           </DialogFooter>
         </DialogContent>

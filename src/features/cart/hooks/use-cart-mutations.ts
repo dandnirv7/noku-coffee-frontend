@@ -7,7 +7,7 @@ import { useClearCart } from "../api/use-clear-cart";
 import { useCheckoutProduct } from "../api/use-checkout";
 
 export function useCartMutations() {
-  const { mutate: addToCart, isPending: isAdding } = useCreateCart({
+  const { mutateAsync: addToCart, isPending: isAdding } = useCreateCart({
     mutationConfig: {
       onSuccess: () => toast.success("Item berhasil ditambahkan ke keranjang"),
       onError: (error) =>
@@ -15,15 +15,16 @@ export function useCartMutations() {
     },
   });
 
-  const { mutate: updateQuantity, isPending: isUpdating } = useUpdateQuantity({
-    mutationConfig: {
-      onSuccess: () => toast.success("Jumlah berhasil diubah"),
-      onError: (error) =>
-        toast.error(getErrorMessage(error, "Gagal mengubah jumlah item")),
-    },
-  });
+  const { mutateAsync: updateQuantity, isPending: isUpdating } =
+    useUpdateQuantity({
+      mutationConfig: {
+        onSuccess: () => toast.success("Jumlah berhasil diubah"),
+        onError: (error) =>
+          toast.error(getErrorMessage(error, "Gagal mengubah jumlah item")),
+      },
+    });
 
-  const { mutate: deleteItem, isPending: isDeleting } = useDeleteItem({
+  const { mutateAsync: deleteItem, isPending: isDeleting } = useDeleteItem({
     mutationConfig: {
       onSuccess: () => toast.success("Item berhasil dihapus"),
       onError: (error) =>
@@ -31,7 +32,7 @@ export function useCartMutations() {
     },
   });
 
-  const { mutate: clearCart, isPending: isClearing } = useClearCart({
+  const { mutateAsync: clearCart, isPending: isClearing } = useClearCart({
     mutationConfig: {
       onSuccess: () =>
         toast.success("Seluruh item di dalam keranjang berhasil dihapus"),
@@ -40,8 +41,8 @@ export function useCartMutations() {
     },
   });
 
-  const { mutate: checkoutProduct, isPending: isCheckout } = useCheckoutProduct(
-    {
+  const { mutateAsync: checkoutProduct, isPending: isCheckout } =
+    useCheckoutProduct({
       mutationConfig: {
         onSuccess: (data) => {
           toast.success("Checkout berhasil");
@@ -53,8 +54,7 @@ export function useCartMutations() {
           toast.error(getErrorMessage(error, "Checkout gagal"));
         },
       },
-    },
-  );
+    });
 
   return {
     addToCart,
