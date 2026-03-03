@@ -1,7 +1,7 @@
 import { api } from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query";
 import z from "zod";
-import { ProductSchema } from "../lib/products-schema";
+import { Product, ProductSchema } from "../lib/products-schema";
 
 const SingleProductResponseSchema = z.object({
   success: z.boolean(),
@@ -21,10 +21,11 @@ export const getProductBySlug = async (slug: string) => {
   return validated.data.data;
 };
 
-export const useGetProductBySlug = (slug?: string) => {
+export const useGetProductBySlug = (slug?: string, initialData?: Product) => {
   return useQuery({
     queryKey: ["product", slug],
     queryFn: () => getProductBySlug(slug!),
     enabled: !!slug,
+    initialData,
   });
 };

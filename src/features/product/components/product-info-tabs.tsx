@@ -13,11 +13,37 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { toRupiah } from "@/lib/utils"; // Asumsi ada helper ini
+import { toRupiah } from "@/lib/utils";
+import { useCreateCart } from "@/features/cart/api/use-create-cart";
+import { toast } from "sonner";
+import { Product } from "../lib/products-schema";
 
-export function ProductInfoTabs({ product, onAddToCart }: any) {
+export function ProductInfoTabs({ product }: { product: Product }) {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("desc");
+  const [isLocalPending, setIsLocalPending] = useState(false);
+
+  const { mutate: addToCart, isPending } = useCreateCart({
+    mutationConfig: {
+      onSuccess: () => {
+        toast.success("Item berhasil ditambahkan ke keranjang");
+      },
+      onError: () => {
+        toast.error("Gagal menambahkan item");
+      },
+    },
+  });
+
+  const handleAddToCart = () => {
+    if (isLocalPending) return;
+    setIsLocalPending(true);
+    addToCart(
+      { productId: product.id, quantity },
+      {
+        onSettled: () => setIsLocalPending(false),
+      },
+    );
+  };
 
   const isLowStock = product.stock > 0 && product.stock < 5;
   const isOutOfStock = product.stock === 0;
@@ -56,7 +82,6 @@ export function ProductInfoTabs({ product, onAddToCart }: any) {
         </div>
       </div>
 
-      {/* Tabs Navigation */}
       <div className="flex gap-6 border-b border-border">
         {["desc", "specs", "brew"].map((tab) => (
           <button
@@ -172,11 +197,15 @@ export function ProductInfoTabs({ product, onAddToCart }: any) {
               </Button>
             </div>
             <Button
-              className="flex-1 h-12 font-bold rounded-xl"
-              disabled={isOutOfStock}
-              onClick={() => onAddToCart?.({ productId: product.id, quantity })}
+              className="flex-1 h-12 font-bold rounded-xl disabled:opacity-50"
+              disabled={isOutOfStock || isPending || isLocalPending}
+              onClick={handleAddToCart}
             >
-              {isOutOfStock ? "Stok Habis" : "+ Keranjang"}
+              {isOutOfStock
+                ? "Stok Habis"
+                : isPending || isLocalPending
+                  ? "Menambahkan..."
+                  : "+ Keranjang"}
             </Button>
           </div>
         </div>
