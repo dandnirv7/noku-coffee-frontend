@@ -2,112 +2,51 @@
 
 import { ProductCard } from "@/components/shared/product-card";
 import { cn } from "@/lib/utils";
-import { useMemo } from "react";
-import { useSearchProducts } from "../api/search-products";
-import { useSearchFilters } from "../hooks/use-search-filters";
+import { useSearchProductList } from "../hooks/use-search-product-list";
+import { SearchProductEmpty } from "./search-product-empty";
 import { SearchProductError } from "./search-product-error";
 import { SearchProductFilterPanel } from "./search-product-filter-panel";
-import { SearchProductListSkeleton } from "./skeleton/search-product-list-skeleton";
 import { SearchProductListingTopBar } from "./search-product-listing-topbar";
 import { FilterPanelSkeleton } from "./skeleton/search-product-filter-panel-skeleton";
+import { SearchProductListSkeleton } from "./skeleton/search-product-list-skeleton";
 import { SearchProductListingTopBarSkeleton } from "./skeleton/search-product-listing-topbar-skeleton";
-import { SearchProductEmpty } from "./search-product-empty";
-import { useCreateCart } from "@/features/cart/api/use-create-cart";
-import { useGetCart } from "@/features/cart/api/use-get-cart";
-import { useUpdateQuantity } from "@/features/cart/api/use-update-quantity";
-import { useDeleteItem } from "@/features/cart/api/use-delete-item";
-import {
-  useToggleWishlist,
-  useWishlist,
-} from "@/features/cart/api/use-wishlist";
-import { toast } from "sonner";
 
 const SearchProductList = () => {
-  const { params, reset } = useSearchFilters();
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch,
+    isPlaceholderData,
+    params,
+    reset,
+    getCartQuantity,
+    isInWishlist,
+    updatingQuantityItemId,
+    creatingCartItemId,
+    togglingWishlistItemId,
+    handleAddToCart,
+    handleUpdateQuantity,
+    handleRemoveFromCart,
+    handleToggleWishlist,
+  } = useSearchProductList();
 
-  const { data, isLoading, isError, refetch, isPlaceholderData } =
-    useSearchProducts(params);
-
-  const { data: cartData } = useGetCart();
-  const { data: wishlistData } = useWishlist();
-
-  const { mutate: createCart } = useCreateCart({
-    mutationConfig: {
-      onSuccess: () => {
-        toast.success("Produk berhasil ditambahkan ke keranjang");
-      },
-    },
-  });
-
-  const { mutate: updateQuantity } = useUpdateQuantity({
-    mutationConfig: {
-      onSuccess: () => {
-        toast.success("Jumlah berhasil diperbarui");
-      },
-    },
-  });
-
-  const { mutate: deleteItem } = useDeleteItem({
-    mutationConfig: {
-      onSuccess: () => {
-        toast.success("Dihapus dari keranjang");
-      },
-    },
-  });
-
-  const { mutate: toggleWishlist } = useToggleWishlist({
-    mutationConfig: {
-      onSuccess: (data) => {
-        toast.success(
-          data.data.isAdded
-            ? "Ditambahkan ke wishlist"
-            : "Dihapus dari wishlist",
-        );
-      },
-    },
-  });
-
-  const getCartQuantity = (productId: string) => {
-    const item = cartData?.data.items.find((i) => i.productId === productId);
-    return item?.quantity ?? 0;
-  };
-
-  const isInWishlist = (productId: string) => {
-    return (
-      wishlistData?.data.some((item) => item.productId === productId) ?? false
-    );
-  };
-
-  const handleToggleWishlist = (productId: string) => {
-    toggleWishlist(productId);
-  };
-
-  const handleUpdateQuantity = (data: {
-    productId: string;
-    quantity: number;
-  }) => {
-    updateQuantity(data);
-  };
-
-  const handleRemoveFromCart = (productId: string) => {
-    deleteItem({ productId });
-  };
-
-  const renderedProducts = useMemo(() => {
-    return data?.data.data.map((product) => (
-      <ProductCard
-        key={product.id}
-        product={product}
-        viewMode={params.viewMode}
-        onAddToCart={(item) => createCart(item)}
-        onToggleWishlist={handleToggleWishlist}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveFromCart={handleRemoveFromCart}
-        cartQuantity={getCartQuantity(product.id)}
-        isInWishlist={isInWishlist(product.id)}
-      />
-    ));
-  }, [data?.data.data, params.viewMode, cartData, wishlistData]);
+  const renderedProducts = data?.data.data.map((product) => (
+    <ProductCard
+      key={product.id}
+      product={product}
+      viewMode={params.viewMode}
+      onAddToCart={handleAddToCart}
+      onToggleWishlist={handleToggleWishlist}
+      onUpdateQuantity={handleUpdateQuantity}
+      onRemoveFromCart={handleRemoveFromCart}
+      cartQuantity={getCartQuantity(product.id)}
+      isInWishlist={isInWishlist(product.id)}
+      isAddingToCart={creatingCartItemId === product.id}
+      isUpdatingQuantity={updatingQuantityItemId === product.id}
+      isTogglingWishlist={togglingWishlistItemId === product.id}
+    />
+  ));
 
   if (isLoading) {
     return (
@@ -134,7 +73,7 @@ const SearchProductList = () => {
   }
 
   return (
-    <div className="container px-4 py-4 mx-auto">
+    <div className="container px-4 mx-auto">
       <div className="flex relative flex-col gap-6 lg:flex-row">
         <aside className="hidden sticky top-24 w-64 h-fit lg:block shrink-0">
           <SearchProductFilterPanel />

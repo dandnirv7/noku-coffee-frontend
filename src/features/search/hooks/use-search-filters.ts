@@ -1,5 +1,9 @@
 import { useQueryStates } from "nuqs";
-import { searchParamsSchema, ProductType } from "../lib/search-params";
+import {
+  searchParamsSchema,
+  ProductType,
+  SortType,
+} from "../lib/search-params";
 
 export function useSearchFilters() {
   const [params, setParams] = useQueryStates(searchParamsSchema, {
@@ -14,7 +18,7 @@ export function useSearchFilters() {
   };
 
   const updateSort = (val: string) => {
-    setParams({ sort: val as any, page: 1 });
+    setParams({ sort: val as SortType, page: 1 });
   };
 
   const updateViewMode = (mode: "grid" | "list") => {
