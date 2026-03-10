@@ -1,6 +1,13 @@
 import { authClient } from "@/features/auth/lib/auth-client";
 import axios from "axios";
 
+type BetterAuthSession = typeof authClient.$Infer.Session;
+
+interface AuthSessionResponse {
+  data: BetterAuthSession | null;
+  error?: unknown;
+}
+
 export const api = axios.create({
   baseURL:
     typeof window !== "undefined"
@@ -15,12 +22,33 @@ export const api = axios.create({
   withCredentials: true,
 });
 
-api.interceptors.request.use(async (config) => {
-  const { data: session } = await authClient.getSession();
+let sessionPromise: Promise<AuthSessionResponse | null> | null = null;
 
-  if (session?.session?.token) {
-    config.headers.Authorization = `Bearer ${session.session.token}`;
+api.interceptors.request.use(async (config) => {
+  if (typeof window === "undefined") return config;
+
+  if (!sessionPromise) {
+    sessionPromise = authClient
+      .getSession()
+      .catch(() => null) as Promise<AuthSessionResponse | null>;
+  }
+
+  const response = await sessionPromise;
+  const sessionData = response?.data;
+
+  if (sessionData?.session?.token) {
+    config.headers.Authorization = `Bearer ${sessionData.session.token}`;
   }
 
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      sessionPromise = null;
+    }
+    return Promise.reject(error);
+  },
+);
