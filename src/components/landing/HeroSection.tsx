@@ -1,8 +1,11 @@
-import { ArrowRight, Star, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ArrowRight, Star, Truck } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function HeroSection({ id }: { id: string }) {
+  const router = useRouter();
+
   return (
     <section
       id={id}
@@ -34,11 +37,7 @@ export default function HeroSection({ id }: { id: string }) {
               <Button
                 size="lg"
                 className="rounded-full"
-                onClick={() =>
-                  document
-                    .getElementById("products")
-                    ?.scrollIntoView({ behavior: "smooth" })
-                }
+                onClick={() => router.push(`/login`)}
               >
                 Belanja Sekarang <ArrowRight size={18} className="ml-2" />
               </Button>

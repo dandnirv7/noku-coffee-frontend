@@ -1,13 +1,17 @@
+"use client";
+
 import { Star } from "lucide-react";
+import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
-import { Badge } from "../ui/badge";
 
-import grinder from "@/assets/grinder.png";
 import espressoMachine from "@/assets/espresso-machine.png";
-import Image, { StaticImageData } from "next/image";
+import grinder from "@/assets/grinder.png";
 import { toRupiah } from "@/lib/utils";
+import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 interface Products {
   id: string;
@@ -75,6 +79,12 @@ const products: Products[] = [
 ];
 
 export default function ProductList({ id }: { id?: string }) {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push("/login");
+  }, [router]);
+
   return (
     <section id={id} className="py-24 bg-background scroll-mt-20">
       <div className="container px-4 mx-auto md:px-6">
@@ -96,10 +106,10 @@ export default function ProductList({ id }: { id?: string }) {
           {products.map((product) => (
             <Card
               key={product.id}
-              className="overflow-hidden gap-0 p-0 bg-white rounded-xl border-none shadow-sm transition-all group hover:shadow-md flex flex-col h-full"
+              className="flex overflow-hidden flex-col gap-0 p-0 h-full bg-white rounded-xl border-none shadow-sm transition-all group hover:shadow-md"
             >
               {/* Image area */}
-              <div className="relative overflow-hidden aspect-square bg-neutral-100">
+              <div className="overflow-hidden relative aspect-square bg-neutral-100">
                 {product.tag && (
                   <Badge className="absolute top-3 left-3 z-10 bg-primary text-[10px]">
                     {product.tag}
@@ -125,11 +135,8 @@ export default function ProductList({ id }: { id?: string }) {
                   )}
                 </p>
 
-                <Link
-                  href={`/products/${product.slug}`}
-                  className="block group/title"
-                >
-                  <h3 className="text-base font-black tracking-tighter leading-tight uppercase transition-colors group-hover/title:text-primary line-clamp-2 mb-2">
+                <Link href={`/login`} className="block group/title">
+                  <h3 className="mb-2 text-base font-black tracking-tighter leading-tight uppercase transition-colors group-hover/title:text-primary line-clamp-2">
                     {product.name}
                   </h3>
                 </Link>
@@ -151,17 +158,17 @@ export default function ProductList({ id }: { id?: string }) {
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center mt-auto pt-3 border-t border-border/50">
+                <div className="flex justify-between items-center pt-3 mt-auto border-t border-border/50">
                   <span className="text-lg font-black tracking-tighter text-slate-900">
                     {toRupiah(product.price)}
                   </span>
                 </div>
 
                 <Button
-                  asChild
-                  className="w-full mt-3 h-10 font-bold rounded-lg"
+                  className="mt-3 w-full h-10 font-bold rounded-lg"
+                  onClick={() => router.push(`/login`)}
                 >
-                  <Link href={`/products/${product.slug}`}>+ Keranjang</Link>
+                  + Keranjang
                 </Button>
               </div>
             </Card>
