@@ -3,7 +3,8 @@ import {
   parseAsString,
   parseAsStringLiteral,
   parseAsArrayOf,
-} from "nuqs";
+  createSearchParamsCache,
+} from "nuqs/server";
 
 export type SortType = "price_asc" | "price_desc" | "name_asc" | "name_desc";
 export type ProductType = "BEAN" | "GEAR" | "BUNDLE";
@@ -24,3 +25,5 @@ export const searchParamsSchema = {
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(9),
 };
+
+export const searchParamsCache = createSearchParamsCache(searchParamsSchema);

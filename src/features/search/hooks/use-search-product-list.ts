@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useSearchProducts } from "../api/search-products";
 import { useSearchFilters } from "./use-search-filters";
 import { useCreateCart } from "@/features/cart/api/use-create-cart";
@@ -10,9 +10,11 @@ import {
 } from "@/features/cart/api/use-wishlist";
 import { useGetCart } from "@/features/cart/api/use-get-cart";
 import { toast } from "sonner";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 
 export function useSearchProductList() {
   const { params, reset } = useSearchFilters();
+  const { requireAuth } = useRequireAuth();
 
   const { data, isLoading, isError, refetch, isPlaceholderData } =
     useSearchProducts(params);
@@ -28,6 +30,32 @@ export function useSearchProductList() {
   const [togglingWishlistItemId, setTogglingWishlistItemId] = useState<
     string | null
   >(null);
+
+  const cartLookup = useMemo(() => {
+    const map = new Map<string, number>();
+    cartData?.data.items.forEach((item) =>
+      map.set(item.productId, item.quantity),
+    );
+    return map;
+  }, [cartData]);
+
+  const wishlistSet = useMemo(() => {
+    return new Set(wishlistData?.data.map((item) => item.productId));
+  }, [wishlistData]);
+
+  const getCartQuantity = useCallback(
+    (productId: string) => {
+      return cartLookup.get(productId) ?? 0;
+    },
+    [cartLookup],
+  );
+
+  const isInWishlist = useCallback(
+    (productId: string) => {
+      return wishlistSet.has(productId);
+    },
+    [wishlistSet],
+  );
 
   const { mutate: createCart } = useCreateCart({
     mutationConfig: {
@@ -50,64 +78,94 @@ export function useSearchProductList() {
 
   const { mutate: toggleWishlist } = useToggleWishlist({
     mutationConfig: {
-      onSuccess: (data) =>
+      onSuccess: (res) =>
         toast.success(
-          data.data.isAdded
+          res.data.isAdded
             ? "Ditambahkan ke wishlist"
             : "Dihapus dari wishlist",
         ),
     },
   });
 
-  const getCartQuantity = (productId: string) =>
-    cartData?.data.items.find((i) => i.productId === productId)?.quantity ?? 0;
+  const handleAddToCart = useCallback(
+    (item: { productId: string; quantity: number }) => {
+      requireAuth(() => {
+        setCreatingCartItemId(item.productId);
+        createCart(item, { onSettled: () => setCreatingCartItemId(null) });
+      });
+    },
+    [createCart, requireAuth],
+  );
 
-  const isInWishlist = (productId: string) =>
-    wishlistData?.data.some((item) => item.productId === productId) ?? false;
+  const handleUpdateQuantity = useCallback(
+    (data: { productId: string; quantity: number }) => {
+      setUpdatingQuantityItemId(data.productId);
+      updateQuantity(data, {
+        onSettled: () => setUpdatingQuantityItemId(null),
+      });
+    },
+    [updateQuantity],
+  );
 
-  const handleAddToCart = (item: { productId: string; quantity: number }) => {
-    setCreatingCartItemId(item.productId);
-    createCart(item, {
-      onSettled: () => setCreatingCartItemId(null),
-    });
-  };
+  const handleRemoveFromCart = useCallback(
+    (productId: string) => {
+      deleteItem({ productId });
+    },
+    [deleteItem],
+  );
 
-  const handleUpdateQuantity = (data: {
-    productId: string;
-    quantity: number;
-  }) => {
-    setUpdatingQuantityItemId(data.productId);
-    updateQuantity(data, {
-      onSettled: () => setUpdatingQuantityItemId(null),
-    });
-  };
+  const handleToggleWishlist = useCallback(
+    (productId: string) => {
+      requireAuth(() => {
+        setTogglingWishlistItemId(productId);
+        toggleWishlist(productId, {
+          onSettled: () => setTogglingWishlistItemId(null),
+        });
+      });
+    },
+    [toggleWishlist, requireAuth],
+  );
 
-  const handleRemoveFromCart = (productId: string) => deleteItem({ productId });
-  const handleToggleWishlist = (productId: string) => {
-    setTogglingWishlistItemId(productId);
-    toggleWishlist(productId, {
-      onSettled: () => setTogglingWishlistItemId(null),
-    });
-  };
-
-  return {
-    data,
-    isLoading,
-    isError,
-    refetch,
-    isPlaceholderData,
-    params,
-    reset,
-    cartData,
-    wishlistData,
-    getCartQuantity,
-    isInWishlist,
-    updatingQuantityItemId,
-    creatingCartItemId,
-    togglingWishlistItemId,
-    handleAddToCart,
-    handleUpdateQuantity,
-    handleRemoveFromCart,
-    handleToggleWishlist,
-  };
+  return useMemo(
+    () => ({
+      data,
+      isLoading,
+      isError,
+      refetch,
+      isPlaceholderData,
+      params,
+      reset,
+      cartData,
+      wishlistData,
+      getCartQuantity,
+      isInWishlist,
+      updatingQuantityItemId,
+      creatingCartItemId,
+      togglingWishlistItemId,
+      handleAddToCart,
+      handleUpdateQuantity,
+      handleRemoveFromCart,
+      handleToggleWishlist,
+    }),
+    [
+      data,
+      isLoading,
+      isError,
+      refetch,
+      isPlaceholderData,
+      params,
+      reset,
+      cartData,
+      wishlistData,
+      getCartQuantity,
+      isInWishlist,
+      updatingQuantityItemId,
+      creatingCartItemId,
+      togglingWishlistItemId,
+      handleAddToCart,
+      handleUpdateQuantity,
+      handleRemoveFromCart,
+      handleToggleWishlist,
+    ],
+  );
 }

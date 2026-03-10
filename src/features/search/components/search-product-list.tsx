@@ -3,13 +3,20 @@
 import { ProductCard } from "@/components/shared/product-card";
 import { cn } from "@/lib/utils";
 import { useSearchProductList } from "../hooks/use-search-product-list";
-import { SearchProductEmpty } from "./search-product-empty";
-import { SearchProductError } from "./search-product-error";
+import dynamic from "next/dynamic";
+
+const SearchProductEmpty = dynamic(() =>
+  import("./search-product-empty").then((mod) => mod.SearchProductEmpty),
+);
+const SearchProductError = dynamic(() =>
+  import("./search-product-error").then((mod) => mod.SearchProductError),
+);
 import { SearchProductFilterPanel } from "./search-product-filter-panel";
-import { SearchProductListingTopBar } from "./search-product-listing-topbar";
 import { FilterPanelSkeleton } from "./skeleton/search-product-filter-panel-skeleton";
 import { SearchProductListSkeleton } from "./skeleton/search-product-list-skeleton";
 import { SearchProductListingTopBarSkeleton } from "./skeleton/search-product-listing-topbar-skeleton";
+
+import { SearchProductListingTopBar } from "./search-product-listing-topbar";
 
 const SearchProductList = () => {
   const {
