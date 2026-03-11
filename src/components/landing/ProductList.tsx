@@ -11,7 +11,6 @@ import { toRupiah } from "@/lib/utils";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 interface Products {
   id: string;
@@ -81,10 +80,6 @@ const products: Products[] = [
 export default function ProductList({ id }: { id?: string }) {
   const router = useRouter();
 
-  useEffect(() => {
-    router.push("/login");
-  }, [router]);
-
   return (
     <section id={id} className="py-24 bg-background scroll-mt-20">
       <div className="container px-4 mx-auto md:px-6">
@@ -98,7 +93,7 @@ export default function ProductList({ id }: { id?: string }) {
             </p>
           </div>
           <Button variant="link" className="hidden md:flex text-primary">
-            <Link href="/products">Lihat Katalog Lengkap</Link>
+            <Link href="/search">Lihat Katalog Lengkap</Link>
           </Button>
         </div>
 
