@@ -22,7 +22,7 @@ export default function BottomNav() {
       badge: !isLoadingCart && cartCount > 0 ? cartCount : undefined,
     },
     { label: "Pesanan", href: "/orders", icon: Package },
-    { label: "Profil", href: "/user/profile", icon: User },
+    { label: "Profil", href: "/settings", icon: User },
   ];
 
   const guestTabs = [
@@ -39,8 +39,8 @@ export default function BottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t border-border bg-background/95 backdrop-blur-md">
-      <div className="flex items-center justify-around h-16 px-2">
+    <nav className="fixed right-0 bottom-0 left-0 z-50 border-t backdrop-blur-md md:hidden border-border bg-background/95">
+      <div className="flex justify-around items-center px-2 h-16">
         {tabs.map((tab) => {
           const active = isActive(tab.href);
           const Icon = tab.icon;

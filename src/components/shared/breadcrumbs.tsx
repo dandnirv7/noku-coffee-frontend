@@ -23,6 +23,7 @@ const pathMap: Record<string, string> = {
   profile: "Profil",
   login: "Masuk",
   register: "Daftar",
+  settings: "Pengaturan",
 };
 
 export function DynamicBreadcrumbs() {
@@ -33,14 +34,14 @@ export function DynamicBreadcrumbs() {
   const paths = pathname.split("/").filter((p) => p !== "");
 
   return (
-    <div className="container mx-auto px-4 pt-6 pb-2">
+    <div className="container px-4 pt-6 pb-2 mx-auto">
       <Breadcrumb className="px-4">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link
                 href="/"
-                className="flex items-center gap-1 hover:text-primary transition-colors"
+                className="flex gap-1 items-center transition-colors hover:text-primary"
                 aria-label="Beranda"
               >
                 <Home className="w-4 h-4" />
@@ -72,7 +73,7 @@ export function DynamicBreadcrumbs() {
                     <BreadcrumbLink asChild>
                       <Link
                         href={href}
-                        className="hover:text-primary transition-colors"
+                        className="transition-colors hover:text-primary"
                       >
                         {formattedPath}
                       </Link>
