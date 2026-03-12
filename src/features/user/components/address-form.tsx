@@ -21,23 +21,28 @@ import {
   createAddressSchema,
   useCreateAddress,
 } from "../api/use-create-address";
+import { useUpdateAddress } from "../api/use-update-address";
 
 interface AddressFormProps {
   onSuccess?: () => void;
   onCancel?: () => void;
   isFirstAddress?: boolean;
+  initialData?: CreateAddressInput & { id?: string };
 }
 
 export function AddressForm({
   onSuccess,
   onCancel,
   isFirstAddress = false,
+  initialData,
 }: AddressFormProps) {
-  const { mutate: createAddress, isPending } = useCreateAddress();
+  const { mutate: createAddress, isPending: isCreating } = useCreateAddress();
+  const { mutate: updateAddress, isPending: isUpdating } = useUpdateAddress();
+  const isPending = isCreating || isUpdating;
 
   const form = useForm<CreateAddressInput>({
     resolver: zodResolver(createAddressSchema) as Resolver<CreateAddressInput>,
-    defaultValues: {
+    defaultValues: initialData || {
       label: "",
       receiverName: "",
       phone: "",
@@ -51,25 +56,44 @@ export function AddressForm({
   });
 
   const onSubmit = (data: CreateAddressInput) => {
-    createAddress(data, {
-      onSuccess: () => {
-        toast.success("Alamat berhasil ditambahkan");
-        onSuccess?.();
-      },
-      onError: (error: unknown) => {
-        const errorMsg =
-          error instanceof Error ? error.message : "Terjadi kesalahan";
-        toast.error("Gagal menambahkan alamat", {
-          description: errorMsg,
-        });
-      },
-    });
+    if (initialData && initialData.id) {
+      updateAddress(
+        { id: initialData.id, data },
+        {
+          onSuccess: () => {
+            toast.success("Alamat berhasil diperbarui");
+            onSuccess?.();
+          },
+          onError: (error: unknown) => {
+            const errorMsg =
+              error instanceof Error ? error.message : "Terjadi kesalahan";
+            toast.error("Gagal memperbarui alamat", {
+              description: errorMsg,
+            });
+          },
+        },
+      );
+    } else {
+      createAddress(data, {
+        onSuccess: () => {
+          toast.success("Alamat berhasil ditambahkan");
+          onSuccess?.();
+        },
+        onError: (error: unknown) => {
+          const errorMsg =
+            error instanceof Error ? error.message : "Terjadi kesalahan";
+          toast.error("Gagal menambahkan alamat", {
+            description: errorMsg,
+          });
+        },
+      });
+    }
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
             name="label"
@@ -162,7 +186,7 @@ export function AddressForm({
           )}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
             name="city"
@@ -197,7 +221,7 @@ export function AddressForm({
             control={form.control}
             name="isDefault"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+              <FormItem className="flex flex-row justify-between items-center p-3 rounded-lg border shadow-sm">
                 <div className="space-y-0.5">
                   <FormLabel>Jadikan Alamat Utama</FormLabel>
                   <div className="text-[0.8rem] text-muted-foreground">
@@ -227,7 +251,7 @@ export function AddressForm({
             </Button>
           )}
           <Button type="submit" disabled={isPending}>
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isPending && <Loader2 className="mr-2 w-4 h-4 animate-spin" />}
             Simpan Alamat
           </Button>
         </div>
