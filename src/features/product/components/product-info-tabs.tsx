@@ -17,11 +17,13 @@ import { toRupiah } from "@/lib/utils";
 import { useCreateCart } from "@/features/cart/api/use-create-cart";
 import { toast } from "sonner";
 import { Product } from "../lib/products-schema";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 
 export function ProductInfoTabs({ product }: { product: Product }) {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("desc");
   const [isLocalPending, setIsLocalPending] = useState(false);
+  const { requireAuth } = useRequireAuth();
 
   const { mutate: addToCart, isPending } = useCreateCart({
     mutationConfig: {
@@ -35,14 +37,16 @@ export function ProductInfoTabs({ product }: { product: Product }) {
   });
 
   const handleAddToCart = () => {
-    if (isLocalPending) return;
-    setIsLocalPending(true);
-    addToCart(
-      { productId: product.id, quantity },
-      {
-        onSettled: () => setIsLocalPending(false),
-      },
-    );
+    requireAuth(() => {
+      if (isLocalPending) return;
+      setIsLocalPending(true);
+      addToCart(
+        { productId: product.id, quantity },
+        {
+          onSettled: () => setIsLocalPending(false),
+        },
+      );
+    });
   };
 
   const isLowStock = product.stock > 0 && product.stock < 5;

@@ -23,6 +23,7 @@ import { ProductDetailSkeleton } from "./product-detail-skeleton";
 import { ProductDetailError } from "./product-detail-error";
 import { ProductInfoTabs } from "./product-info-tabs";
 import { Product } from "../lib/products-schema";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 
 interface ProductDetailViewProps {
   slug: string;
@@ -41,6 +42,7 @@ export function ProductDetailView({
   } = useGetProductBySlug(slug, initialData);
   const { data: relatedProducts } = useSearchProducts();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const { requireAuth } = useRequireAuth();
 
   const { data: wishlistData } = useWishlist();
   const { mutate: toggleWishlist, isPending: isTogglingWishlist } =
@@ -83,9 +85,11 @@ export function ProductDetailView({
   });
 
   const handleAddToCart = (item: { productId: string; quantity: number }) => {
-    setCreatingCartItemId(item.productId);
-    createCart(item, {
-      onSettled: () => setCreatingCartItemId(null),
+    requireAuth(() => {
+      setCreatingCartItemId(item.productId);
+      createCart(item, {
+        onSettled: () => setCreatingCartItemId(null),
+      });
     });
   };
 
@@ -100,7 +104,8 @@ export function ProductDetailView({
   };
 
   const handleRemoveFromCart = (productId: string) => deleteItem({ productId });
-  const handleToggleWishlist = (productId: string) => toggleWishlist(productId);
+  const handleToggleWishlist = (productId: string) =>
+    requireAuth(() => toggleWishlist(productId));
 
   const getCartQuantity = (productId: string) =>
     cartData?.data.items.find((i) => i.productId === productId)?.quantity ?? 0;
@@ -146,7 +151,7 @@ export function ProductDetailView({
                 />
                 <button
                   className="absolute top-4 right-4 p-3 rounded-full shadow-sm transition-all bg-white/80 hover:bg-white disabled:opacity-50"
-                  onClick={() => toggleWishlist(product.id)}
+                  onClick={() => requireAuth(() => toggleWishlist(product.id))}
                   disabled={isTogglingWishlist}
                 >
                   <Heart
