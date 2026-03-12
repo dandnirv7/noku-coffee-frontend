@@ -1,8 +1,8 @@
-import { queryClient } from "@/lib/react-query";
 import {
   useMutation,
   UseMutationOptions,
   useQuery,
+  useQueryClient,
 } from "@tanstack/react-query";
 import { ToggleWishlistResponse } from "../lib/wishlist-schema";
 import { getWishlist, toggleWishlist } from "./wishlist";
@@ -23,6 +23,8 @@ type UseToggleWishlistParams = {
 export const useToggleWishlist = ({
   mutationConfig,
 }: UseToggleWishlistParams = {}) => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     ...mutationConfig,
     mutationFn: toggleWishlist,

@@ -1,6 +1,6 @@
 import { api } from "@/lib/axios";
-import { MutationConfig, queryClient } from "@/lib/react-query";
-import { useMutation } from "@tanstack/react-query";
+import { MutationConfig } from "@/lib/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getCartQueryKey } from "./use-get-cart";
 import z from "zod";
 
@@ -39,6 +39,8 @@ type UseDeleteItemParams = {
 };
 
 export const useDeleteItem = ({ mutationConfig }: UseDeleteItemParams = {}) => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: deleteItem,
     ...mutationConfig,

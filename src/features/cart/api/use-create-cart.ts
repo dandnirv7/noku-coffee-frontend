@@ -1,6 +1,6 @@
 import { api } from "@/lib/axios";
-import { MutationConfig, queryClient, QueryConfig } from "@/lib/react-query";
-import { useMutation } from "@tanstack/react-query";
+import { MutationConfig, QueryConfig } from "@/lib/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import z from "zod";
 import { getCartQueryKey } from "./use-get-cart";
 
@@ -40,6 +40,8 @@ type UseCreateCartParams = {
 };
 
 export const useCreateCart = ({ mutationConfig }: UseCreateCartParams = {}) => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: createCart,
     ...mutationConfig,

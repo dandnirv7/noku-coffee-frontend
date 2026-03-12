@@ -1,6 +1,6 @@
 import { api } from "@/lib/axios";
-import { MutationConfig, queryClient } from "@/lib/react-query";
-import { useMutation } from "@tanstack/react-query";
+import { MutationConfig } from "@/lib/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import z from "zod";
 import { getCartQueryKey } from "./use-get-cart";
 
@@ -45,6 +45,8 @@ type UseUpdateQuantityParams = {
 export const useUpdateQuantity = ({
   mutationConfig,
 }: UseUpdateQuantityParams = {}) => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: updateQuantity,
     ...mutationConfig,

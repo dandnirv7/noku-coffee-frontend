@@ -1,6 +1,5 @@
 import { api } from "@/lib/axios";
-import { queryClient } from "@/lib/react-query";
-import { useMutation, UseMutationOptions } from "@tanstack/react-query";
+import { useMutation, UseMutationOptions, useQueryClient } from "@tanstack/react-query";
 import { getCartQueryKey } from "./use-get-cart";
 import z from "zod";
 
@@ -29,6 +28,8 @@ type UseClearCartParams = {
 };
 
 export const useClearCart = ({ mutationConfig }: UseClearCartParams = {}) => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     ...mutationConfig,
     mutationFn: clearCart,
