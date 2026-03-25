@@ -35,7 +35,9 @@ export default function OrderDetailHeader() {
         </div>
         <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
           <Button variant="outline" size="sm" asChild>
-            <Link href={`/orders/tracking/${order.id}`}>Lacak Pesanan</Link>
+            <Link href={`/orders/tracking/${order.trackingNumber}`}>
+              Lacak Pesanan
+            </Link>
           </Button>
 
           <Button variant="outline" size="sm">

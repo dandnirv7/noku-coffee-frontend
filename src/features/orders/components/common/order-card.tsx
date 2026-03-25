@@ -75,9 +75,13 @@ export const OrderCard = ({ order, onCancel }: OrderCardProps) => {
                   Batalkan
                 </Button>
               )}
-              {order.paymentExternalId && (
+              {order.shipping?.trackingNumber && (
                 <Button asChild variant="outline" size="sm">
-                  <Link href={`/orders/tracking/${order.id}`}>Lacak</Link>
+                  <Link
+                    href={`/orders/tracking/${order.shipping.trackingNumber}`}
+                  >
+                    Lacak
+                  </Link>
                 </Button>
               )}
               <Button asChild size="sm">

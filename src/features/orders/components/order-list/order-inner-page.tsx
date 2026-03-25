@@ -2,33 +2,51 @@
 
 import { Filter, Search } from "lucide-react";
 import { useQueryStates } from "nuqs";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useCallback } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useGetOrders } from "@/features/orders/api/use-get-orders";
+import { useGetOrdersInfinite } from "@/features/orders/api/use-get-orders";
 import { orderParamsSchema } from "@/features/orders/lib/order-params";
 import { OrderDetail, OrderList } from "@/features/orders/lib/order-schema";
 import { OrderCard } from "../common/order-card";
 import CancelOrderModal from "../order-detail/cancel-order-modal";
 import { OrderEmpty } from "./order-empty";
+import { OrderListSkeleton } from "../skeleton/order-list-skeleton";
 
 export default function OrderInnerPage() {
-  const { data: orders } = useGetOrders();
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useGetOrdersInfinite();
   const [{ search: searchQuery, status: activeTab }, setParams] =
     useQueryStates(orderParamsSchema, {
       shallow: true,
       history: "replace",
     });
 
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastElementRef = useCallback(
+    (node: HTMLDivElement) => {
+      if (isLoading || isFetchingNextPage) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [isLoading, isFetchingNextPage, hasNextPage, fetchNextPage],
+  );
+
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderList | null>(null);
 
   const filteredOrders = useMemo(() => {
-    if (!orders) return [];
+    if (!data) return [];
+    const allOrders = data.pages.flatMap((page) => page.data);
 
-    return orders.filter((order) => {
+    return allOrders.filter((order) => {
       const matchesTab = activeTab === "all" || order.status === activeTab;
       const matchesSearch =
         order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -39,7 +57,7 @@ export default function OrderInnerPage() {
         );
       return matchesTab && matchesSearch;
     });
-  }, [orders, activeTab, searchQuery]);
+  }, [data, activeTab, searchQuery]);
 
   const handleCancelOrder = (order: OrderList) => {
     setSelectedOrder(order);
@@ -103,17 +121,33 @@ export default function OrderInnerPage() {
           </div>
 
           <TabsContent value={activeTab} className="mt-0">
-            {filteredOrders.length === 0 ? (
+            {isLoading ? (
+              <OrderListSkeleton />
+            ) : filteredOrders.length === 0 ? (
               <OrderEmpty searchQuery={searchQuery} activeTab={activeTab} />
             ) : (
               <div className="grid gap-4">
-                {filteredOrders.map((order) => (
-                  <OrderCard
-                    key={order.id}
-                    order={order}
-                    onCancel={handleCancelOrder}
-                  />
-                ))}
+                {filteredOrders.map((order, index) => {
+                  if (index === filteredOrders.length - 1) {
+                    return (
+                      <div ref={lastElementRef} key={order.id}>
+                        <OrderCard order={order} onCancel={handleCancelOrder} />
+                      </div>
+                    );
+                  }
+                  return (
+                    <OrderCard
+                      key={order.id}
+                      order={order}
+                      onCancel={handleCancelOrder}
+                    />
+                  );
+                })}
+                {isFetchingNextPage && (
+                  <div className="py-4 text-center text-sm text-gray-500">
+                    Memuat pesanan lainnya...
+                  </div>
+                )}
               </div>
             )}
           </TabsContent>
