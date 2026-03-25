@@ -2,29 +2,49 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { CheckCircle2, MapPin, Phone, Truck } from "lucide-react";
-import { OrderDetail } from "../../lib/order-schema";
+import { TrackingData } from "../../lib/order-schema";
+import { useState, useEffect } from "react";
 
 interface TrackingStatusCardProps {
-  order: OrderDetail;
-  progress: number;
-  remainingHours: number;
-  remainingMinutes: number;
-  currentLocation: string;
-  latestEventDate?: string | null;
+  trackingData: TrackingData;
 }
 
 export const TrackingStatusCard = ({
-  order,
-  progress,
-  remainingHours,
-  remainingMinutes,
-  currentLocation,
-  latestEventDate,
+  trackingData,
 }: TrackingStatusCardProps) => {
-  const orderDate = new Date(order.date);
-  const estimatedDeliveryDate = order.shipping.estimatedDelivery
-    ? new Date(order.shipping.estimatedDelivery)
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => setCurrentTime(new Date()), 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const orderDate = trackingData.status_summary.order_placed
+    ? new Date(trackingData.status_summary.order_placed)
+    : new Date();
+
+  const estimatedDeliveryDate = trackingData.status_summary.estimated_delivery
+    ? new Date(trackingData.status_summary.estimated_delivery)
     : new Date(orderDate.getTime() + 2 * 24 * 60 * 60 * 1000);
+
+  const remainingTime = Math.max(
+    0,
+    estimatedDeliveryDate.getTime() - currentTime.getTime(),
+  );
+  const remainingHours = Math.floor(remainingTime / (1000 * 60 * 60));
+  const remainingMinutes = Math.floor(
+    (remainingTime % (1000 * 60 * 60)) / (1000 * 60),
+  );
+
+  const totalEvents = trackingData.timeline.length;
+  const completedEvents = trackingData.timeline.filter(
+    (t) => t.is_completed,
+  ).length;
+  const progress = totalEvents > 0 ? (completedEvents / totalEvents) * 100 : 0;
+
+  const isFinished = trackingData.timeline.some(
+    (t) => t.is_latest && t.status === "Selesai",
+  );
 
   return (
     <Card>
@@ -33,36 +53,28 @@ export const TrackingStatusCard = ({
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {order.status !== "delivered" && (
+          {!isFinished && (
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 flex items-start">
               <Truck className="h-5 w-5 text-blue-500 mt-0.5 mr-3 shrink-0" />
               <div>
                 <h3 className="font-medium text-blue-800">
-                  Pesanan Anda sedang dalam perjalanan!
+                  {trackingData.status_summary.headline}
                 </h3>
                 <p className="text-sm text-blue-700 mt-1">
-                  {remainingHours > 0 || remainingMinutes > 0 ? (
-                    <>
-                      Estimasi tiba dalam{" "}
-                      {remainingHours > 0 ? `${remainingHours} jam ` : ""}
-                      {remainingMinutes > 0 ? `${remainingMinutes} menit` : ""}
-                    </>
-                  ) : (
-                    "Pesanan Anda akan tiba sebentar lagi!"
-                  )}
+                  {trackingData.status_summary.sub_headline}
                 </p>
               </div>
             </div>
           )}
-          {order.status === "delivered" && (
+          {isFinished && (
             <div className="bg-green-50 p-4 rounded-lg border border-green-100 flex items-start">
               <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
               <div>
                 <h3 className="font-medium text-green-800">
-                  Pesanan Anda telah tiba!
+                  {trackingData.status_summary.headline}
                 </h3>
                 <p className="text-sm text-green-700 mt-1">
-                  Pesanan telah diterima dengan baik.
+                  {trackingData.status_summary.sub_headline}
                 </p>
               </div>
             </div>
@@ -96,20 +108,26 @@ export const TrackingStatusCard = ({
               <div className="text-sm text-gray-500 mb-1">Lokasi Terkini</div>
               <div className="font-medium flex items-center">
                 <MapPin className="h-4 w-4 mr-1 text-gray-400" />
-                {currentLocation}
+                {trackingData.status_summary.current_location}
               </div>
               <div className="text-xs text-gray-500 mt-1">
                 Diperbarui{" "}
-                {latestEventDate
-                  ? format(new Date(latestEventDate), "d MMM, HH:mm", {
-                      locale: localeId,
-                    })
+                {trackingData.status_summary.last_updated
+                  ? format(
+                      new Date(trackingData.status_summary.last_updated),
+                      "d MMM, HH:mm",
+                      {
+                        locale: localeId,
+                      },
+                    )
                   : "-"}
               </div>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg border">
               <div className="text-sm text-gray-500 mb-1">Kurir Pengiriman</div>
-              <div className="font-medium">{order.shipping.method}</div>
+              <div className="font-medium">
+                {trackingData.delivery_information.shipping_method}
+              </div>
               <div className="text-xs text-gray-500 mt-1 flex items-center">
                 <Phone className="h-3 w-3 mr-1" />
                 Hubungi Bantuan Noku

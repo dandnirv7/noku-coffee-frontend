@@ -1,28 +1,28 @@
 import { Metadata } from "next";
-import { getDetailOrder } from "@/features/orders/api/use-get-detail-order.server";
+import { getTracking } from "@/features/orders/api/use-get-tracking.server";
 import OrderTrackingInnerPage from "../components/tracking/order-tracking-inner-page";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
-  const orderId = params.id;
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id: trackingNumber } = await params;
   try {
-    const order = await getDetailOrder(orderId);
+    const trackingData = await getTracking(trackingNumber);
     return {
-      title: `Lacak Pesanan #${order.id} | Noku Coffee`,
-      description: `Lacak status pengiriman pesanan Anda #${order.id} dari Noku Coffee di real-time.`,
+      title: `Lacak Pesanan #${trackingData.order_number} | Noku Coffee`,
+      description: `Lacak status pengiriman pesanan Anda #${trackingData.order_number} dari Noku Coffee di real-time.`,
       openGraph: {
-        title: `Lacak Pesanan #${order.id} | Noku Coffee`,
-        description: `Status pengiriman pesanan #${order.id}.`,
-        url: `https://noku.coffee/orders/tracking/${order.id}`,
+        title: `Lacak Pesanan #${trackingData.order_number} | Noku Coffee`,
+        description: `Status pengiriman pesanan #${trackingData.order_number}.`,
+        url: `https://noku.coffee/orders/tracking/${trackingData.tracking_number}`,
         type: "website",
       },
       twitter: {
         card: "summary",
-        title: `Lacak Pesanan #${order.id} | Noku Coffee`,
-        description: `Status pengiriman pesanan #${order.id}.`,
+        title: `Lacak Pesanan #${trackingData.order_number} | Noku Coffee`,
+        description: `Status pengiriman pesanan #${trackingData.order_number}.`,
       },
       robots: {
         index: false,
@@ -41,16 +41,11 @@ export async function generateMetadata({
   }
 }
 
-export default async function OrderTrackingPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const orderId = params.id;
-  let initialData = undefined;
+export default async function OrderTrackingPage({ params }: Props) {
+  const { id: trackingNumber } = await params;
 
   try {
-    initialData = await getDetailOrder(orderId);
+    await getTracking(trackingNumber);
   } catch (error: unknown) {
     console.error(
       "Gagal mendapatkan initial data untuk order tracking:",
@@ -58,5 +53,5 @@ export default async function OrderTrackingPage({
     );
   }
 
-  return <OrderTrackingInnerPage orderId={orderId} initialData={initialData} />;
+  return <OrderTrackingInnerPage trackingNumber={trackingNumber} />;
 }

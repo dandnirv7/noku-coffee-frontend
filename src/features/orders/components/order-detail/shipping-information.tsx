@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, MapPin, Truck } from "lucide-react";
 import { useOrderDetail } from "../../context/order-detail-context";
+import { formatDateWithTime } from "@/features/user/hooks/formatDate";
 
 export default function ShippingInformation() {
   const { order } = useOrderDetail();
@@ -39,7 +40,7 @@ export default function ShippingInformation() {
               <p>{order.shipping.method}</p>
               <div className="flex items-center text-sm">
                 <Clock className="h-4 w-4 mr-1 text-gray-400" />
-                Perkiraan tiba:
+                Perkiraan tiba: {order.shipping.estimatedDelivery ? formatDateWithTime(order.shipping.estimatedDelivery) : "-"}
               </div>
               <div className="flex items-center text-sm mt-2">
                 <Truck className="h-4 w-4 mr-1 text-gray-400" />

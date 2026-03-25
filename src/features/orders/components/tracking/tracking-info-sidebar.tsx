@@ -4,17 +4,17 @@ import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { MapPin, Phone, User } from "lucide-react";
-import { OrderDetail } from "../../lib/order-schema";
+import { TrackingData } from "../../lib/order-schema";
 import { OrderItemRow } from "../order-detail/order-item-row";
 
 interface TrackingInfoSidebarProps {
-  order: OrderDetail;
+  trackingData: TrackingData;
 }
 
-export const TrackingInfoSidebar = ({ order }: TrackingInfoSidebarProps) => {
-  const estimatedDeliveryDate = order.shipping.estimatedDelivery
-    ? new Date(order.shipping.estimatedDelivery)
-    : new Date(new Date(order.date).getTime() + 2 * 24 * 60 * 60 * 1000);
+export const TrackingInfoSidebar = ({ trackingData }: TrackingInfoSidebarProps) => {
+  const estimatedDeliveryDate = trackingData.status_summary.estimated_delivery
+    ? new Date(trackingData.status_summary.estimated_delivery)
+    : new Date();
 
   return (
     <div className="space-y-6">
@@ -29,14 +29,7 @@ export const TrackingInfoSidebar = ({ order }: TrackingInfoSidebarProps) => {
               <div className="text-gray-600 space-y-1 text-sm">
                 <div className="flex items-start">
                   <MapPin className="h-4 w-4 mr-2 mt-0.5 text-gray-400 shrink-0" />
-                  <div>
-                    <p>{order.shipping.address}</p>
-                    <p>
-                      {order.shipping.city}, {order.shipping.province}{" "}
-                      {order.shipping.postalCode}
-                    </p>
-                    <p>{order.shipping.country}</p>
-                  </div>
+                  <div>{trackingData.delivery_information.address}</div>
                 </div>
               </div>
             </div>
@@ -49,12 +42,12 @@ export const TrackingInfoSidebar = ({ order }: TrackingInfoSidebarProps) => {
                 <div className="flex items-center">
                   <User className="h-4 w-4 mr-2 text-gray-400" />
                   <div className="text-gray-600 font-medium">
-                    {order.customer.name}
+                    {trackingData.delivery_information.recipient}
                   </div>
                 </div>
                 <div className="flex items-center">
                   <Phone className="h-4 w-4 mr-2 text-gray-400" />
-                  <div className="text-gray-600">{order.customer.phone}</div>
+                  <div className="text-gray-600">{trackingData.delivery_information.phone}</div>
                 </div>
               </div>
             </div>
@@ -67,13 +60,13 @@ export const TrackingInfoSidebar = ({ order }: TrackingInfoSidebarProps) => {
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Metode</span>
                   <span className="font-medium text-right">
-                    {order.shipping.method}
+                    {trackingData.delivery_information.shipping_method}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Nomor Resi</span>
                   <span className="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-xs">
-                    {order.trackingNumber || "-"}
+                    {trackingData.tracking_number || "-"}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
@@ -96,11 +89,11 @@ export const TrackingInfoSidebar = ({ order }: TrackingInfoSidebarProps) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {order.items.map((item, index) => (
+            {trackingData.order_summary.items.map((item, index) => (
               <OrderItemRow
                 key={index}
                 name={item.name}
-                quantity={item.quantity}
+                quantity={item.qty}
                 price={item.price}
                 image={null}
                 className="py-1"
@@ -112,7 +105,7 @@ export const TrackingInfoSidebar = ({ order }: TrackingInfoSidebarProps) => {
             <div className="flex justify-between font-bold text-base pt-1">
               <span>Total Pembayaran</span>
               <span className="text-primary text-right">
-                Rp {order.total.toLocaleString("id-ID")}
+                Rp {trackingData.order_summary.total.toLocaleString("id-ID")}
               </span>
             </div>
           </div>
