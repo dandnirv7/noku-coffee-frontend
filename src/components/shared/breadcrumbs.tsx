@@ -29,7 +29,15 @@ const pathMap: Record<string, string> = {
 export function DynamicBreadcrumbs() {
   const pathname = usePathname();
 
-  if (pathname === "/" || pathname.startsWith("/products/")) return null;
+  if (
+    pathname === "/" ||
+    pathname.startsWith("/products/") ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/register") ||
+    pathname.startsWith("/reset-password") ||
+    pathname.startsWith("/verify")
+  )
+    return null;
 
   const paths = pathname.split("/").filter((p) => p !== "");
 
