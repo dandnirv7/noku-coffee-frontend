@@ -84,7 +84,7 @@ export default function VerifyInnerPage() {
           {status === "error" && (
             <div className="text-sm text-center text-gray-500">
               Jika masalah ini terus berlanjut, silakan hubungi kami di{" "}
-              <strong>support@noku.com</strong>.
+              <strong>support@nokucoffee.me</strong>.
             </div>
           )}
         </CardContent>
