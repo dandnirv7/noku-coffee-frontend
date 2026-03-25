@@ -10,6 +10,7 @@ import { authClient } from "../lib/auth-client";
 
 export function useLoginForm() {
   const [isVisible, setIsVisible] = useState(false);
+  const [isForgotOpen, setIsForgotOpen] = useState(false);
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || undefined;
 
@@ -38,6 +39,8 @@ export function useLoginForm() {
     isVisible,
     setIsVisible,
     onSubmit,
+    isForgotOpen,
+    setIsForgotOpen,
     handleGoogleLogin,
     isPending,
   };

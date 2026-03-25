@@ -16,6 +16,7 @@ interface LoginFormProps {
   isPending: boolean;
   isVisible: boolean;
   setIsVisible: (isVisible: boolean) => void;
+  setIsForgotOpen: (isForgotOpen: boolean) => void;
 }
 
 export default function LoginForm({
@@ -25,6 +26,7 @@ export default function LoginForm({
   isPending,
   isVisible,
   setIsVisible,
+  setIsForgotOpen,
 }: LoginFormProps) {
   const {
     register,
@@ -113,7 +115,11 @@ export default function LoginForm({
         </div>
 
         <div className="flex gap-y-2 justify-between items-center">
-          <Link href="/reset-password" className="hover:underline">
+          <Link
+            href="#"
+            onClick={() => setIsForgotOpen(true)}
+            className="hover:underline"
+          >
             <span className="text-sm text-muted-foreground">
               Lupa Kata Sandi?
             </span>
