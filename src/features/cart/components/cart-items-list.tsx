@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useOptimistic, startTransition, useState } from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { CartItem } from "./cart-item";
 import { CartItem as CartItemType } from "../lib/cart-schema";
+import { motion, AnimatePresence } from "motion/react";
 
 interface CartItemsListProps {
   items: CartItemType[];
@@ -33,7 +34,32 @@ export function CartItemsList({
   const [pendingItemId, setPendingItemId] = useState<string | null>(null);
   const [isClearingCart, setIsClearingCart] = useState(false);
 
+  type OptimisticAction =
+    | { type: "REMOVE"; id: string }
+    | { type: "UPDATE"; id: string; quantity: number };
+
+  const [optimisticItems, dispatchOptimistic] = useOptimistic(
+    items,
+    (state: CartItemType[], action: OptimisticAction) => {
+      switch (action.type) {
+        case "REMOVE":
+          return state.filter((item) => item.productId !== action.id);
+        case "UPDATE":
+          return state.map((item) =>
+            item.productId === action.id
+              ? { ...item, quantity: action.quantity }
+              : item,
+          );
+        default:
+          return state;
+      }
+    },
+  );
+
   const handleDeleteItem = async (productId: string) => {
+    startTransition(() => {
+      dispatchOptimistic({ type: "REMOVE", id: productId });
+    });
     try {
       setPendingItemId(productId);
       await onDeleteItem(productId);
@@ -44,6 +70,9 @@ export function CartItemsList({
 
   const handleMoveToWishlist = async (productId: string) => {
     if (!onMoveToWishlist) return;
+    startTransition(() => {
+      dispatchOptimistic({ type: "REMOVE", id: productId });
+    });
     try {
       setPendingItemId(productId);
       await onMoveToWishlist(productId);
@@ -53,6 +82,9 @@ export function CartItemsList({
   };
 
   const handleUpdateQuantity = async (productId: string, quantity: number) => {
+    startTransition(() => {
+      dispatchOptimistic({ type: "UPDATE", id: productId, quantity });
+    });
     try {
       setPendingItemId(productId);
       await onUpdateQuantity(productId, quantity);
@@ -73,25 +105,43 @@ export function CartItemsList({
 
   return (
     <>
-      <Card className="py-4">
-        {items.map((item) => (
-          <CardContent key={item.id}>
-            <CartItem
-              item={item}
-              updateQuantity={handleUpdateQuantity}
-              onDeleteItem={handleDeleteItem}
-              onMoveToWishlist={handleMoveToWishlist}
-              isPending={pendingItemId === item.productId}
-            />
-            <Separator className="bg-gray-200 mt-4" />
-          </CardContent>
-        ))}
-        <CardFooter>
+      <Card className="py-4 overflow-hidden">
+        <AnimatePresence initial={false} mode="popLayout">
+          {optimisticItems.map((item) => (
+            <motion.div
+              layout
+              key={item.id}
+              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{
+                opacity: 0,
+                scale: 0.95,
+                height: 0,
+                overflow: "hidden",
+                marginTop: 0,
+                marginBottom: 0,
+              }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+            >
+              <CardContent>
+                <CartItem
+                  item={item}
+                  updateQuantity={handleUpdateQuantity}
+                  onDeleteItem={handleDeleteItem}
+                  onMoveToWishlist={handleMoveToWishlist}
+                  isPending={pendingItemId === item.productId}
+                />
+                <Separator className="bg-gray-200 mt-4" />
+              </CardContent>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+        <CardFooter className="pt-4">
           <Button
             variant="link"
-            className="w-auto underline underline-offset-4 underline-primary"
+            className="w-auto underline underline-offset-4 underline-primary p-0"
             onClick={() => setIsClearingCart(true)}
-            disabled={isClearingCart}
+            disabled={isClearingCart || optimisticItems.length === 0}
           >
             {isClearingCart ? "Menghapus..." : "Hapus semua dari keranjang"}
           </Button>
@@ -103,8 +153,7 @@ export function CartItemsList({
           <DialogHeader>
             <DialogTitle>Hapus Semua Item?</DialogTitle>
             <DialogDescription>
-              Apakah Anda yakin ingin menghapus semua item ({items.length}) dari
-              keranjang?
+              Apakah Anda yakin ingin menghapus semua item dari keranjang?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">

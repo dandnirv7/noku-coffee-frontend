@@ -30,7 +30,6 @@ export function useCartPageState() {
     removePromo,
   } = usePromoLogic({
     subtotal: baseSummary.subtotal,
-    shipping: baseSummary.shipping,
   });
 
   const summary = useMemo(

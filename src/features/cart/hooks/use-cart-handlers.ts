@@ -39,8 +39,12 @@ export function useCartHandlers() {
     await toggleWishlist(productId);
   };
 
-  const handleCheckout = async (addressId: string): Promise<void> => {
-    await checkoutProduct({ addressId });
+  const handleCheckout = async (
+    addressId: string,
+    promoCode?: string,
+    courier?: string,
+  ): Promise<void> => {
+    await checkoutProduct({ addressId, promoCode, shippingMethod: courier });
   };
 
   return {

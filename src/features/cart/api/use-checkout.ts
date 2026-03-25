@@ -1,11 +1,13 @@
 import { api } from "@/lib/axios";
 import { MutationConfig } from "@/lib/react-query";
 import { useMutation } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import z from "zod";
 
 type CheckoutParams = {
   addressId: string;
   promoCode?: string;
+  shippingMethod?: string;
 };
 
 const CheckoutResponseSchema = z.object({
@@ -18,17 +20,34 @@ const CheckoutResponseSchema = z.object({
 export const checkoutProduct = async ({
   addressId,
   promoCode,
+  shippingMethod,
 }: CheckoutParams) => {
-  const { data } = await api.post("/orders/checkout", { addressId, promoCode });
+  const payload = {
+    addressId,
+    ...(promoCode && promoCode.trim() !== "" && { promoCode }),
+    shippingMethod: shippingMethod || "NOKU_REGULAR",
+  };
 
-  const validated = CheckoutResponseSchema.safeParse(data);
+  try {
+    const { data } = await api.post("/orders/checkout", payload);
 
-  if (!validated.success) {
-    console.error("Schema Error:", validated.error);
-    throw new Error("Format data checkout dari server tidak valid");
+    const validated = CheckoutResponseSchema.safeParse(data);
+
+    if (!validated.success) {
+      console.error("Schema Error:", validated.error);
+      throw new Error("Format data checkout dari server tidak valid");
+    }
+
+    return validated.data;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.error(
+        "🚨 Error dari Backend NestJS:",
+        error.response?.data?.message || error.response?.data,
+      );
+    }
+    throw error;
   }
-
-  return validated.data;
 };
 
 type UseCheckoutProductParams = {

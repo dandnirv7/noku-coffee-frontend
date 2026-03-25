@@ -1,13 +1,14 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/features/auth/lib/auth-client";
 import { toRupiah } from "@/lib/utils";
 import { CheckCircle2, Loader2, Package, TicketPercent, X } from "lucide-react";
-import Link from "next/link";
-import { PromoCode } from "../lib/promo-codes";
+
 import {
   Dialog,
   DialogContent,
@@ -26,15 +27,40 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import { CartSummary } from "../lib/cart-schema";
-import { useState } from "react";
+
+interface Promo {
+  code: string;
+  description: string;
+}
+
+interface AddressType {
+  id: string;
+  isDefault: boolean;
+  label: string;
+  streetLine1: string;
+}
 
 interface OrderSummaryProps {
   summary: CartSummary;
-  onCheckout?: (addressId: string) => void;
-  onApplyPromo?: (code: string) => Promise<void>;
+  onCheckout?: (
+    addressId: string,
+    promoCode?: string,
+    courier?: string,
+  ) => void;
+  onApplyPromo?: (code: string) => void;
   onRemovePromo?: () => void;
-  appliedPromo?: PromoCode | null;
+  appliedPromo?: Promo | null;
   isValidatingPromo?: boolean;
   isCheckingOut?: boolean;
 }
@@ -51,35 +77,44 @@ export function OrderSummary({
   const [promoCode, setPromoCode] = useState("");
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [courier, setCourier] = useState<string>("NOKU_REGULAR");
 
   const { data: session } = authClient.useSession();
 
-  type AddressType = {
-    id: string;
-    isDefault: boolean;
-    label: string;
-    streetLine1: string;
-  };
-  const addresses =
-    (session?.user as unknown as { address?: AddressType[] })?.address || [];
+  const addresses: AddressType[] =
+    (session?.user as { address?: AddressType[] } | undefined)?.address ?? [];
 
   const defaultAddress = addresses.find((a) => a.isDefault);
   const activeAddress = defaultAddress || addresses[0];
   const addressId = activeAddress?.id;
 
-  const handleApplyPromo = async () => {
-    if (onApplyPromo) {
-      await onApplyPromo(promoCode);
-      if (appliedPromo) {
-        setPromoCode("");
-      }
+  const getShippingFee = (selectedCourier: string) => {
+    switch (selectedCourier) {
+      case "NOKU_REGULAR":
+        return 15000;
+      case "NOKU_EXPRESS":
+        return 30000;
+      case "NOKU_SAMEDAY":
+        return 50000;
+      default:
+        return summary.shipping;
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleApplyPromo();
+  const currentShippingFee =
+    summary.subtotal > 500000 ? summary.shipping : getShippingFee(courier);
+
+  const finalTotal = summary.total - summary.shipping + currentShippingFee;
+
+  const handleApplyPromo = async () => {
+    if (onApplyPromo && promoCode.trim()) {
+      await onApplyPromo(promoCode.toUpperCase());
+      if (appliedPromo) setPromoCode("");
     }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") handleApplyPromo();
   };
 
   const handleCheckout = () => {
@@ -88,12 +123,12 @@ export function OrderSummary({
       return;
     }
 
-    if (!defaultAddress) {
+    if (!defaultAddress && activeAddress?.id) {
       setIsConfirmModalOpen(true);
       return;
     }
 
-    onCheckout?.(addressId);
+    if (addressId) onCheckout?.(addressId, appliedPromo?.code, courier);
   };
 
   return (
@@ -102,6 +137,26 @@ export function OrderSummary({
         <h2 className="text-lg font-bold text-gray-900 mb-6">
           Ringkasan Pesanan
         </h2>
+
+        <div className="space-y-3 pb-6">
+          <Label className="text-xs font-semibold text-gray-400 uppercase mb-2 block">
+            Pengiriman
+          </Label>
+          <Select value={courier} onValueChange={setCourier}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Noku Regular" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem defaultValue="NOKU_REGULAR" value="NOKU_REGULAR">
+                  Noku Regular
+                </SelectItem>
+                <SelectItem value="NOKU_EXPRESS">Noku Express</SelectItem>
+                <SelectItem value="NOKU_SAMEDAY">Noku Same Day</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
 
         <div className="mb-6">
           <Label className="text-xs font-semibold text-gray-400 uppercase mb-2 block">
@@ -142,7 +197,7 @@ export function OrderSummary({
                   placeholder="NOKUHEMAT"
                   value={promoCode}
                   onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                  onKeyPress={handleKeyPress}
+                  onKeyDown={handleKeyPress}
                   disabled={isValidatingPromo}
                   className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF7A3D]/20 focus:border-[#FF7A3D] uppercase"
                 />
@@ -184,14 +239,16 @@ export function OrderSummary({
             </div>
           )}
 
-          {summary.shipping > 0 && (
-            <div className="flex justify-between text-sm text-gray-600">
-              <span>Ongkir</span>
+          <div className="flex justify-between text-sm text-gray-600">
+            <span>Ongkir</span>
+            {currentShippingFee > 0 ? (
               <span className="font-medium text-gray-900">
-                {toRupiah(summary.shipping)}
+                {toRupiah(currentShippingFee)}
               </span>
-            </div>
-          )}
+            ) : (
+              <span className="font-medium text-green-600">Gratis Ongkir</span>
+            )}
+          </div>
         </div>
 
         <div className="flex justify-between items-center py-4 mb-2">
@@ -199,7 +256,7 @@ export function OrderSummary({
             Total Tagihan
           </span>
           <span className="text-xl font-bold text-[#FF7A3D]">
-            {toRupiah(summary.total)}
+            {toRupiah(finalTotal)}
           </span>
         </div>
 
@@ -243,8 +300,11 @@ export function OrderSummary({
           <AddressForm
             isFirstAddress={addresses.length === 0}
             onCancel={() => setIsAddressModalOpen(false)}
-            onSuccess={() => {
+            onSuccess={(newAddressId) => {
               setIsAddressModalOpen(false);
+              if (addresses.length === 0 && newAddressId) {
+                onCheckout?.(newAddressId, appliedPromo?.code);
+              }
             }}
           />
         </DialogContent>
@@ -269,12 +329,14 @@ export function OrderSummary({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Pilih Alamat Lain</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-[#FF7A3D] hover:bg-[#E56A32]"
-              onClick={() => onCheckout?.(addressId!)}
-            >
-              Ya, Gunakan Alamat Ini
-            </AlertDialogAction>
+            {addressId && (
+              <AlertDialogAction
+                className="bg-[#FF7A3D] hover:bg-[#E56A32]"
+                onClick={() => onCheckout?.(addressId, appliedPromo?.code)}
+              >
+                Ya, Gunakan Alamat Ini
+              </AlertDialogAction>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
