@@ -28,7 +28,7 @@ export function PaymentCardActions({ status, data, handlePrint }: Props) {
               asChild
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
             >
-              <Link href="/user/orders">Lihat Pesanan Saya</Link>
+              <Link href="/orders">Lihat Pesanan Saya</Link>
             </Button>
             <div className="grid grid-cols-2 gap-3 w-full">
               <Button
@@ -79,7 +79,7 @@ export function PaymentCardActions({ status, data, handlePrint }: Props) {
               asChild
               className="w-full text-white bg-orange-500 hover:bg-orange-600"
             >
-              <Link href={`/user/orders/${data?.orderId}`}>
+              <Link href={`/orders/${data?.orderId}`}>
                 Cek Status Pesanan
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Link>

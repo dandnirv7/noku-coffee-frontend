@@ -24,7 +24,7 @@ import {
 import { useUpdateAddress } from "../api/use-update-address";
 
 interface AddressFormProps {
-  onSuccess?: () => void;
+  onSuccess?: (addressId?: string) => void;
   onCancel?: () => void;
   isFirstAddress?: boolean;
   initialData?: CreateAddressInput & { id?: string };
@@ -62,7 +62,7 @@ export function AddressForm({
         {
           onSuccess: () => {
             toast.success("Alamat berhasil diperbarui");
-            onSuccess?.();
+            onSuccess?.(initialData.id);
           },
           onError: (error: unknown) => {
             const errorMsg =
@@ -75,9 +75,9 @@ export function AddressForm({
       );
     } else {
       createAddress(data, {
-        onSuccess: () => {
+        onSuccess: (res: any) => {
           toast.success("Alamat berhasil ditambahkan");
-          onSuccess?.();
+          onSuccess?.(res?.id);
         },
         onError: (error: unknown) => {
           const errorMsg =
