@@ -217,3 +217,32 @@
     animation: glowPulse 4s ease-in-out infinite;
   }
 }
+
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  @page {
+    size: A4;
+    margin: 16mm;
+  }
+
+  .print-bg {
+    print-color-adjust: exact;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+
+  .avoid-break {
+    page-break-inside: avoid;
+  }
+}
