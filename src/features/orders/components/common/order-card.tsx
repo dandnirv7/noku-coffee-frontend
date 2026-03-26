@@ -40,7 +40,7 @@ export const OrderCard = ({ order, onCancel }: OrderCardProps) => {
             {order.items.slice(0, 1).map((item, index) => (
               <OrderItemRow
                 key={index}
-                name={item.productNameSnapshot}
+                name={item.productNameSnapshot || ""}
                 quantity={item.quantity}
                 price={Number(item.priceAtPurchase)}
                 image={null}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { AppliedPromo } from "../lib/cart-schema";
-import { PromoCode } from "../lib/promo-codes";
+import { PromoCode } from "../lib/promo-code-schema";
 import { useValidatePromo } from "../api/use-validate-promo";
 import { isAxiosError } from "axios";
 

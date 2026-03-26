@@ -2,7 +2,7 @@ import { toRupiah } from "@/lib/utils";
 import Image from "next/image";
 
 interface OrderItemRowProps {
-  name: string;
+  name?: string;
   quantity: number;
   price: number;
   image?: string | null;
@@ -10,7 +10,7 @@ interface OrderItemRowProps {
 }
 
 export const OrderItemRow = ({
-  name,
+  name = "Unknown Product",
   quantity,
   price,
   image,

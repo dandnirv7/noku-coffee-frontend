@@ -19,7 +19,7 @@ export default function OrderItems() {
               key={index}
               name={item.name}
               quantity={item.quantity}
-              price={item.price}
+              price={Number(item.price)}
               image={null}
             />
           ))}

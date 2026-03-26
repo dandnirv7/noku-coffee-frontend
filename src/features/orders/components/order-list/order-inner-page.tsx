@@ -52,7 +52,7 @@ export default function OrderInnerPage() {
         order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
         order.items.some((item) =>
           item.productNameSnapshot
-            .toLowerCase()
+            ?.toLowerCase()
             .includes(searchQuery.toLowerCase()),
         );
       return matchesTab && matchesSearch;
