@@ -75,9 +75,13 @@ export function AddressForm({
       );
     } else {
       createAddress(data, {
-        onSuccess: (res: any) => {
+        onSuccess: (res) => {
           toast.success("Alamat berhasil ditambahkan");
-          onSuccess?.(res?.id);
+          const newId =
+            res?.data?.id ||
+            res?.id ||
+            (typeof res === "string" ? res : undefined);
+          onSuccess?.(newId);
         },
         onError: (error: unknown) => {
           const errorMsg =

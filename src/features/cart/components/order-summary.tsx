@@ -77,7 +77,7 @@ export function OrderSummary({
   const [promoCode, setPromoCode] = useState("");
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [courier, setCourier] = useState<string>("NOKU_REGULAR");
+  const [courier, setCourier] = useState<string>("NOKU_REGULER");
 
   const { data: session } = authClient.useSession();
 
@@ -90,19 +90,21 @@ export function OrderSummary({
 
   const getShippingFee = (selectedCourier: string) => {
     switch (selectedCourier) {
-      case "NOKU_REGULAR":
-        return 15000;
+      case "NOKU_REGULER":
+        return 10000;
       case "NOKU_EXPRESS":
-        return 30000;
-      case "NOKU_SAMEDAY":
-        return 50000;
+        return 18000;
+      case "NOKU_NEXTDAY":
+        return 28000;
       default:
         return summary.shipping;
     }
   };
 
   const currentShippingFee =
-    summary.subtotal > 500000 ? summary.shipping : getShippingFee(courier);
+    summary.subtotal > 500000 && courier === "NOKU_REGULER"
+      ? 0
+      : getShippingFee(courier);
 
   const finalTotal = summary.total - summary.shipping + currentShippingFee;
 
@@ -148,11 +150,15 @@ export function OrderSummary({
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectItem defaultValue="NOKU_REGULAR" value="NOKU_REGULAR">
-                  Noku Regular
+                <SelectItem defaultValue="NOKU_REGULER" value="NOKU_REGULER">
+                  Noku Reguler — Rp10.000 (2–5 hari)
                 </SelectItem>
-                <SelectItem value="NOKU_EXPRESS">Noku Express</SelectItem>
-                <SelectItem value="NOKU_SAMEDAY">Noku Same Day</SelectItem>
+                <SelectItem value="NOKU_EXPRESS">
+                  Noku Express — Rp18.000 (1–2 hari)
+                </SelectItem>
+                <SelectItem value="NOKU_NEXTDAY">
+                  Noku Next Day — Rp28.000 (besok sampai)
+                </SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -303,7 +309,7 @@ export function OrderSummary({
             onSuccess={(newAddressId) => {
               setIsAddressModalOpen(false);
               if (addresses.length === 0 && newAddressId) {
-                onCheckout?.(newAddressId, appliedPromo?.code);
+                onCheckout?.(newAddressId, appliedPromo?.code, courier);
               }
             }}
           />
@@ -332,7 +338,9 @@ export function OrderSummary({
             {addressId && (
               <AlertDialogAction
                 className="bg-[#FF7A3D] hover:bg-[#E56A32]"
-                onClick={() => onCheckout?.(addressId, appliedPromo?.code)}
+                onClick={() =>
+                  onCheckout?.(addressId, appliedPromo?.code, courier)
+                }
               >
                 Ya, Gunakan Alamat Ini
               </AlertDialogAction>

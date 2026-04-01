@@ -25,7 +25,7 @@ export const checkoutProduct = async ({
   const payload = {
     addressId,
     ...(promoCode && promoCode.trim() !== "" && { promoCode }),
-    shippingMethod: shippingMethod || "NOKU_REGULAR",
+    shippingMethod: shippingMethod || "NOKU_REGULER",
   };
 
   try {
