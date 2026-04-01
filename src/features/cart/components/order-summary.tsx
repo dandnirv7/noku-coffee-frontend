@@ -151,7 +151,7 @@ export function OrderSummary({
             <SelectContent>
               <SelectGroup>
                 <SelectItem defaultValue="NOKU_REGULER" value="NOKU_REGULER">
-                  Noku Reguler — Rp10.000 (2–5 hari)
+                  Noku Reguler — Rp10.000 (2–3 hari)
                 </SelectItem>
                 <SelectItem value="NOKU_EXPRESS">
                   Noku Express — Rp18.000 (1–2 hari)

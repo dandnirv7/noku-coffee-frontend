@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import OrderInnerPage from "../components/order-list/order-inner-page";
 import { Metadata } from "next";
+import { OrderListSkeleton } from "../components/skeleton/order-list-skeleton";
 
 export function generateMetadata(): Metadata {
   return {
@@ -26,5 +28,9 @@ export function generateMetadata(): Metadata {
 }
 
 export default function OrderPage() {
-  return <OrderInnerPage />;
+  return (
+    <Suspense fallback={<OrderListSkeleton />}>
+      <OrderInnerPage />
+    </Suspense>
+  );
 }
