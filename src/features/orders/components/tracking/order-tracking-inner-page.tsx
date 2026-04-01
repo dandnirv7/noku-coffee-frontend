@@ -150,7 +150,7 @@ export default function OrderTrackingInnerPage({
 
       <div className="hidden print:block">
         {trackingData.order_id && (
-          <InvoiceClient invoiceId={trackingData.order_id} isPrintOnly={true} />
+          <InvoiceClient invoiceId={trackingData.order_id} />
         )}
       </div>
     </>

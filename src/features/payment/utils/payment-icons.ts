@@ -1,4 +1,4 @@
-export const getPaymentIcon = (channel: string | undefined): string => {
+export const getPaymentIcon = (channel: string | undefined | null): string => {
   if (!channel) return "/images/payments/default.svg";
 
   const normalizedChannel = channel.toUpperCase();

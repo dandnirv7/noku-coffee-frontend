@@ -229,6 +229,10 @@
     margin: 16mm;
   }
 
+  .break-inside-avoid {
+    page-break-inside: avoid;
+  }
+
   .print-bg {
     print-color-adjust: exact;
   }
