@@ -15,7 +15,7 @@ export function InvoiceFooter() {
         <div className="flex items-center gap-4 text-sm font-medium text-gray-600">
           <a
             href="mailto:support@nokucoffee.me"
-            className="flex items-center gap-1.5 hover:text-blue-600 transition-colors"
+            className="flex items-center gap-1.5 hover:text-primary transition-colors"
           >
             <Mail className="w-4 h-4" />
             Hubungi Support

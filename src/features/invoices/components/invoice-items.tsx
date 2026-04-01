@@ -16,13 +16,13 @@ export const InvoiceItems = () => {
 
   return (
     <div>
-      <div className="flex items-center gap-2 mb-4 text-blue-600 font-semibold print:text-gray-800">
+      <div className="flex items-center gap-2 mb-4 text-primary font-semibold print:hidden">
         <Package className="w-5 h-5" />
         Ringkasan Pesanan
       </div>
 
-      <div className="hidden md:block print:block border rounded-lg overflow-hidden print:border-gray-200">
-        <Table>
+      <div className="hidden md:block print:block border rounded-lg overflow-hidden print:border-none print:rounded-none">
+        <Table className="table-fixed w-full">
           <TableHeader className="bg-gray-50 print:bg-gray-100">
             <TableRow>
               <TableHead className="w-[300px] font-semibold text-gray-600 text-xs">
@@ -45,7 +45,7 @@ export const InvoiceItems = () => {
           <TableBody>
             {invoice.items.map((item, index: number) => (
               <TableRow key={index}>
-                <TableCell className="font-semibold text-sm">
+                <TableCell className="font-semibold text-sm print:w-[300px] truncate print:wrap-break-words print:whitespace-normal print:leading-snug">
                   {item.productName}
                 </TableCell>
                 <TableCell className="text-gray-500 text-xs font-mono">

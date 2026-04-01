@@ -10,7 +10,7 @@ export function InvoiceNavbar() {
           variant="ghost"
           size="sm"
           asChild
-          className="text-gray-600 hover:text-gray-900 -ml-3"
+          className="text-gray-600 hover:text-primary -ml-3"
         >
           <Link href="/orders">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -22,10 +22,13 @@ export function InvoiceNavbar() {
           variant="ghost"
           size="sm"
           asChild
-          className="text-gray-500 hover:text-blue-600"
+          className="text-gray-500 hover:text-primary"
         >
-          <Link href="/support">
-            <HelpCircle className="w-4 h-4 mr-2" />
+          <Link
+            href="/support"
+            className="flex items-center justify-center sm:justify-start"
+          >
+            <HelpCircle className="w-4 h-4 sm:mr-2" />
             <span className="hidden sm:inline">Bantuan</span>
           </Link>
         </Button>

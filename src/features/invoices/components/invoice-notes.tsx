@@ -19,7 +19,7 @@ export const InvoiceNotes = () => {
             </span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">
+            <span className="text-primary mt-0.5">
               <Package className="w-3 h-3" />
             </span>
             <span>
@@ -28,14 +28,14 @@ export const InvoiceNotes = () => {
             </span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">
+            <span className="text-primary mt-0.5">
               <Mail className="w-3 h-3" />
             </span>
             <span>
               Untuk dukungan atau pertanyaan:{" "}
               <a
                 href="mailto:support@nokucoffee.me"
-                className="text-blue-600 font-semibold hover:underline"
+                className="text-primary font-semibold hover:underline"
               >
                 support@nokucoffee.me
               </a>

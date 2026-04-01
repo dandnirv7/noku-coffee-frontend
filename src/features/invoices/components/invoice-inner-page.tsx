@@ -17,13 +17,7 @@ import { InvoiceCompanyInfo } from "./invoice-compay-info";
 
 import { InvoiceProvider } from "../context/invoices-context";
 
-export default function InvoiceInnerPage({
-  invoiceId,
-  isPrintOnly = false,
-}: {
-  invoiceId: string;
-  isPrintOnly?: boolean;
-}) {
+export default function InvoiceInnerPage({ invoiceId }: { invoiceId: string }) {
   const { data: invoiceData, isLoading, isError } = useGetInvoice(invoiceId);
   const printRef = useRef<HTMLDivElement>(null);
 
@@ -52,7 +46,6 @@ export default function InvoiceInnerPage({
   }
 
   if (isError || !invoiceData) {
-    if (isPrintOnly) return null;
     return (
       <div className="min-h-screen bg-gray-50 p-4 md:p-8 flex flex-col items-center justify-center font-sans">
         <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
@@ -76,30 +69,18 @@ export default function InvoiceInnerPage({
   return (
     <div
       ref={printRef}
-      className={`min-h-screen bg-gray-50 p-4 md:p-8 flex justify-center font-sans print:p-0 print:bg-white ${
-        isPrintOnly ? "hidden print:block" : ""
-      }`}
+      className={`min-h-screen bg-gray-50 p-4 md:p-8 flex justify-center font-sans print:p-0 print:bg-white`}
     >
       <div className="w-full max-w-4xl bg-white shadow-sm rounded-xl border border-gray-100 overflow-hidden print:shadow-none print:border-none print:rounded-none">
         <div className="p-6 md:p-10 space-y-8 print:p-[20mm] print:space-y-6">
           <InvoiceProvider invoice={invoiceData}>
-            <InvoiceBranding
-              handlePrint={handlePrint}
-              isPrintOnly={isPrintOnly}
-            />
-
+            <InvoiceBranding handlePrint={handlePrint} />
             <InvoiceMetaInfo />
-
-            <InvoiceDetails />
-
             <InvoiceItems />
-
             <InvoicePaymentSummary />
-
+            <InvoiceDetails trackingUrl={trackingUrl} />
             <InvoiceNotes />
-
             <div className="border-t border-gray-100 print:my-6" />
-
             <InvoiceCompanyInfo trackingUrl={trackingUrl} />
           </InvoiceProvider>
         </div>
