@@ -1,1 +1,1 @@
-export { default } from "@/features/orders/pages/order-page";
+export { default, generateMetadata } from "@/features/orders/pages/order-page";
