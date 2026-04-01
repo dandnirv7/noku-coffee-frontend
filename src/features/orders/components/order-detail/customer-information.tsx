@@ -8,8 +8,8 @@ export default function CustomerInformation() {
   const { order } = useOrderDetail();
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
+    <Card className="gap-2">
+      <CardHeader>
         <CardTitle className="text-lg">Informasi Pelanggan</CardTitle>
       </CardHeader>
       <CardContent>

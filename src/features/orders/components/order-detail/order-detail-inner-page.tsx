@@ -10,11 +10,11 @@ import OrderTimeline from "./order-timeline";
 import ShippingInformation from "./shipping-information";
 
 export default async function OrderDetailInnerPage({
-  orderId,
+  orderNumber,
 }: {
-  orderId: string;
+  orderNumber: string;
 }) {
-  const order: OrderDetail = await getDetailOrder(orderId);
+  const order: OrderDetail = await getDetailOrder(orderNumber);
 
   return (
     <OrderDetailProvider order={order}>

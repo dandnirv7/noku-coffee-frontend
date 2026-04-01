@@ -14,6 +14,7 @@ import { OrderCard } from "../common/order-card";
 import CancelOrderModal from "../order-detail/cancel-order-modal";
 import { OrderEmpty } from "./order-empty";
 import { OrderListSkeleton } from "../skeleton/order-list-skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function OrderInnerPage() {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -89,19 +90,19 @@ export default function OrderInnerPage() {
             <div className="flex-1 overflow-x-auto pb-2 -mb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] relative">
               <TabsList className="w-max inline-flex h-11 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground">
                 <TabsTrigger value="all" className="px-4">
-                  Semua Pesanan
+                  Semua
                 </TabsTrigger>
                 <TabsTrigger value="PENDING" className="px-4">
-                  Menunggu
+                  Menunggu Pembayaran
                 </TabsTrigger>
-                <TabsTrigger value="PROCESSING" className="px-4">
+                <TabsTrigger value="PAID" className="px-4">
                   Diproses
                 </TabsTrigger>
                 <TabsTrigger value="SHIPPED" className="px-4">
                   Dikirim
                 </TabsTrigger>
-                <TabsTrigger value="PAID" className="px-4">
-                  Dibayar
+                <TabsTrigger value="COMPLETED" className="px-4">
+                  Selesai
                 </TabsTrigger>
                 <TabsTrigger value="CANCELLED" className="px-4">
                   Dibatalkan
@@ -144,8 +145,33 @@ export default function OrderInnerPage() {
                   );
                 })}
                 {isFetchingNextPage && (
-                  <div className="py-4 text-center text-sm text-gray-500">
-                    Memuat pesanan lainnya...
+                  <div className="p-6 bg-white rounded-2xl border border-border shadow-sm">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="space-y-2">
+                        <Skeleton className="w-32 h-5" />
+                        <Skeleton className="w-24 h-4" />
+                      </div>
+                      <Skeleton className="w-20 h-6 rounded-full" />
+                    </div>
+
+                    <div className="pt-4 mt-4 space-y-4 border-t border-border">
+                      <div className="flex gap-4">
+                        <Skeleton className="w-20 h-20 rounded-xl shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="w-3/4 h-5" />
+                          <Skeleton className="w-1/4 h-4" />
+                          <Skeleton className="w-1/2 h-4" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-4 mt-4 border-t border-border">
+                      <Skeleton className="w-32 h-6" />
+                      <div className="flex gap-2">
+                        <Skeleton className="w-24 h-9 rounded-xl" />
+                        <Skeleton className="w-32 h-9 rounded-xl" />
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>

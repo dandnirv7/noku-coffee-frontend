@@ -4,12 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { toRupiah } from "@/lib/utils";
 import { useOrderDetail } from "@/features/orders/context/order-detail-context";
+import Image from "next/image";
+import { getPaymentIcon } from "@/features/payment/utils/payment-icons";
 
 export default function OrderSummary() {
   const { order } = useOrderDetail();
 
   return (
-    <Card>
+    <Card className="gap-2">
       <CardHeader>
         <CardTitle className="text-lg">Ringkasan Pesanan</CardTitle>
       </CardHeader>
@@ -19,6 +21,10 @@ export default function OrderSummary() {
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Subtotal</span>
               <span>{toRupiah(order.subtotal)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-500">Pajak</span>
+              <span>{toRupiah(order.tax)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Diskon</span>
@@ -39,12 +45,14 @@ export default function OrderSummary() {
             <span>{toRupiah(order.total)}</span>
           </div>
 
-          <div className="pt-2">
-            <div className="text-sm text-gray-500 mb-1">Metode Pembayaran</div>
-            <div className="font-medium">{order.paymentMethod}</div>
-            <div className="text-sm text-green-600 mt-1">
-              {order.paymentStatus}
-            </div>
+          <div className="flex justify-between items-center ">
+            <div className=" font-medium">Metode Pembayaran</div>
+            <Image
+              src={getPaymentIcon(order?.paymentChannel)}
+              alt={order?.paymentChannel ?? ""}
+              width={64}
+              height={64}
+            />
           </div>
         </div>
       </CardContent>

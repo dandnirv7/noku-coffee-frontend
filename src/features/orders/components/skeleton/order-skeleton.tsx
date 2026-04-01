@@ -9,10 +9,18 @@ export default function OrderSkeleton() {
       </div>
 
       <div className="mb-6 space-y-2">
-        <div className="flex gap-2 mb-4">
-          {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="w-24 h-10 rounded-md" />
-          ))}
+        <div className="flex justify-between">
+          <div className="flex gap-2 mb-4">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton
+                key={i}
+                className={`w-24 h-10 rounded-md ${
+                  i >= 3 ? "hidden sm:block" : ""
+                }`}
+              />
+            ))}
+          </div>
+          <Skeleton className="w-24 h-10 rounded-md hidden md:block" />
         </div>
 
         {[...Array(3)].map((_, i) => (
@@ -39,11 +47,14 @@ export default function OrderSkeleton() {
               </div>
             </div>
 
-            <div className="flex justify-between items-center pt-4 mt-4 border-t border-border">
-              <Skeleton className="w-32 h-6" />
+            <div className="flex justify-between md:items-center pt-4 mt-4 border-t border-border">
+              <div className="flex flex-col gap-2">
+                <Skeleton className="w-32 h-6" />
+                <Skeleton className="w-28 md:w-32 h-6" />
+              </div>
               <div className="flex gap-2">
-                <Skeleton className="w-24 h-9 rounded-xl" />
-                <Skeleton className="w-32 h-9 rounded-xl" />
+                <Skeleton className="w-24 md:w-24 h-9 rounded-xl" />
+                <Skeleton className="w-24 md:w-32 h-9 rounded-xl" />
               </div>
             </div>
           </div>

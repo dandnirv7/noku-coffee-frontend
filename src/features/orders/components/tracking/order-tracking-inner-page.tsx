@@ -7,6 +7,7 @@ import { useGetTracking } from "@/features/orders/api/use-get-tracking";
 import {
   AlertCircle,
   ArrowLeft,
+  Dot,
   FileText,
   MapPin,
   Package,
@@ -73,10 +74,13 @@ export default function OrderTrackingInnerPage({
             <h1 className="text-2xl font-bold text-gray-900">
               Lacak Pesanan Anda
             </h1>
-            <div className="flex items-center text-gray-500 mt-1">
-              <Package className="h-4 w-4 mr-1" />
-              Pesanan #{trackingData.order_number} • Resi #
-              {trackingData.tracking_number || "Segera Tampil"}
+            <div className="flex flex-col md:flex-row items-center text-gray-500 mt-1">
+              <div className="flex flex-row items-center">
+                <Package className="h-4 w-4 mr-1" />
+                Pesanan #{trackingData.order_number}
+              </div>
+              <Dot className="hidden md:block" />
+              <div>Resi #{trackingData.tracking_number || "Segera Tampil"}</div>
             </div>
           </div>
           <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
@@ -119,8 +123,8 @@ export default function OrderTrackingInnerPage({
           <div className="lg:col-span-2 space-y-6">
             <TrackingStatusCard trackingData={trackingData} />
 
-            <Card>
-              <CardHeader className="pb-3">
+            <Card className="gap-2">
+              <CardHeader>
                 <CardTitle className="text-lg">Peta Lokasi</CardTitle>
               </CardHeader>
               <CardContent>

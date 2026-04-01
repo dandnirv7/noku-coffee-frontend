@@ -11,15 +11,17 @@ interface TrackingInfoSidebarProps {
   trackingData: TrackingData;
 }
 
-export const TrackingInfoSidebar = ({ trackingData }: TrackingInfoSidebarProps) => {
+export const TrackingInfoSidebar = ({
+  trackingData,
+}: TrackingInfoSidebarProps) => {
   const estimatedDeliveryDate = trackingData.status_summary.estimated_delivery
     ? new Date(trackingData.status_summary.estimated_delivery)
     : new Date();
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader className="pb-3">
+      <Card className="gap-2">
+        <CardHeader>
           <CardTitle className="text-lg">Informasi Pengiriman</CardTitle>
         </CardHeader>
         <CardContent>
@@ -47,7 +49,9 @@ export const TrackingInfoSidebar = ({ trackingData }: TrackingInfoSidebarProps) 
                 </div>
                 <div className="flex items-center">
                   <Phone className="h-4 w-4 mr-2 text-gray-400" />
-                  <div className="text-gray-600">{trackingData.delivery_information.phone}</div>
+                  <div className="text-gray-600">
+                    {trackingData.delivery_information.phone}
+                  </div>
                 </div>
               </div>
             </div>
@@ -83,8 +87,8 @@ export const TrackingInfoSidebar = ({ trackingData }: TrackingInfoSidebarProps) 
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader className="pb-3">
+      <Card className="gap-2">
+        <CardHeader>
           <CardTitle className="text-lg">Ringkasan Pesanan</CardTitle>
         </CardHeader>
         <CardContent>
@@ -112,8 +116,8 @@ export const TrackingInfoSidebar = ({ trackingData }: TrackingInfoSidebarProps) 
         </CardContent>
       </Card>
 
-      <Card className="bg-orange-50 border-orange-100 shadow-sm">
-        <CardHeader className="pb-3">
+      <Card className="bg-orange-50 border-orange-100 shadow-sm gap-2">
+        <CardHeader>
           <CardTitle className="text-lg text-orange-900">
             Butuh Bantuan?
           </CardTitle>

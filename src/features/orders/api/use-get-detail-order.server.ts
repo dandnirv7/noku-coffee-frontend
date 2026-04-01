@@ -1,9 +1,9 @@
 import { createServerApi } from "@/lib/axios-server";
 import { OrderDetailResponseSchema } from "../lib/order-schema";
 
-export const getDetailOrder = async (id: string) => {
+export const getDetailOrder = async (orderNumber: string) => {
   const serverApi = await createServerApi();
-  const { data } = await serverApi.get(`/orders/${id}`);
+  const { data } = await serverApi.get(`/orders/${orderNumber}`);
 
   const validated = OrderDetailResponseSchema.safeParse(data);
 

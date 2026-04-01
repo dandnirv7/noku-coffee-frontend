@@ -28,7 +28,9 @@ export function OrderDetailProvider({
 export function useOrderDetail() {
   const context = useContext(OrderDetailContext);
   if (!context) {
-    throw new Error("useOrder must be used within an OrderDetailProvider");
+    throw new Error(
+      "useOrderDetail must be used within an OrderDetailProvider",
+    );
   }
 
   return context;

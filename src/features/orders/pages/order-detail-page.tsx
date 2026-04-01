@@ -2,24 +2,25 @@ import OrderDetailInnerPage from "../components/order-detail/order-detail-inner-
 import { Metadata } from "next";
 
 type Props = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ orderNumber: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
+  const { orderNumber } = await params;
+
   return {
-    title: `Detail Pesanan #${id} | Noku Coffee`,
-    description: `Periksa rincian lengkap pesanan #${id} Anda di Noku Coffee. Lihat item, rincian pembayaran, dan informasi pengiriman.`,
+    title: `Detail Pesanan #${orderNumber} | Noku Coffee`,
+    description: `Periksa rincian lengkap pesanan #${orderNumber} Anda di Noku Coffee. Lihat item, rincian pembayaran, dan informasi pengiriman.`,
     openGraph: {
-      title: `Detail Pesanan #${id} | Noku Coffee`,
-      description: `Rincian lengkap pesanan #${id} di Noku Coffee.`,
-      url: `https://noku.coffee/orders/${id}`,
+      title: `Detail Pesanan #${orderNumber} | Noku Coffee`,
+      description: `Rincian lengkap pesanan #${orderNumber} di Noku Coffee.`,
+      url: `https://noku.coffee/orders/${orderNumber}`,
       type: "website",
     },
     twitter: {
       card: "summary",
-      title: `Detail Pesanan #${id} | Noku Coffee`,
-      description: `Rincian lengkap pesanan #${id} di Noku Coffee.`,
+      title: `Detail Pesanan #${orderNumber} | Noku Coffee`,
+      description: `Rincian lengkap pesanan #${orderNumber} di Noku Coffee.`,
     },
     robots: {
       index: false,
@@ -29,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function OrderDetailPage({ params }: Props) {
-  const { id } = await params;
+  const { orderNumber } = await params;
 
-  return <OrderDetailInnerPage orderId={id} />;
+  return <OrderDetailInnerPage orderNumber={orderNumber} />;
 }

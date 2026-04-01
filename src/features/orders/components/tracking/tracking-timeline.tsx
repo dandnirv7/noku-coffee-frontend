@@ -10,8 +10,8 @@ interface TrackingTimelineProps {
 
 export const TrackingTimeline = ({ timeline }: TrackingTimelineProps) => {
   return (
-    <Card>
-      <CardHeader className="pb-3">
+    <Card className="gap-2">
+      <CardHeader>
         <CardTitle className="text-lg">Riwayat Perjalanan Pesanan</CardTitle>
       </CardHeader>
       <CardContent>

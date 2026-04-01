@@ -47,8 +47,8 @@ export const TrackingStatusCard = ({
   );
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
+    <Card className="gap-2">
+      <CardHeader>
         <CardTitle className="text-lg">Status Pengiriman</CardTitle>
       </CardHeader>
       <CardContent>

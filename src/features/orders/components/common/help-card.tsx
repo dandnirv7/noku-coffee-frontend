@@ -3,8 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function HelpCard() {
   return (
-    <Card className="bg-orange-50 border-orange-100">
-      <CardHeader className="pb-3">
+    <Card className="bg-orange-50 border-orange-100 gap-2">
+      <CardHeader>
         <CardTitle className="text-lg">Butuh Bantuan?</CardTitle>
       </CardHeader>
       <CardContent>

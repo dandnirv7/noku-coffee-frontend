@@ -8,6 +8,7 @@ import { toRupiah } from "@/lib/utils";
 import { ArrowRight, Calendar } from "lucide-react";
 import Link from "next/link";
 import { OrderItemRow } from "../order-detail/order-item-row";
+import { useRouter } from "next/navigation";
 
 interface OrderCardProps {
   order: OrderList;
@@ -15,10 +16,16 @@ interface OrderCardProps {
 }
 
 export const OrderCard = ({ order, onCancel }: OrderCardProps) => {
+  const router = useRouter();
+
+  const handleBayarSekarang = () => {
+    router.push(order.paymentUrl || "#");
+  };
+
   return (
-    <Card className="overflow-hidden p-0 transition-all hover:shadow-md">
+    <Card className="overflow-hidden p-0 gap-0 transition-all hover:shadow-md">
       <CardHeader className="py-4 bg-gray-50/50">
-        <div className="flex flex-col gap-4 justify-between md:flex-row md:items-center">
+        <div className="flex  gap-4 justify-between items-start flex-row  md:items-center">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <div className="flex items-center">
               {getStatusIcon(order.status)}
@@ -55,7 +62,7 @@ export const OrderCard = ({ order, onCancel }: OrderCardProps) => {
 
           <Separator className="opacity-50" />
 
-          <div className="flex flex-col gap-4 justify-between sm:flex-row sm:items-center">
+          <div className="flex gap-4 justify-between flex-row items-center">
             <div className="space-y-0.5">
               <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Total Pembayaran
@@ -64,7 +71,7 @@ export const OrderCard = ({ order, onCancel }: OrderCardProps) => {
                 {toRupiah(Number(order.totalAmount))}
               </div>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex  gap-2">
               {order.status === "PENDING" && onCancel && (
                 <Button
                   variant="outline"
@@ -75,21 +82,37 @@ export const OrderCard = ({ order, onCancel }: OrderCardProps) => {
                   Batalkan
                 </Button>
               )}
-              {order.shipping?.trackingNumber && (
-                <Button asChild variant="outline" size="sm">
-                  <Link
-                    href={`/orders/tracking/${order.shipping.trackingNumber}`}
-                  >
-                    Lacak
-                  </Link>
+              {order.status === "PENDING" ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-green-500 border-green-200 hover:bg-green-50 hover:text-green-600 hover:border-green-300"
+                  onClick={handleBayarSekarang}
+                >
+                  Bayar
                 </Button>
+              ) : (
+                <>
+                  {order.shipping?.trackingNumber && (
+                    <Button asChild variant="outline" size="sm">
+                      <Link
+                        href={`/orders/tracking/${order.shipping.trackingNumber}`}
+                      >
+                        Lacak
+                      </Link>
+                    </Button>
+                  )}
+                  <Button asChild size="sm">
+                    <Link
+                      href={`/orders/${order.orderNumber}`}
+                      className="group"
+                    >
+                      Detail
+                      <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    </Link>
+                  </Button>
+                </>
               )}
-              <Button asChild size="sm">
-                <Link href={`/orders/${order.id}`} className="group">
-                  Detail
-                  <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </Link>
-              </Button>
             </div>
           </div>
         </div>

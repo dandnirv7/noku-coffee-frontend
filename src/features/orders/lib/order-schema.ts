@@ -40,6 +40,7 @@ const OrderListSchema = z.object({
   createdAt: z.string(),
   status: z.string(),
   paymentExternalId: z.string().nullable().optional(),
+  paymentUrl: z.string().nullable().optional(),
   shipping: z
     .object({
       trackingNumber: z.string().optional().nullable(),
@@ -84,14 +85,17 @@ export const ShippingSchema = z.object({
 
 export const OrderDetailDataSchema = z.object({
   id: z.string(),
+  orderNumber: z.string(),
   date: z.string(),
   status: z.string(),
   items: z.array(OrderListItemSchema),
   subtotal: coercedNumber,
   discount: coercedNumber,
   deliveryFee: coercedNumber,
+  tax: coercedNumber,
   total: coercedNumber,
   paymentMethod: z.string().nullable().optional(),
+  paymentChannel: z.string().nullable().optional(),
   paymentStatus: z.string().optional().nullable(),
   customer: CustomerSchema,
   shipping: ShippingSchema,
@@ -101,6 +105,9 @@ export const OrderDetailDataSchema = z.object({
       status: z.string(),
       date: z.string().nullable().optional(),
       description: z.string(),
+      isLatest: z.boolean().optional(),
+      isSimulated: z.boolean().optional(),
+      realDate: z.string().nullable().optional(),
     }),
   ),
   invoiceId: z.string().optional().nullable(),
@@ -110,7 +117,6 @@ export const OrderDetailResponseSchema = z.object({
   success: z.boolean().optional(),
   message: z.string().optional(),
   data: OrderDetailDataSchema,
-  meta: OrdersMetaSchema.optional(),
 });
 
 export const TrackingDataSchema = z.object({

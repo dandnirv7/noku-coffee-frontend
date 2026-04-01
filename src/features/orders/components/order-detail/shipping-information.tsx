@@ -9,8 +9,8 @@ export default function ShippingInformation() {
   const { order } = useOrderDetail();
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
+    <Card className="gap-2">
+      <CardHeader>
         <CardTitle className="text-lg">Informasi Pengiriman</CardTitle>
       </CardHeader>
       <CardContent>
@@ -40,7 +40,10 @@ export default function ShippingInformation() {
               <p>{order.shipping.method}</p>
               <div className="flex items-center text-sm">
                 <Clock className="h-4 w-4 mr-1 text-gray-400" />
-                Perkiraan tiba: {order.shipping.estimatedDelivery ? formatDateWithTime(order.shipping.estimatedDelivery) : "-"}
+                Perkiraan tiba:{" "}
+                {order.shipping.estimatedDelivery
+                  ? formatDateWithTime(order.shipping.estimatedDelivery)
+                  : "-"}
               </div>
               <div className="flex items-center text-sm mt-2">
                 <Truck className="h-4 w-4 mr-1 text-gray-400" />

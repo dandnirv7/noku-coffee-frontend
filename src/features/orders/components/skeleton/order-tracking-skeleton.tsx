@@ -8,22 +8,27 @@ export default function OrderTrackingPageSkeleton() {
         <Skeleton className="h-4 w-36" />
       </div>
 
-      <div className="flex flex-col md:flex-row items-start justify-between mb-6">
+      <div className="flex flex-col md:flex-row items-start justify-between mb-6 gap-4">
         <div>
-          <Skeleton className="h-8 w-36 mb-2" />
-          <div className="flex items-center">
-            <Skeleton className="h-4 w-4 mr-1" />
-            <Skeleton className="h-4 w-48" />
+          <Skeleton className="h-8 w-48 mb-2" />
+          <div className="flex flex-col md:flex-row items-start md:items-center mt-1">
+            <div className="flex flex-row items-center mb-1 md:mb-0">
+              <Skeleton className="h-4 w-4 mr-1" />
+              <Skeleton className="h-4 w-40" />
+            </div>
+            <Skeleton className="h-4 w-4 md:block hidden mx-1" />
+            <Skeleton className="h-4 w-32" />
           </div>
         </div>
         <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
-          <Skeleton className="h-8 w-20" />
-          <Skeleton className="h-8 w-16" />
+          <Skeleton className="h-9 w-24 rounded-md" />
+          <Skeleton className="h-9 w-28 rounded-md" />
+          <Skeleton className="h-9 w-24 rounded-md" />
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 space-y-6">
+      <div className="grid lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
           {}
           <Card>
             <CardHeader className="pb-3">

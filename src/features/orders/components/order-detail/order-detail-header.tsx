@@ -23,11 +23,13 @@ export default function OrderDetailHeader() {
       </div>
 
       <div className="flex flex-col md:flex-row items-start justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            Pesanan #{order.id}
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-col md:flex-row md:items-center gap-0 md:gap-3">
+            <h1 className="text-2xl font-bold text-gray-900">
+              Pesanan #{order.orderNumber}
+            </h1>
             <OrderStatusBadge status={order.status} />
-          </h1>
+          </div>
           <div className="flex items-center text-gray-500 mt-1">
             <Calendar className="h-4 w-4 mr-1" />
             {formatDateWithTime(order.date)} WIB

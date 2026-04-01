@@ -4,25 +4,26 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function OrderDetailsPageSkeleton() {
   return (
     <main className="container mx-auto px-4 py-8">
-      <div className="flex items-center mb-6">
-        <Skeleton className="h-4 w-32" />
-      </div>
+      <div className="mb-6 space-y-4 md:space-y-6">
+        <Skeleton className="h-5 w-48" />
 
-      <div className="flex flex-col md:flex-row items-start justify-between mb-6">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <Skeleton className="h-8 w-32" />
-            <Skeleton className="h-6 w-20" />
+        <div className="flex flex-col md:flex-row items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Skeleton className="h-8 w-40" />
+              <Skeleton className="h-6 w-24 rounded-full" />
+            </div>
+            <div className="flex items-center text-sm">
+              <Skeleton className="h-4 w-28" />
+              <span className="mx-2 text-gray-200">•</span>
+              <Skeleton className="h-4 w-32" />
+            </div>
           </div>
-          <div className="flex items-center">
-            <Skeleton className="h-4 w-4 mr-1" />
-            <Skeleton className="h-4 w-40" />
+          <div className="flex flex-wrap gap-2">
+            <Skeleton className="h-9 w-32 rounded-md" />
+            <Skeleton className="h-9 w-28 rounded-md" />
+            <Skeleton className="h-9 w-24 rounded-md" />
           </div>
-        </div>
-        <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
-          <Skeleton className="h-8 w-24" />
-          <Skeleton className="h-8 w-32" />
-          <Skeleton className="h-8 w-28" />
         </div>
       </div>
 
@@ -119,33 +120,32 @@ export default function OrderDetailsPageSkeleton() {
         </div>
 
         <div className="space-y-6">
-          {}
+          {/* Summary */}
           <Card>
             <CardHeader className="pb-3">
-              <Skeleton className="h-6 w-28" />
+              <Skeleton className="h-6 w-40" />
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  {Array.from({ length: 3 }).map((_, index) => (
-                    <div key={index} className="flex justify-between">
-                      <Skeleton className="h-4 w-16" />
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <div key={index} className="flex justify-between text-sm">
+                      <Skeleton className="h-4 w-24" />
                       <Skeleton className="h-4 w-20" />
                     </div>
                   ))}
                 </div>
 
-                <div className="border-t pt-2">
-                  <div className="flex justify-between">
+                <div className="border-t pt-4">
+                  <div className="flex justify-between font-medium">
                     <Skeleton className="h-5 w-12" />
                     <Skeleton className="h-5 w-24" />
                   </div>
                 </div>
 
-                <div className="pt-2">
-                  <Skeleton className="h-4 w-24 mb-1" />
-                  <Skeleton className="h-4 w-32 mb-1" />
-                  <Skeleton className="h-4 w-16" />
+                <div className="flex justify-between items-center pt-2">
+                  <Skeleton className="h-5 w-36" />
+                  <Skeleton className="h-16 w-16 rounded-md" />
                 </div>
               </div>
             </CardContent>
