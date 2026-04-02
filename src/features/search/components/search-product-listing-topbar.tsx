@@ -1,6 +1,7 @@
 "use client";
 
 import { DebouncedInput } from "@/components/shared/debounced-input";
+import ScrollCategories from "@/components/shared/scroll-categories";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -10,9 +11,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { LayoutGrid, List } from "lucide-react";
+import { Filter, LayoutGrid, List } from "lucide-react";
 import { useSearchFilters } from "../hooks/use-search-filters";
+import { SearchProductFilterPanel } from "./search-product-filter-panel";
 
 const sortOptions: { value: string; label: string }[] = [
   { value: "name_asc", label: "A - Z" },
@@ -26,8 +29,8 @@ export function SearchProductListingTopBar() {
     useSearchFilters();
 
   return (
-    <div className="flex flex-col gap-4 pb-4 mb-6 border-b md:flex-row md:items-center md:justify-between">
-      <div className="relative w-full md:max-w-full">
+    <div className="flex flex-col gap-4 justify-between pb-4 mb-6 border-b lg:flex-row lg:items-center">
+      <div className="relative w-full">
         <DebouncedInput
           value={params.search}
           onChange={updateSearch}
@@ -35,10 +38,27 @@ export function SearchProductListingTopBar() {
         />
       </div>
 
-      <div className="flex gap-3 items-center w-full md:w-auto">
+      <div className="flex gap-3 items-center w-auto">
+        <ScrollCategories className="lg:hidden" />
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline" className="px-3 rounded-lg lg:hidden">
+              <Filter className="mr-2 w-4 h-4" />
+              Filter
+            </Button>
+          </SheetTrigger>
+
+          <SheetContent
+            side="left"
+            className="w-[85vw] sm:w-[400px] overflow-y-auto [&>button:first-of-type]:hidden"
+          >
+            <SearchProductFilterPanel />
+          </SheetContent>
+        </Sheet>
+
         <Label className="hidden sm:inline">Urutkan</Label>
         <Select value={params.sort} onValueChange={updateSort}>
-          <SelectTrigger className="w-[180px] rounded-lg">
+          <SelectTrigger className="w-[80px] md:w-[180px] rounded-lg">
             <SelectValue placeholder="Urutkan" />
           </SelectTrigger>
           <SelectContent>
@@ -50,7 +70,7 @@ export function SearchProductListingTopBar() {
           </SelectContent>
         </Select>
 
-        <div className="flex items-center p-1 rounded-lg border bg-muted/50">
+        <div className="hidden items-center p-1 rounded-lg border md:flex bg-muted/50">
           <Button
             variant="ghost"
             size="sm"

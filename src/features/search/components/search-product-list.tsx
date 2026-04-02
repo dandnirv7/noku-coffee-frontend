@@ -2,8 +2,12 @@
 
 import { ProductCard } from "@/components/shared/product-card";
 import { cn } from "@/lib/utils";
-import { useSearchProductList } from "../hooks/use-search-product-list";
 import dynamic from "next/dynamic";
+import { useSearchProductList } from "../hooks/use-search-product-list";
+import { SearchProductFilterPanel } from "./search-product-filter-panel";
+import { FilterPanelSkeleton } from "./skeleton/search-product-filter-panel-skeleton";
+import { SearchProductListSkeleton } from "./skeleton/search-product-list-skeleton";
+import { SearchProductListingTopBarSkeleton } from "./skeleton/search-product-listing-topbar-skeleton";
 
 const SearchProductEmpty = dynamic(() =>
   import("./search-product-empty").then((mod) => mod.SearchProductEmpty),
@@ -11,10 +15,6 @@ const SearchProductEmpty = dynamic(() =>
 const SearchProductError = dynamic(() =>
   import("./search-product-error").then((mod) => mod.SearchProductError),
 );
-import { SearchProductFilterPanel } from "./search-product-filter-panel";
-import { FilterPanelSkeleton } from "./skeleton/search-product-filter-panel-skeleton";
-import { SearchProductListSkeleton } from "./skeleton/search-product-list-skeleton";
-import { SearchProductListingTopBarSkeleton } from "./skeleton/search-product-listing-topbar-skeleton";
 
 import { SearchProductListingTopBar } from "./search-product-listing-topbar";
 
@@ -57,7 +57,7 @@ const SearchProductList = () => {
 
   if (isLoading) {
     return (
-      <div className="container px-4 py-4 mx-auto">
+      <div className="px-4 py-4 mx-auto">
         <div className="flex relative flex-col gap-6 lg:flex-row">
           <aside className="hidden w-64 lg:block shrink-0">
             <FilterPanelSkeleton />
@@ -73,14 +73,14 @@ const SearchProductList = () => {
 
   if (isError) {
     return (
-      <div className="container px-4 py-10 mx-auto">
+      <div className="px-4 py-10 mx-auto">
         <SearchProductError reset={() => refetch()} />
       </div>
     );
   }
 
   return (
-    <div className="container px-4 mx-auto">
+    <div className="mx-auto lg:px-4">
       <div className="flex relative flex-col gap-6 lg:flex-row">
         <aside className="hidden sticky top-24 w-64 h-fit lg:block shrink-0">
           <SearchProductFilterPanel />
@@ -98,9 +98,9 @@ const SearchProductList = () => {
 
           <div
             className={cn(
-              "grid gap-4",
+              "grid gap-2 md:gap-4",
               params.viewMode === "grid"
-                ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"
+                ? "grid-cols-2 lg:grid-cols-3"
                 : "grid-cols-1",
             )}
           >
