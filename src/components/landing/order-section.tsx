@@ -27,7 +27,7 @@ export default function OrderSection({ id }: { id?: string }) {
     >
       <div className="absolute left-0 top-1/2 w-96 h-96 rounded-full blur-3xl -translate-y-1/2 bg-orange-50/50 -z-10" />
 
-      <div className="container px-4 mx-auto md:px-6">
+      <div className="px-4 mx-auto md:px-6">
         <div className="grid md:grid-cols-2 gap-12 items-center bg-[#1F2933] text-white rounded-3xl p-8 md:p-12 shadow-2xl">
           <div>
             <h3 className="mb-6 text-2xl font-bold md:text-3xl">

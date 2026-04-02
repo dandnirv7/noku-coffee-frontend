@@ -82,7 +82,7 @@ export default function ProductList({ id }: { id?: string }) {
 
   return (
     <section id={id} className="py-24 bg-background scroll-mt-20">
-      <div className="container px-4 mx-auto md:px-6">
+      <div className="px-4 mx-auto md:px-6">
         <div className="flex justify-between items-end mb-12">
           <div>
             <h2 className="mb-2 text-3xl font-bold text-foreground">
@@ -97,13 +97,18 @@ export default function ProductList({ id }: { id?: string }) {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div
+          className={`
+    flex gap-4 overflow-x-auto pb-4
+    sm:gap-6 sm:overflow-x-auto
+    lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-x-visible
+  `}
+        >
           {products.map((product) => (
             <Card
               key={product.id}
-              className="flex overflow-hidden flex-col gap-0 p-0 h-full bg-white rounded-xl border-none shadow-sm transition-all group hover:shadow-md"
+              className="shrink-0 w-72 lg:w-auto flex flex-col overflow-hidden gap-0 p-0 h-full bg-white rounded-xl border-none shadow-sm transition-all group hover:shadow-md"
             >
-              {/* Image area */}
               <div className="overflow-hidden relative aspect-square bg-neutral-100">
                 {product.tag && (
                   <Badge className="absolute top-3 left-3 z-10 bg-primary text-[10px]">
@@ -119,7 +124,6 @@ export default function ProductList({ id }: { id?: string }) {
                 />
               </div>
 
-              {/* Content */}
               <div className="flex flex-col flex-1 p-4">
                 <p className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground/60 mb-1">
                   {product.roast || product.category}

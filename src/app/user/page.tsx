@@ -1,1 +1,7 @@
-export { default } from "@/features/user/pages/user-page";
+"use client";
+
+import { redirect } from "next/navigation";
+
+export default function UserRedirectPage() {
+  redirect("/");
+}

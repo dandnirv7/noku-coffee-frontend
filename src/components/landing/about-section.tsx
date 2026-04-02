@@ -3,7 +3,7 @@ import Image from "next/image";
 export default function AboutSection({ id }: { id?: string }) {
   return (
     <section id={id} className="py-24 bg-surface">
-      <div className="container px-4 mx-auto md:px-6">
+      <div className="px-4 mx-auto md:px-6">
         <div className="flex flex-col gap-16 items-center md:flex-row">
           <div className="relative order-2 md:w-1/2 md:order-1">
             <div className="overflow-hidden relative z-10 rounded-2xl shadow-2xl aspect-5/4">

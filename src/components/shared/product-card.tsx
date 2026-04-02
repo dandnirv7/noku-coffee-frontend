@@ -104,7 +104,7 @@ export function ProductCard({
           </Link>
 
           {isOutOfStock && (
-            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+            <div className="flex absolute inset-0 justify-center items-center bg-black/50">
               <Badge
                 variant="destructive"
                 className="text-xs font-semibold rounded-md"
@@ -115,12 +115,12 @@ export function ProductCard({
           )}
 
           {isLowStock && !isOutOfStock && (
-            <div className="absolute top-3 left-3 z-10">
+            <div className="hidden absolute top-3 left-3 z-10 md:block">
               <Badge
                 variant="outline"
-                className="text-xs border-orange-500 text-orange-600 bg-white/90 rounded-md"
+                className="text-xs text-orange-600 rounded-md border-orange-500 bg-white/90"
               >
-                <AlertCircle className="h-3 w-3 inline mr-1" />
+                <AlertCircle className="inline mr-1 w-3 h-3" />
                 Stok Terbatas
               </Badge>
             </div>
@@ -131,7 +131,7 @@ export function ProductCard({
               variant="ghost"
               size="icon"
               className={cn(
-                "absolute top-3 right-3 z-10 rounded-full backdrop-blur-md bg-white/70 hover:bg-white disabled:opacity-50",
+                "hidden md:inline-flex absolute top-3 right-3 z-10 rounded-full backdrop-blur-md bg-white/70 hover:bg-white disabled:opacity-50",
                 isInWishlist && "bg-white",
               )}
               onClick={(e) => {
@@ -158,10 +158,10 @@ export function ProductCard({
       </CardHeader>
 
       <div className={cn("flex flex-col flex-1", isListView && "py-4 md:py-6")}>
-        <CardContent className="p-4 pt-0">
+        <CardContent className="p-4 py-0 md:pb-4">
           <p
             className={cn(
-              "text-[10px] font-bold tracking-widest uppercase text-muted-foreground/60 mb-1",
+              "text-[8px] md:text-[10px] hidden md:block md:font-bold tracking-widest uppercase text-muted-foreground/60 mb-1",
               isListView && "font-semibold",
             )}
           >
@@ -171,7 +171,7 @@ export function ProductCard({
           <Link href={productHref} className="block group/title">
             <h3
               className={cn(
-                "text-lg font-black tracking-tighter leading-tight uppercase transition-colors group-hover/title:text-primary line-clamp-1",
+                "text-sm md:text-lg font-black md:tracking-tighter md:leading-tight md:uppercase transition-colors group-hover/title:text-primary line-clamp-1",
                 isListView && "text-base",
               )}
             >
@@ -191,7 +191,7 @@ export function ProductCard({
           </div>
 
           {!isListView && (
-            <div className="flex flex-wrap gap-2 mt-2">
+            <div className="hidden flex-wrap gap-2 mt-2 md:flex">
               {badges.slice(0, 3).map((badge, index) => (
                 <Badge
                   key={`${badge.key}-${index}`}
@@ -212,38 +212,39 @@ export function ProductCard({
             </div>
           )}
 
-          <p
-            className={cn(
-              "mt-3 text-xs leading-relaxed text-muted-foreground",
-              isListView ? "line-clamp-3" : "line-clamp-2",
-              pathname?.includes("cart") && "hidden",
-            )}
-          >
-            {product.description}
-          </p>
+          {!pathname?.includes("cart") && (
+            <p
+              className={cn(
+                "hidden mt-3 text-xs leading-relaxed text-muted-foreground md:block",
+                isListView ? "block line-clamp-3" : "",
+              )}
+            >
+              {product.description}
+            </p>
+          )}
         </CardContent>
 
         <CardFooter className="p-4 pt-0 mt-auto">
           <div
             className={cn(
-              "flex items-center justify-between w-full gap-4",
+              "flex flex-col md:flex-row md:items-center justify-between w-full gap-4",
               pathname?.includes("cart") && "flex-col items-start",
               isListView && "max-w-xs flex-col items-start",
             )}
           >
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col-reverse gap-1 md:flex-col">
               <p className="text-xl font-black tracking-tighter text-slate-900">
                 {toRupiah(product.price)}
               </p>
               {!pathname?.includes("cart") && (
-                <div className="flex items-center gap-1">
+                <div className="gap-1 items-center md:flex">
                   {isOutOfStock ? (
-                    <span className="text-xs text-red-600 font-medium flex items-center gap-1">
-                      <AlertCircle className="h-3 w-3" /> Stok Habis
+                    <span className="flex gap-1 items-center text-xs font-medium text-red-600">
+                      <AlertCircle className="w-3 h-3" /> Stok Habis
                     </span>
                   ) : isLowStock ? (
-                    <span className="text-xs text-orange-600 font-medium flex items-center gap-1">
-                      <AlertCircle className="h-3 w-3" /> Tersisa {stock} item
+                    <span className="flex gap-1 items-center text-xs font-medium text-orange-600">
+                      <AlertCircle className="w-3 h-3" /> Tersisa {stock} item
                     </span>
                   ) : (
                     <span className="text-xs text-gray-500">Stok: {stock}</span>
