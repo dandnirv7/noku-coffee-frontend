@@ -4,7 +4,9 @@ import withBundleAnalyzer from "@next/bundle-analyzer";
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
+  htmlLimitedBots: /facebookexternalhit|linkedinbot|whatsapp|twitterbot/i,
   images: {
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         protocol: "https",
