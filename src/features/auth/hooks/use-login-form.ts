@@ -27,7 +27,7 @@ export function useLoginForm() {
   };
 
   const handleGoogleLogin = async () => {
-    const redirectUrl = callbackUrl || "/search";
+    const redirectUrl = callbackUrl || "/";
     await authClient.signIn.social({
       provider: "google",
       callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}${redirectUrl}`,

@@ -26,9 +26,13 @@ export const useLogin = (options?: UseLoginOptions) => {
 
       return res.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      const user = data?.user as { role?: string };
+      const role = user?.role?.toLowerCase();
+      const targetUrl = role === "admin" ? "/dashboard" : "/";
+
       toast.success("Berhasil masuk! Selamat datang kembali.");
-      router.push(redirectUrl);
+      router.push(targetUrl);
       router.refresh();
     },
     onError: () => {

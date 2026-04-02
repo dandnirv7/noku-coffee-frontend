@@ -1,14 +1,19 @@
 "use client";
 
-import AboutSection from "@/components/landing/AboutSection";
-import HeroSection from "@/components/landing/HeroSection";
-import OrderSection from "@/components/landing/OrderSection";
-import ProductList from "@/components/landing/ProductList";
+import AboutSection from "@/components/landing/about-section";
+import HeroSection from "@/components/landing/hero-section";
+import OrderSection from "@/components/landing/order-section";
+import ProductList from "@/components/landing/product-list";
 import BottomNav from "@/components/layout/landing/BottomNav";
 import Navbar from "@/components/layout/landing/Navbar";
 import { Badge } from "@/components/ui/badge";
 import { Award, MapPin } from "lucide-react";
 import Link from "next/link";
+import { authClient } from "@/features/auth/lib/auth-client";
+import UserDashboardPage from "@/features/user/pages/user-page";
+import UserDashboardLayout from "@/features/user/components/dashboard/layout";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 interface FooterColumns {
   title: string;
@@ -43,7 +48,35 @@ const footerColumns: FooterColumns[] = [
   },
 ];
 
-export default function LandingPage() {
+export default function HomePage() {
+  const { data: session, isPending } = authClient.useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (
+      !isPending &&
+      session?.user &&
+      (session.user as { role?: string }).role?.toLowerCase() === "admin"
+    ) {
+      router.push("/dashboard");
+    }
+  }, [session, isPending, router]);
+
+  if (isPending) {
+    return null;
+  }
+
+  if (
+    session?.user &&
+    (session.user as { role?: string }).role?.toLowerCase() === "user"
+  ) {
+    return (
+      <UserDashboardLayout>
+        <UserDashboardPage />
+      </UserDashboardLayout>
+    );
+  }
+
   return (
     <div className="min-h-screen overflow-x-hidden font-sans antialiased bg-background text-foreground selection:bg-primary selection:text-white pb-16 md:pb-0">
       <div className="relative overflow-hidden bg-[#1F2933] py-2.5 px-4 text-center text-sm font-medium text-white">
@@ -64,7 +97,7 @@ export default function LandingPage() {
 
       <HeroSection id="hero" />
       <div className="py-10 bg-white border-y border-border">
-        <div className="container flex flex-wrap gap-8 justify-center items-center px-4 mx-auto opacity-60 grayscale transition-all hover:grayscale-0 md:justify-between">
+        <div className="flex flex-wrap gap-8 justify-center items-center px-4 mx-auto opacity-60 grayscale transition-all hover:grayscale-0 md:justify-between">
           {awards.map((b, i) => (
             <div
               key={i}
@@ -81,7 +114,7 @@ export default function LandingPage() {
       <OrderSection id="order" />
 
       <footer className="pt-16 pb-12 border-t border-border bg-surface">
-        <div className="container px-4 mx-auto md:px-6">
+        <div className="px-4 mx-auto md:px-6">
           <div className="grid grid-cols-1 gap-12 mb-16 md:grid-cols-5">
             <div className="space-y-6 md:col-span-2">
               <div className="flex gap-2 items-center">

@@ -1,4 +1,12 @@
 import MainLayout from "@/components/layout/MainLayout";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return <MainLayout>{children}</MainLayout>;
