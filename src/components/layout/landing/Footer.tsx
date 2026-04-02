@@ -40,19 +40,11 @@ const footerColumns: FooterColumn[] = [
 export default function Footer() {
   const { data: session } = authClient.useSession();
 
-  // const accountColumn: FooterColumn = {
-  //   title: "Akun Saya",
-  //   links: [
-  //     { label: "Profil Saya", href: "/profile" },
-  //     { label: "Pesanan", href: "/orders" },
-  //     { label: "Favorit", href: "/favorites" },
-  //     { label: "Pengaturan", href: "/settings" },
-  //   ],
-  // };
+  if (session?.user) return null;
 
   return (
     <footer className="pt-16 pb-6 border-t border-border bg-card">
-      <div className="container px-4 mx-auto md:px-6">
+      <div className="px-4 mx-auto md:px-6">
         <div className="grid grid-cols-2 gap-8 mb-16 md:grid-cols-5">
           <div className="col-span-2 space-y-6">
             <div className="flex gap-2 items-center">

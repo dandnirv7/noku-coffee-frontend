@@ -3,7 +3,7 @@
 import { authClient } from "@/features/auth/lib/auth-client";
 import { useCartCount } from "@/features/cart/hooks/use-cart-count";
 import { cn } from "@/lib/utils";
-import { Home, Package, Search, ShoppingBag, User } from "lucide-react";
+import { Home, Package, Search, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -18,7 +18,7 @@ export default function BottomNav() {
     {
       label: "Keranjang",
       href: "/cart",
-      icon: ShoppingBag,
+      icon: ShoppingCart,
       badge: !isLoadingCart && cartCount > 0 ? cartCount : undefined,
     },
     { label: "Pesanan", href: "/orders", icon: Package },

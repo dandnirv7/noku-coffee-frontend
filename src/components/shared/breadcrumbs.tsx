@@ -42,7 +42,7 @@ export function DynamicBreadcrumbs() {
   const paths = pathname.split("/").filter((p) => p !== "");
 
   return (
-    <div className="container px-4 pt-6 pb-2 mx-auto">
+    <div className="px-4 pt-6 pb-2 mx-auto w-full">
       <Breadcrumb className="px-4">
         <BreadcrumbList>
           <BreadcrumbItem>

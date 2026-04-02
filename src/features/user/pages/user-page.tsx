@@ -158,33 +158,6 @@ export default function DashboardPage() {
   return (
     <>
       <main className="px-4 py-6 mx-auto">
-        <div
-          style={{
-            background: "#6b4f4f",
-            height: "100%",
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            color: "white",
-            fontSize: 64,
-            fontWeight: "bold",
-            fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
-            padding: 40,
-          }}
-        >
-          <div>NOKU COFFEE</div>
-          <div
-            style={{
-              fontSize: 28,
-              marginTop: 12,
-              fontWeight: "normal",
-            }}
-          >
-            Biji Kopi Spesialti, Alat Seduh & Paket Bundling
-          </div>
-        </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <div className="space-y-6 md:col-span-2">
             <div className="mb-6 space-y-4 md:hidden">

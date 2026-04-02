@@ -9,9 +9,10 @@ import {
   ChevronDown,
   Heart,
   LogOut,
+  MessageSquareMore,
   Package,
   Settings,
-  ShoppingBag,
+  ShoppingCart,
   User,
 } from "lucide-react";
 import Link from "next/link";
@@ -83,8 +84,8 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full flex items-center h-20 bg-background border-b border-border">
-      <div className="container flex justify-between items-center px-4 mx-auto md:px-6">
+    <nav className="flex sticky top-0 z-50 items-center w-full h-20 border-b bg-background border-border">
+      <div className="flex justify-between items-center px-4 mx-auto w-full md:px-6">
         <div className="flex gap-2 items-center">
           <Button
             asChild
@@ -97,16 +98,16 @@ export default function Navbar() {
             className="flex items-center w-10 h-10 text-white rounded-xl bg-primary hover:no-underline"
           >
             <Link href="/">
-              <span className="font-serif text-xl font-bold">N</span>
+              <span className="font-sans text-2xl font-bold">N</span>
             </Link>
           </Button>
 
-          <span className="text-xl font-bold tracking-tight text-foreground hidden sm:inline-block">
+          <span className="hidden text-xl font-bold tracking-tight text-foreground sm:inline-block">
             Noku Coffee
           </span>
         </div>
 
-        <div className="hidden gap-4 lg:gap-8 items-center md:flex">
+        <div className="hidden gap-4 items-center lg:gap-8 md:flex">
           {menuItems.map((item) => {
             if ("href" in item) {
               const isActive = pathname === item.href;
@@ -117,7 +118,7 @@ export default function Navbar() {
                   variant="link"
                   key={item.href}
                   className={cn(
-                    "text-sm font-medium px-2 hover:no-underline",
+                    "px-2 text-sm font-medium hover:no-underline",
                     isActive
                       ? "text-primary"
                       : "text-foreground hover:text-primary",
@@ -133,7 +134,7 @@ export default function Navbar() {
                 variant="link"
                 key={item.id}
                 onClick={() => scrollTo(item.id)}
-                className="text-sm font-medium text-foreground hover:text-primary px-2 hover:no-underline"
+                className="px-2 text-sm font-medium text-foreground hover:text-primary hover:no-underline"
               >
                 {item.label}
               </Button>
@@ -145,22 +146,13 @@ export default function Navbar() {
           {session?.user ? (
             <>
               <Button
-                variant="ghost"
-                size="icon"
-                className="relative hidden md:flex"
-              >
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full border-2 border-background" />
-              </Button>
-
-              <Button
                 asChild
                 variant="ghost"
                 size="icon"
-                className="relative hidden md:flex"
+                className="hidden relative md:flex"
               >
                 <Link href="/cart">
-                  <ShoppingBag className="w-5 h-5" />
+                  <ShoppingCart className="w-5 h-5" />
                   {!isLoadingCart && cartCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                       {cartCount}
@@ -169,17 +161,34 @@ export default function Navbar() {
                 </Link>
               </Button>
 
-              <div className="relative hidden md:block" data-profile-dropdown>
+              <Button variant="ghost" size="icon" className="flex relative">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-2 right-2 w-2 h-2 rounded-full border-2 bg-destructive border-background" />
+              </Button>
+
+              <Button variant="ghost" size="icon" className="flex relative">
+                <MessageSquareMore className="w-5 h-5" />
+              </Button>
+
+              <div className="relative" data-profile-dropdown>
                 <Button
                   variant="outline"
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center gap-2 h-10 pl-3 pr-2"
+                  className="flex justify-center items-center w-8 h-8 text-sm font-semibold rounded-full bg-primary/10 text-primary lg:hidden"
+                >
+                  {session.user.name?.charAt(0).toUpperCase()}
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="hidden gap-2 items-center pr-2 pl-3 h-10 lg:flex"
                 >
                   <span className="text-xs font-semibold">
                     {session.user.name}
                   </span>
 
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
+                  <div className="flex justify-center items-center w-8 h-8 text-sm font-semibold rounded-full bg-primary/10 text-primary">
                     {session.user.name?.charAt(0).toUpperCase()}
                   </div>
 
@@ -192,12 +201,12 @@ export default function Navbar() {
                 </Button>
 
                 {isProfileOpen && (
-                  <div className="absolute right-0 mt-2 w-60 bg-background rounded-2xl shadow-lg border border-border py-2">
+                  <div className="absolute right-0 py-2 mt-2 w-60 rounded-2xl border shadow-lg bg-background border-border">
                     <div className="px-4 py-3 border-b border-border">
                       <p className="text-[10px] uppercase text-muted-foreground font-semibold">
                         Akun Anda
                       </p>
-                      <p className="text-sm font-semibold truncate mt-1">
+                      <p className="mt-1 text-sm font-semibold truncate">
                         {session.user.email}
                       </p>
                     </div>
@@ -205,10 +214,10 @@ export default function Navbar() {
                     <Button
                       asChild
                       variant="ghost"
-                      className="w-full justify-start px-4 h-9 font-normal"
+                      className="justify-start px-4 w-full h-9 font-normal"
                     >
-                      <Link href="/profile">
-                        <User className="w-4 h-4 mr-3 opacity-60" />
+                      <Link href="/settings">
+                        <User className="mr-3 w-4 h-4 opacity-60" />
                         Profil Saya
                       </Link>
                     </Button>
@@ -216,10 +225,10 @@ export default function Navbar() {
                     <Button
                       asChild
                       variant="ghost"
-                      className="w-full justify-start px-4 h-9 font-normal"
+                      className="justify-start px-4 w-full h-9 font-normal"
                     >
                       <Link href="/orders">
-                        <Package className="w-4 h-4 mr-3 opacity-60" />
+                        <Package className="mr-3 w-4 h-4 opacity-60" />
                         Pesanan
                       </Link>
                     </Button>
@@ -227,10 +236,10 @@ export default function Navbar() {
                     <Button
                       asChild
                       variant="ghost"
-                      className="w-full justify-start px-4 h-9 font-normal"
+                      className="justify-start px-4 w-full h-9 font-normal"
                     >
                       <Link href="/favorites">
-                        <Heart className="w-4 h-4 mr-3 opacity-60" />
+                        <Heart className="mr-3 w-4 h-4 opacity-60" />
                         Favorit
                       </Link>
                     </Button>
@@ -238,21 +247,21 @@ export default function Navbar() {
                     <Button
                       asChild
                       variant="ghost"
-                      className="w-full justify-start px-4 h-9 font-normal"
+                      className="justify-start px-4 w-full h-9 font-normal"
                     >
                       <Link href="/settings">
-                        <Settings className="w-4 h-4 mr-3 opacity-60" />
+                        <Settings className="mr-3 w-4 h-4 opacity-60" />
                         Pengaturan
                       </Link>
                     </Button>
 
-                    <div className="border-t border-border mt-2 pt-2 px-2">
+                    <div className="px-2 pt-2 mt-2 border-t border-border">
                       <Button
                         variant="ghost"
                         onClick={handleLogout}
-                        className="w-full justify-start px-4 h-9 font-normal text-destructive hover:bg-destructive/10"
+                        className="justify-start px-4 w-full h-9 font-normal text-destructive hover:bg-destructive/10"
                       >
-                        <LogOut className="w-4 h-4 mr-3" />
+                        <LogOut className="mr-3 w-4 h-4" />
                         Keluar
                       </Button>
                     </div>
