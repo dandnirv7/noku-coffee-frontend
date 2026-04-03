@@ -1,15 +1,11 @@
 import SearchProductList from "@/features/search/components/search-product-list";
+import { getQueryClient } from "@/lib/react-query";
+import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { Metadata } from "next";
 import { Suspense } from "react";
-import ProductPageSkeleton from "../components/skeleton/product-page-skeleton";
-import {
-  HydrationBoundary,
-  QueryClient,
-  dehydrate,
-} from "@tanstack/react-query";
 import { getSearchProducts } from "../api/search-products";
+import ProductPageSkeleton from "../components/skeleton/product-page-skeleton";
 import { searchParamsCache } from "../lib/search-params";
-import { getQueryClient } from "@/lib/react-query";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -41,7 +37,7 @@ export default async function SearchProductPage(props: {
   });
 
   return (
-    <div className="container mx-auto px-4 pb-8 min-h-[80vh] space-y-6">
+    <div className="mx-auto px-4 pb-8 min-h-[80vh] space-y-6">
       <div className="flex flex-col gap-4 px-4">
         <p className="text-muted-foreground">
           Temukan peralatan dan biji kopi terbaik untuk seduhanmu.

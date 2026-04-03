@@ -10,7 +10,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
 });
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://noku-coffee.com";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://nokucoffee.me";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -103,6 +103,16 @@ export const metadata: Metadata = {
       {
         url: "/favicon_io/favicon-16x16.png",
         sizes: "16x16",
+        type: "image/png",
+      },
+      {
+        url: "/favicon_io/favicon-48x48.png",
+        sizes: "48x48",
+        type: "image/png",
+      },
+      {
+        url: "/favicon_io/android-chrome-192x192.png",
+        sizes: "192x192",
         type: "image/png",
       },
     ],
