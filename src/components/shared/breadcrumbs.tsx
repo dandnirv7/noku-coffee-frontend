@@ -35,7 +35,8 @@ export function DynamicBreadcrumbs() {
     pathname.startsWith("/login") ||
     pathname.startsWith("/register") ||
     pathname.startsWith("/reset-password") ||
-    pathname.startsWith("/verify")
+    pathname.startsWith("/verify") ||
+    pathname.startsWith("/dashboard")
   )
     return null;
 
