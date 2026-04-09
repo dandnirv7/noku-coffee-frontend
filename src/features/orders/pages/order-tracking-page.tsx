@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title: `Lacak Pesanan #${trackingData.order_number} | Noku Coffee`,
         description: `Status pengiriman pesanan #${trackingData.order_number}.`,
-        url: `https://noku.coffee/orders/tracking/${trackingData.tracking_number}`,
+        url: `https://nokucoffee.me/orders/tracking/${trackingData.tracking_number}`,
         type: "website",
       },
       twitter: {

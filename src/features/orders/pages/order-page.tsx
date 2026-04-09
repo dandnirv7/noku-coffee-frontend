@@ -11,7 +11,7 @@ export function generateMetadata(): Metadata {
     openGraph: {
       title: "Pesanan Saya | Noku Coffee",
       description: "Kelola riwayat pesanan Anda di Noku Coffee.",
-      url: "https://noku.coffee/orders",
+      url: "https://nokucoffee.me/orders",
       siteName: "Noku Coffee",
       type: "website",
     },

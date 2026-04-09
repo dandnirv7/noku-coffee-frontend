@@ -5,7 +5,6 @@ export default function InvoiceSkeleton() {
     <div className="min-h-screen bg-gray-50 p-4 md:p-8 flex justify-center font-sans">
       <div className="w-full max-w-4xl bg-white shadow-sm rounded-xl border border-gray-100 overflow-hidden">
         <div className="p-6 md:p-10 space-y-8">
-          {/* Bagian Header */}
           <div className="flex flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-primary/20 rounded-xl animate-pulse"></div>
@@ -20,7 +19,6 @@ export default function InvoiceSkeleton() {
             </div>
           </div>
 
-          {/* Grid Info Meta */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[1, 2, 3].map((item) => (
               <div
@@ -33,11 +31,9 @@ export default function InvoiceSkeleton() {
             ))}
           </div>
 
-          {/* Ringkasan Pesanan */}
           <div>
             <div className="h-5 w-48 bg-primary/20 rounded mb-4 animate-pulse"></div>
 
-            {/* Tabel Desktop */}
             <div className="hidden md:block border border-gray-200 rounded-lg overflow-hidden">
               <div className="bg-gray-50 h-10 border-b border-gray-200"></div>
               <div className="divide-y divide-gray-100">
@@ -56,7 +52,6 @@ export default function InvoiceSkeleton() {
               </div>
             </div>
 
-            {/* Kartu Mobile */}
             <div className="md:hidden space-y-3">
               {[1, 2, 3].map((item) => (
                 <div
@@ -74,7 +69,6 @@ export default function InvoiceSkeleton() {
             </div>
           </div>
 
-          {/* Detail Pembayaran */}
           <div>
             <div className="h-5 w-48 bg-primary/20 rounded mb-4 animate-pulse"></div>
             <div className="flex md:justify-end">
@@ -90,18 +84,15 @@ export default function InvoiceSkeleton() {
                   <div className="h-5 w-32 bg-primary/20 rounded animate-pulse"></div>
                   <div className="h-6 w-36 bg-primary/20 rounded animate-pulse"></div>
                 </div>
-                {/* Metode Pembayaran Box */}
                 <div className="mt-4 bg-gray-50 h-16 rounded-lg animate-pulse"></div>
               </div>
             </div>
           </div>
 
-          {/* Detail Pelanggan & Pengiriman */}
           <div>
             <div className="h-5 w-64 bg-primary/20 rounded mb-4 animate-pulse"></div>
             <div className="bg-[#f8fafc] border border-blue-100/50 rounded-xl">
               <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
-                {/* Kolom 1 */}
                 <div className="space-y-4">
                   {[1, 2, 3].map((item) => (
                     <div key={`col1-${item}`} className="flex gap-3">
@@ -113,7 +104,6 @@ export default function InvoiceSkeleton() {
                     </div>
                   ))}
                 </div>
-                {/* Kolom 2 */}
                 <div className="space-y-4">
                   {[1, 2, 3].map((item) => (
                     <div key={`col2-${item}`} className="flex gap-3">
@@ -129,7 +119,6 @@ export default function InvoiceSkeleton() {
             </div>
           </div>
 
-          {/* Catatan & Syarat (Optional Skeleton) */}
           <div className="bg-gray-50 border border-gray-100 rounded-xl p-5 space-y-3">
             <div className="h-5 w-40 bg-primary/20 rounded animate-pulse"></div>
             <div className="space-y-2">
@@ -141,7 +130,6 @@ export default function InvoiceSkeleton() {
 
           <div className="h-px bg-gray-100 w-full"></div>
 
-          {/* Footer */}
           <div className="flex flex-row justify-between items-start md:items-center gap-6 pb-4">
             <div className="space-y-3 w-full">
               <div className="h-4 w-32 md:w-48 bg-primary/20 rounded animate-pulse"></div>
@@ -157,7 +145,6 @@ export default function InvoiceSkeleton() {
               </div>
             </div>
 
-            {/* QR Code Placeholder */}
             <div className="flex flex-col items-center gap-2 border border-gray-100 p-3 rounded-xl bg-gray-50 ">
               <div className="w-20 h-20 bg-primary/20 rounded animate-pulse"></div>
               <div className="h-2 w-16 bg-primary/20 rounded animate-pulse"></div>

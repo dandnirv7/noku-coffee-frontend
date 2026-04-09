@@ -12,14 +12,20 @@ import {
   MapPin,
   Package,
   RefreshCw,
-  Share2,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import OrderTrackingPageSkeleton from "../skeleton/order-tracking-skeleton";
 import { TrackingInfoSidebar } from "./tracking-info-sidebar";
 import { TrackingStatusCard } from "./tracking-status-card";
 import { TrackingTimeline } from "./tracking-timeline";
+
+const SocialShare = dynamic(
+  () =>
+    import("@/components/shared/social-share").then((mod) => mod.SocialShare),
+  { ssr: false },
+);
 
 export default function OrderTrackingInnerPage({
   trackingNumber,
@@ -27,6 +33,7 @@ export default function OrderTrackingInnerPage({
   trackingNumber: string;
 }) {
   const router = useRouter();
+
   const {
     data: trackingData,
     isLoading,
@@ -41,7 +48,7 @@ export default function OrderTrackingInnerPage({
 
   if (isError || !trackingData) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center flex-1">
+      <div className="mx-auto px-4 py-16 text-center flex-1">
         <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
         <h2 className="text-2xl font-bold mb-2">Pencarian Pesanan Gagal</h2>
         <p className="text-muted-foreground mb-6">
@@ -55,10 +62,14 @@ export default function OrderTrackingInnerPage({
   }
 
   const reversedTimeline = [...(trackingData.timeline || [])].reverse();
+  const shareText = `Lacak status pesanan #${trackingData.order_number} dengan nomor resi ${trackingData.tracking_number || "ini"}.`;
+
+  // 3. Ambil URL secara sinkron. Operasi ini aman karena SocialShare tidak akan di-render di Server.
+  const pageUrl = typeof window !== "undefined" ? window.location.href : "";
 
   return (
     <>
-      <main className="container mx-auto px-4 py-8 flex-1 print:hidden">
+      <main className=" mx-auto px-4 md:px-8 py-8 flex-1 print:hidden">
         <div className="flex items-center mb-6">
           <Link
             href={`/orders/${trackingData.order_number}`}
@@ -74,7 +85,7 @@ export default function OrderTrackingInnerPage({
             <h1 className="text-2xl font-bold text-gray-900">
               Lacak Pesanan Anda
             </h1>
-            <div className="flex flex-col md:flex-row items-center text-gray-500 mt-1">
+            <div className="flex flex-col md:flex-row md:items-center text-gray-500 mt-1">
               <div className="flex flex-row items-center">
                 <Package className="h-4 w-4 mr-1" />
                 Pesanan #{trackingData.order_number}
@@ -112,10 +123,8 @@ export default function OrderTrackingInnerPage({
                 </>
               )}
             </Button>
-            <Button variant="outline" size="sm">
-              <Share2 className="h-4 w-4 mr-2" />
-              Bagikan
-            </Button>
+
+            <SocialShare url={pageUrl} text={shareText} />
           </div>
         </div>
 

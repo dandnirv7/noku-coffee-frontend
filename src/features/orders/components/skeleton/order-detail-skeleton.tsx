@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function OrderDetailsPageSkeleton() {
   return (
-    <main className="container mx-auto px-4 py-8">
+    <main className="mx-auto px-4 md:px-8 py-8">
       <div className="mb-6 space-y-4 md:space-y-6">
         <Skeleton className="h-5 w-48" />
 
@@ -39,18 +39,16 @@ export default function OrderDetailsPageSkeleton() {
                 {Array.from({ length: 3 }).map((_, index) => (
                   <div
                     key={index}
-                    className="flex items-start border-b pb-4 last:border-b-0 last:pb-0"
+                    className="flex justify-between items-center"
                   >
-                    <Skeleton className="h-20 w-20 rounded-md mr-4 shrink-0" />
-                    <div className="grow">
-                      <Skeleton className="h-5 w-32 mb-2" />
-                      <Skeleton className="h-4 w-20 mb-1" />
-                      <Skeleton className="h-4 w-16" />
+                    <div className="flex items-center">
+                      <Skeleton className="mr-3 w-10 h-10 bg-gray-100 rounded-md shrink-0" />
+                      <div>
+                        <Skeleton className="w-32 md:w-48 h-4 mb-2" />
+                        <Skeleton className="w-20 h-3" />
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <Skeleton className="h-5 w-20 mb-1" />
-                      <Skeleton className="h-4 w-16" />
-                    </div>
+                    <Skeleton className="w-20 md:w-28 h-5" />
                   </div>
                 ))}
               </div>
@@ -120,7 +118,6 @@ export default function OrderDetailsPageSkeleton() {
         </div>
 
         <div className="space-y-6">
-          {/* Summary */}
           <Card>
             <CardHeader className="pb-3">
               <Skeleton className="h-6 w-40" />
