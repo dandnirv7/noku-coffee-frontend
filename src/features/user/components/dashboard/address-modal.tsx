@@ -1,6 +1,12 @@
 "use client";
-import { useState, useEffect } from "react";
-import { X, MapPin, CheckCircle, Plus, ArrowLeft } from "lucide-react";
+import { useState } from "react";
+import { MapPin, CheckCircle, Plus, ArrowLeft } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Address } from "@/features/user/types";
@@ -24,23 +30,6 @@ export function AddressModal({
   const [, setHasSelected] = useState(false);
   const [isAddingNew, setIsAddingNew] = useState(false);
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      setTimeout(() => {
-        setHasSelected(false);
-        setIsAddingNew(false);
-      }, 0);
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
-
-  if (!isOpen) return null;
-
   const handleSelect = (address: Address) => {
     setHasSelected(true);
     onSelect(address);
@@ -48,48 +37,31 @@ export function AddressModal({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-xl w-full max-w-lg mx-auto max-h-[90vh] flex flex-col overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between p-4 border-b shrink-0 bg-white z-10">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-lg p-0 overflow-hidden">
+        <DialogHeader className="p-4 border-b">
           <div className="flex items-center gap-2">
             {isAddingNew && (
               <button
                 onClick={() => setIsAddingNew(false)}
-                className="p-1.5 -ml-1.5 hover:bg-gray-100 rounded-full transition-colors"
-                aria-label="Kembali"
+                className="p-1.5 -ml-1.5 hover:bg-gray-100 rounded-full"
               >
                 <ArrowLeft className="h-5 w-5" />
               </button>
             )}
-            <h2 className="text-lg font-semibold">
+            <DialogTitle>
               {isAddingNew ? "Tambah Alamat Baru" : "Pilih Alamat Pengiriman"}
-            </h2>
+            </DialogTitle>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 -mr-1.5 hover:bg-gray-100 rounded-full transition-colors"
-            aria-label="Tutup"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+        </DialogHeader>
 
-        <div className="overflow-y-auto flex-1 p-4 bg-gray-50/50">
+        <div className="max-h-[70vh] overflow-y-auto p-4 bg-gray-50/50">
           {isAddingNew ? (
             <div className="bg-white p-4 rounded-xl border shadow-sm">
               <AddressForm
                 isFirstAddress={addresses.length === 0}
                 onCancel={() => setIsAddingNew(false)}
-                onSuccess={(newId) => {
-                  // In a real app, you might want to fetch the updated addresses.
-                  // For now, we just close the form.
-                  if (newId) console.log("Added new address:", newId);
+                onSuccess={() => {
                   setIsAddingNew(false);
                   onClose();
                 }}
@@ -101,11 +73,19 @@ export function AddressModal({
                 <div
                   key={addr.id}
                   onClick={() => handleSelect(addr)}
-                  className={`p-4 border rounded-xl cursor-pointer transition-all hover:border-primary hover:shadow-sm bg-white ${selectedId === addr.id ? "border-primary ring-1 ring-primary/20 bg-primary/10" : ""}`}
+                  className={`p-4 border rounded-xl cursor-pointer transition-all hover:border-primary hover:shadow-sm bg-white ${
+                    selectedId === addr.id
+                      ? "border-primary ring-1 ring-primary/20 bg-primary/10"
+                      : ""
+                  }`}
                 >
                   <div className="flex items-start gap-3">
                     <MapPin
-                      className={`h-5 w-5 mt-0.5 ${selectedId === addr.id ? "text-primary" : "text-gray-400"}`}
+                      className={`h-5 w-5 mt-0.5 ${
+                        selectedId === addr.id
+                          ? "text-primary"
+                          : "text-gray-400"
+                      }`}
                     />
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1.5">
@@ -113,7 +93,7 @@ export function AddressModal({
                           {addr.label}
                         </span>
                         {addr.isDefault && (
-                          <Badge className="bg-primary hover:bg-primary/80 text-[10px] px-1.5 py-0 h-5">
+                          <Badge className="bg-primary text-[10px] px-1.5 py-0 h-5">
                             Utama
                           </Badge>
                         )}
@@ -140,10 +120,10 @@ export function AddressModal({
         </div>
 
         {!isAddingNew && (
-          <div className="p-4 border-t bg-white shrink-0">
+          <div className="p-4 border-t">
             <Button
               variant="outline"
-              className="w-full border-dashed border-2 hover:border-primary hover:bg-primary/10 hover:text-primary transition-colors h-12"
+              className="w-full border-dashed border-2 h-12"
               onClick={() => setIsAddingNew(true)}
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -151,7 +131,7 @@ export function AddressModal({
             </Button>
           </div>
         )}
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

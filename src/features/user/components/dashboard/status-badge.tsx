@@ -1,5 +1,13 @@
 "use client";
-import { Clock, Package, Truck, CheckCircle, AlertCircle } from "lucide-react";
+
+import {
+  Clock,
+  Package,
+  Truck,
+  CheckCircle,
+  AlertCircle,
+  HelpCircle,
+} from "lucide-react";
 
 export const statusConfig = {
   pending: {
@@ -20,8 +28,14 @@ export const statusConfig = {
     bg: "bg-purple-100",
     icon: Truck,
   },
-  delivered: {
+  completed: {
     label: "Selesai",
+    color: "text-green-800",
+    bg: "bg-green-100",
+    icon: CheckCircle,
+  },
+  delivered: {
+    label: "Terkirim",
     color: "text-green-800",
     bg: "bg-green-100",
     icon: CheckCircle,
@@ -34,9 +48,21 @@ export const statusConfig = {
   },
 };
 
-export function StatusBadge({ status }: { status: keyof typeof statusConfig }) {
-  const config = statusConfig[status];
+export function StatusBadge({ status }: { status: string }) {
+  const normalizedStatus = status?.toLowerCase() as keyof typeof statusConfig;
+
+  const config = statusConfig[normalizedStatus];
+
+  if (!config) {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium text-gray-600 bg-gray-100">
+        <HelpCircle className="h-3 w-3" /> {status}
+      </span>
+    );
+  }
+
   const Icon = config.icon;
+
   return (
     <span
       className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${config.color} ${config.bg}`}
