@@ -50,7 +50,7 @@ export const getDailyDiscount = async () => {
 
   if (!validated.success) {
     console.error("Schema Error:", validated.error);
-    throw new Error("Format data cart dari server tidak valid");
+    throw new Error("Format data dari server tidak valid");
   }
 
   return validated.data;

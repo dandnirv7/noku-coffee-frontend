@@ -1,43 +1,31 @@
 import { api } from "@/lib/axios";
 import { QueryConfig } from "@/lib/react-query";
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 
-export const FrequentlyBoughtProductSchema = z.object({
+const FrequentlyBoughtItem = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
-  sku: z.string().min(1),
   price: z.coerce.number().nonnegative(),
-  images: z.array(z.string()).optional(),
+  timesOrdered: z.number().int().nonnegative(),
+  image: z.string().nullable(),
 });
 
-export const FrequentlyBoughtItemSchema = z.object({
-  totalBought: z.number().int().nonnegative(),
-  product: FrequentlyBoughtProductSchema,
-});
-
-export const FrequentlyBoughtResponseSchema = z.object({
+const FrequentlyBoughtResponseSchema = z.object({
   success: z.boolean(),
   message: z.string(),
-  data: z.array(FrequentlyBoughtItemSchema),
+  data: z.array(FrequentlyBoughtItem),
 });
 
-export type FrequentlyBoughtProduct = z.infer<
-  typeof FrequentlyBoughtProductSchema
->;
-
-export type FrequentlyBoughtItem = z.infer<typeof FrequentlyBoughtItemSchema>;
-
+export type FrequentlyBoughtItem = z.infer<typeof FrequentlyBoughtItem>;
 export type FrequentlyBoughtResponse = z.infer<
   typeof FrequentlyBoughtResponseSchema
 >;
 
-export const getFrequentlyBought = async (): Promise<
-  FrequentlyBoughtItem[]
-> => {
-  const response = await api.get("/orders/frequently-bought");
+export const getFrequentlyBought = async () => {
+  const { data } = await api.get("/users/dashboard/frequently-bought");
 
-  const validated = FrequentlyBoughtResponseSchema.safeParse(response.data);
+  const validated = FrequentlyBoughtResponseSchema.safeParse(data);
 
   if (!validated.success) {
     console.error("Schema validation error:", validated.error.format());
@@ -49,14 +37,13 @@ export const getFrequentlyBought = async (): Promise<
 
 export const getFrequentlyBoughtQueryKey = () => ["frequently-bought"];
 
-export const getFrequentlyBoughtQueryOptions = () =>
-  queryOptions({
-    queryKey: getFrequentlyBoughtQueryKey(),
-    queryFn: getFrequentlyBought,
-  });
+export const getFrequentlyBoughtQueryOptions = () => ({
+  queryKey: getFrequentlyBoughtQueryKey(),
+  queryFn: getFrequentlyBought,
+});
 
 type UseGetFrequentlyBoughtParams = {
-  queryConfig?: QueryConfig<typeof getFrequentlyBoughtQueryOptions>;
+  queryConfig?: QueryConfig<typeof getFrequentlyBought>;
 };
 
 export const useGetFrequentlyBought = ({
