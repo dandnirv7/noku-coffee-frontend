@@ -81,7 +81,6 @@ export function SearchProductEmpty({
         </Button>
       </div>
 
-      {/* Footer Label */}
       <div className="flex gap-2 items-center mt-12">
         <div className="w-8 h-px bg-slate-200" />
         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">
