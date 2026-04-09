@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { Filter, LayoutGrid, List } from "lucide-react";
 import { useSearchFilters } from "../hooks/use-search-filters";
 import { SearchProductFilterPanel } from "./search-product-filter-panel";
+import QuickCategories from "@/components/shared/quick-categories";
 
 const sortOptions: { value: string; label: string }[] = [
   { value: "name_asc", label: "A - Z" },
@@ -39,7 +40,7 @@ export function SearchProductListingTopBar() {
       </div>
 
       <div className="flex gap-3 items-center w-auto">
-        <ScrollCategories className="lg:hidden" />
+        <QuickCategories classNames="max-w-[172px]" isTitleHidden />
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline" className="px-3 rounded-lg lg:hidden">

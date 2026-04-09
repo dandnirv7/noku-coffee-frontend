@@ -4,7 +4,7 @@ import { SearchProductListingTopBarSkeleton } from "./search-product-listing-top
 
 export default function ProductPageSkeleton() {
   return (
-    <div className="container px-4 py-4 mx-auto">
+    <div className="px-4 py-4 mx-auto">
       <div className="flex relative flex-col gap-6 lg:flex-row">
         <aside className="hidden w-64 lg:block shrink-0">
           <FilterPanelSkeleton />

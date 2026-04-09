@@ -96,7 +96,7 @@ export function ProductCard({
         <div className="overflow-hidden relative rounded-lg aspect-square bg-muted">
           <Link href={productHref} className="block w-full h-full">
             <Image
-              src={product.images[0] || "/placeholder-product.png"}
+              src={product?.images?.[0] || "/placeholder-product.png"}
               alt={product.name}
               fill
               className="object-cover transition-transform duration-700 group-hover:scale-105"
