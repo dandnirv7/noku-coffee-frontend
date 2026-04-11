@@ -1,11 +1,16 @@
-import { AUTH_ROUTES, PROTECTED_ROUTES } from "@/features/auth/lib/routes";
-import { NextRequest, NextResponse } from "next/server";
 import { authClient } from "@/features/auth/lib/auth-client";
+import {
+  ADMIN_ROUTES,
+  AUTH_ROUTES,
+  PROTECTED_ROUTES,
+} from "@/features/auth/lib/routes";
+import { NextRequest, NextResponse } from "next/server";
 
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   let session = null;
+
   try {
     const res = await authClient.getSession({
       fetchOptions: {
@@ -15,8 +20,7 @@ export default async function proxy(request: NextRequest) {
       },
     });
     session = res.data;
-  } catch (error) {
-    console.error("Auth Check Failed:", error);
+  } catch {
     session = null;
   }
 
@@ -24,16 +28,20 @@ export default async function proxy(request: NextRequest) {
     pathname.startsWith(route),
   );
 
+  const isAdminRoute = ADMIN_ROUTES.some((route) => pathname.startsWith(route));
+
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
 
-  if (isProtectedRoute && !session) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(loginUrl);
+  if ((isProtectedRoute || isAdminRoute) && !session) {
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
+
+  if (isAdminRoute && session?.user?.role !== "ADMIN") {
+    return NextResponse.redirect(new URL("/forbidden", request.url));
   }
 
   if (isAuthRoute && session) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();
