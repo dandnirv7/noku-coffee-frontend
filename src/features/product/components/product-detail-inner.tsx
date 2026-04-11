@@ -10,12 +10,10 @@ import {
   useToggleWishlist,
   useWishlist,
 } from "@/features/cart/api/use-wishlist";
-
 import { useCreateCart } from "@/features/cart/api/use-create-cart";
 import { useUpdateQuantity } from "@/features/cart/api/use-update-quantity";
 import { useDeleteItem } from "@/features/cart/api/use-delete-item";
 import { useGetCart } from "@/features/cart/api/use-get-cart";
-
 import { ProductCard } from "@/components/shared/product-card";
 import { useSearchProducts } from "@/features/search/api/search-products";
 import { useGetProductBySlug } from "../api/get-product-by-slug";
@@ -45,6 +43,7 @@ export function ProductDetailView({
   const { requireAuth } = useRequireAuth();
 
   const { data: wishlistData } = useWishlist();
+
   const { mutate: toggleWishlist, isPending: isTogglingWishlist } =
     useToggleWishlist({
       mutationConfig: {
@@ -58,6 +57,7 @@ export function ProductDetailView({
     });
 
   const { data: cartData } = useGetCart();
+
   const [updatingQuantityItemId, setUpdatingQuantityItemId] = useState<
     string | null
   >(null);
@@ -104,16 +104,18 @@ export function ProductDetailView({
   };
 
   const handleRemoveFromCart = (productId: string) => deleteItem({ productId });
+
   const handleToggleWishlist = (productId: string) =>
     requireAuth(() => toggleWishlist(productId));
 
   const getCartQuantity = (productId: string) =>
-    cartData?.data.items.find((i) => i.productId === productId)?.quantity ?? 0;
+    cartData?.data?.items?.find((i) => i.productId === productId)?.quantity ??
+    0;
 
-  const checkIsInWishlist = (productId: string) =>
-    wishlistData?.data.some((item) => item.productId === productId) ?? false;
+  const isInWishlistCheck = (productId: string) =>
+    wishlistData?.data?.some((item) => item.productId === productId) ?? false;
 
-  const isInWishlist = checkIsInWishlist(product?.id || "");
+  const isInWishlist = isInWishlistCheck(product?.id || "");
 
   if (isError) return <ProductDetailError reset={() => refetch()} />;
 
@@ -142,7 +144,7 @@ export function ProductDetailView({
               <div className="overflow-hidden relative rounded-3xl border aspect-square bg-muted group">
                 <Image
                   src={
-                    product.images[activeImageIndex] ??
+                    product.images?.[activeImageIndex] ??
                     "/placeholder-product.png"
                   }
                   alt={product.name}
@@ -165,8 +167,9 @@ export function ProductDetailView({
                   />
                 </button>
               </div>
+
               <div className="grid grid-cols-4 gap-3">
-                {product.images.slice(0, 4).map((img, i) => (
+                {product.images?.slice(0, 4)?.map((img, i) => (
                   <button
                     key={i}
                     onClick={() => setActiveImageIndex(i)}
@@ -197,8 +200,9 @@ export function ProductDetailView({
             <h3 className="mb-6 text-2xl font-black tracking-tighter uppercase">
               Mungkin Anda Suka
             </h3>
+
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-              {relatedProducts?.data?.data.slice(0, 3).map((p) => (
+              {relatedProducts?.data?.data?.slice(0, 3)?.map((p) => (
                 <ProductCard
                   key={p.id}
                   product={p}
@@ -207,7 +211,7 @@ export function ProductDetailView({
                   onUpdateQuantity={handleUpdateQuantity}
                   onRemoveFromCart={handleRemoveFromCart}
                   cartQuantity={getCartQuantity(p.id)}
-                  isInWishlist={checkIsInWishlist(p.id)}
+                  isInWishlist={isInWishlistCheck(p.id)}
                   isAddingToCart={creatingCartItemId === p.id}
                   isUpdatingQuantity={updatingQuantityItemId === p.id}
                 />
