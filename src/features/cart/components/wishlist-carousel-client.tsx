@@ -1,16 +1,7 @@
 "use client";
 
 import { ProductCard } from "@/components/shared/product-card";
-import {
-  Carousel,
-  CarouselApi,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import { WishlistItem } from "@/features/cart/lib/wishlist-schema";
-import { useEffect, useState } from "react";
 
 interface WishlistCarouselClientProps {
   items: WishlistItem[];
@@ -23,81 +14,36 @@ export function WishlistCarouselClient({
   onAddToCart,
   onRemoveFromWishlist,
 }: WishlistCarouselClientProps) {
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
-  const [api, setApi] = useState<CarouselApi>();
-
-  useEffect(() => {
-    if (!api) return;
-
-    const updateScrollState = () => {
-      setCanScrollPrev(api.canScrollPrev());
-      setCanScrollNext(api.canScrollNext());
-    };
-
-    const timer = setTimeout(updateScrollState, 0);
-
-    api.on("reInit", updateScrollState);
-    api.on("select", updateScrollState);
-
-    return () => {
-      clearTimeout(timer);
-      api.off("reInit", updateScrollState);
-      api.off("select", updateScrollState);
-    };
-  }, [api]);
-
   if (items.length === 0) {
     return null;
   }
 
   return (
     <section className="py-12">
-      <div className="container mx-auto px-4">
+      <div className="mx-auto px-4">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">
           Wishlist ({items.length})
         </h1>
 
         <div className="relative">
-          <Carousel
-            opts={{
-              align: "start",
-              slidesToScroll: 1,
-            }}
-            className="w-full"
-            setApi={setApi}
-          >
-            <div className="relative">
-              {canScrollPrev && (
-                <div className="w-32 absolute left-0 top-0 bottom-0 bg-linear-to-r from-gray-100/60 to-transparent z-10 pointer-events-none" />
-              )}
-              {canScrollNext && (
-                <div className="w-32 absolute right-0 top-0 bottom-0 bg-linear-to-l from-gray-100/60 to-transparent z-10 pointer-events-none" />
-              )}
-
-              <CarouselContent>
-                {items.map((item) => (
-                  <CarouselItem
-                    key={item.id}
-                    className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-[22.22%]"
-                  >
-                    <ProductCard
-                      product={item.product}
-                      viewMode="grid"
-                      onAddToCart={(item) => onAddToCart(item)}
-                      isInWishlist={true}
-                      onToggleWishlist={(productId) =>
-                        onRemoveFromWishlist(productId)
-                      }
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </div>
-
-            {canScrollPrev && <CarouselPrevious className="left-4 z-99" />}
-            {canScrollNext && <CarouselNext className="right-4 z-99" />}
-          </Carousel>
+          <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {items.map((item) => (
+              <div
+                key={item.id}
+                className="shrink-0 snap-start w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.75rem)] lg:w-[calc(25%-0.75rem)]"
+              >
+                <ProductCard
+                  product={item.product}
+                  viewMode="grid"
+                  onAddToCart={(item) => onAddToCart(item)}
+                  isInWishlist={true}
+                  onToggleWishlist={(productId) =>
+                    onRemoveFromWishlist(productId)
+                  }
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

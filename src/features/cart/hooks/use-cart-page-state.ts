@@ -8,7 +8,7 @@ import { useWishlistOperations } from "./use-wishlist-operations";
 export function useCartPageState() {
   const { data: cartData, isLoading, isError, error, refetch } = useGetCart();
 
-  const cartItems = useMemo(() => cartData?.data.items || [], [cartData]);
+  const cartItems = useMemo(() => cartData?.data?.items || [], [cartData]);
 
   const itemCount = useMemo(
     () => cartItems.reduce((acc, item) => acc + item.quantity, 0),

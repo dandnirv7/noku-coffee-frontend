@@ -25,7 +25,6 @@ export function useCartHandlers() {
 
   const handleMoveToWishlist = async (productId: string): Promise<void> => {
     await moveToWishlist(productId, handleDeleteItem);
-    await deleteItem({ productId });
   };
 
   const handleAddToCart = async (item: {

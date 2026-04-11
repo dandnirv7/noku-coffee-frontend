@@ -43,12 +43,12 @@ export const CartItemSchema = z.object({
 export type CartItem = z.infer<typeof CartItemSchema>;
 
 export const CartDataSchema = z.object({
-  id: z.string(),
-  userId: z.string(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  items: z.array(CartItemSchema),
-  total: z.number(),
+  id: z.string().optional().catch(undefined),
+  userId: z.string().optional().catch(undefined),
+  createdAt: z.string().optional().catch(undefined),
+  updatedAt: z.string().optional().catch(undefined),
+  items: z.array(CartItemSchema).default([]).catch([]),
+  total: z.number().default(0).catch(0),
 });
 
 export type CartData = z.infer<typeof CartDataSchema>;
@@ -56,7 +56,7 @@ export type CartData = z.infer<typeof CartDataSchema>;
 export const CartResponseSchema = z.object({
   success: z.boolean(),
   message: z.string(),
-  data: CartDataSchema,
+  data: CartDataSchema.nullable().catch(null),
 });
 
 export type CartResponse = z.infer<typeof CartResponseSchema>;

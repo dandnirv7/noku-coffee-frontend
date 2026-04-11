@@ -16,6 +16,7 @@ import Link from "next/link";
 import { useState, useRef } from "react";
 import { CartItem as CartItemType } from "../lib/cart-schema";
 import { ProductCartMeta } from "./product-cart-meta";
+import { toRupiah } from "@/lib/utils";
 
 interface CartItemProps {
   item: CartItemType;
@@ -88,10 +89,8 @@ export function CartItem({
 
   return (
     <>
-      <div
-        className={`flex flex-col sm:flex-row gap-4 ${isOutOfStock ? "opacity-60" : ""}`}
-      >
-        <div className="w-full sm:w-24 h-24 rounded-lg overflow-hidden shrink-0 relative">
+      <div className={`flex gap-4 ${isOutOfStock ? "opacity-60" : ""}`}>
+        <div className="w-24 h-24 rounded-lg overflow-hidden shrink-0 relative">
           <Image
             src={imageSrc}
             alt={product.name}
@@ -130,7 +129,7 @@ export function CartItem({
 
               <div className="flex items-center gap-2 mt-2">
                 <span className="font-medium text-gray-900">
-                  Rp {product.price.toLocaleString("id-ID")}
+                  {toRupiah(product.price)}
                 </span>
               </div>
 
@@ -190,7 +189,7 @@ export function CartItem({
 
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">
-                  Rp {(product.price * quantity).toLocaleString("id-ID")}
+                  {toRupiah(product.price * quantity)}
                 </span>
 
                 <Button

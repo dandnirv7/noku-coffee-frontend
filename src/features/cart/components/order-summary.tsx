@@ -1,22 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/features/auth/lib/auth-client";
 import { toRupiah } from "@/lib/utils";
 import { CheckCircle2, Loader2, Package, TicketPercent, X } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { AddressForm } from "@/features/user/components/address-form";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +19,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { AddressModal } from "@/features/user/components/address-modal";
+import { Address } from "@/features/user/types";
 
 import {
   Select,
@@ -42,13 +36,6 @@ import { CartSummary } from "../lib/cart-schema";
 interface Promo {
   code: string;
   description: string;
-}
-
-interface AddressType {
-  id: string;
-  isDefault: boolean;
-  label: string;
-  streetLine1: string;
 }
 
 interface OrderSummaryProps {
@@ -81,8 +68,8 @@ export function OrderSummary({
 
   const { data: session } = authClient.useSession();
 
-  const addresses: AddressType[] =
-    (session?.user as { address?: AddressType[] } | undefined)?.address ?? [];
+  const addresses: Address[] =
+    (session?.user as { address?: Address[] } | undefined)?.address ?? [];
 
   const defaultAddress = addresses.find((a) => a.isDefault);
   const activeAddress = defaultAddress || addresses[0];
@@ -294,27 +281,17 @@ export function OrderSummary({
         </p>
       </div>
 
-      <Dialog open={isAddressModalOpen} onOpenChange={setIsAddressModalOpen}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Tambah Alamat Pengiriman</DialogTitle>
-            <DialogDescription>
-              Anda belum memiliki alamat pengiriman. Silakan isi form berikut
-              untuk melanjutkan checkout.
-            </DialogDescription>
-          </DialogHeader>
-          <AddressForm
-            isFirstAddress={addresses.length === 0}
-            onCancel={() => setIsAddressModalOpen(false)}
-            onSuccess={(newAddressId) => {
-              setIsAddressModalOpen(false);
-              if (addresses.length === 0 && newAddressId) {
-                onCheckout?.(newAddressId, appliedPromo?.code, courier);
-              }
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+      <AddressModal
+        isOpen={isAddressModalOpen}
+        onClose={() => setIsAddressModalOpen(false)}
+        addresses={addresses}
+        onAddSuccess={(newAddressId) => {
+          if (addresses.length === 0 && newAddressId) {
+            onCheckout?.(newAddressId, appliedPromo?.code, courier);
+          }
+        }}
+        defaultView="add"
+      />
 
       <AlertDialog
         open={isConfirmModalOpen}

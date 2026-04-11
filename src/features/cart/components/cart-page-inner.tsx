@@ -59,7 +59,7 @@ export function CartPageInner() {
 
   return (
     <div className="mx-auto px-4 sm:px-6 lg:px-8 py-4">
-      <main className="container mx-auto px-4">
+      <main className="mx-auto">
         <div className="mb-6">
           <p className="text-gray-600">{itemCount} item di keranjang</p>
         </div>

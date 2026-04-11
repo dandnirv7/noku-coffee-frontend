@@ -12,8 +12,6 @@ export function useWishlistOperations() {
         onSuccess: (data) => {
           if (data.data.isAdded) {
             toast.success("Item berhasil ditambahkan ke wishlist");
-          } else {
-            toast.success("Item berhasil dihapus dari wishlist");
           }
         },
         onError: (error) => {
