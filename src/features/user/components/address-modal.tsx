@@ -1,23 +1,24 @@
-"use client";
-import { useState } from "react";
-import { MapPin, CheckCircle, Plus, ArrowLeft } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Address } from "@/features/user/types";
 import { AddressForm } from "@/features/user/components/address-form";
+import { Address } from "@/features/user/types";
+import { ArrowLeft, CheckCircle, MapPin, Plus } from "lucide-react";
+import { useState } from "react";
 
 interface AddressModalProps {
   isOpen: boolean;
   onClose: () => void;
   addresses: Address[];
   selectedId?: string;
-  onSelect: (address: Address) => void;
+  onSelect?: (address: Address) => void;
+  onAddSuccess?: (addressId: string) => void;
+  defaultView?: "list" | "add";
 }
 
 export function AddressModal({
@@ -26,22 +27,28 @@ export function AddressModal({
   addresses,
   selectedId,
   onSelect,
+  onAddSuccess,
+  defaultView = "list",
 }: AddressModalProps) {
   const [, setHasSelected] = useState(false);
-  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [isAddingNew, setIsAddingNew] = useState(defaultView === "add");
 
   const handleSelect = (address: Address) => {
     setHasSelected(true);
-    onSelect(address);
+    onSelect?.(address);
     setTimeout(onClose, 300);
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg p-0 overflow-hidden">
+    <Dialog
+      key={isOpen ? "open" : "closed"}
+      open={isOpen}
+      onOpenChange={onClose}
+    >
+      <DialogContent className="w-full md:max-w-lg p-0 overflow-hidden">
         <DialogHeader className="p-4 border-b">
           <div className="flex items-center gap-2">
-            {isAddingNew && (
+            {isAddingNew && addresses.length > 0 && (
               <button
                 onClick={() => setIsAddingNew(false)}
                 className="p-1.5 -ml-1.5 hover:bg-gray-100 rounded-full"
@@ -61,9 +68,10 @@ export function AddressModal({
               <AddressForm
                 isFirstAddress={addresses.length === 0}
                 onCancel={() => setIsAddingNew(false)}
-                onSuccess={() => {
+                onSuccess={(newId) => {
                   setIsAddingNew(false);
                   onClose();
+                  if (newId) onAddSuccess?.(newId);
                 }}
               />
             </div>

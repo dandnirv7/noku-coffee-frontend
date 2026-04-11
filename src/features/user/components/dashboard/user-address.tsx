@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import { useGetAddresses } from "../../api/use-get-addresses";
-import { AddressModal } from "./address-modal";
+import { AddressModal } from "../address-modal";
 import { Address } from "../../types";
 
 export default function UserAddress() {
@@ -88,8 +88,19 @@ export default function UserAddress() {
               </p>
             </div>
           ) : (
-            <div className="p-4 text-center rounded-lg border">
-              <p className="text-sm text-gray-500">Belum ada alamat.</p>
+            <div className="flex flex-col items-center justify-center p-6 text-center rounded-lg border-2 border-dashed border-gray-200 bg-gray-50/50">
+              <div className="relative">
+                <div className="absolute inset-0 rounded-full blur-3xl bg-primary/10 animate-glow-pulse" />
+                <div className="relative p-4 rounded-full bg-gray-100 text-gray-400 animate-float">
+                  <MapPin size={24} strokeWidth={1.5} />
+                </div>
+              </div>
+              <p className="text-sm font-medium text-gray-800">
+                Belum ada alamat
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Tambahkan alamat untuk pengiriman pesanan Anda.
+              </p>
             </div>
           )}
 
@@ -99,8 +110,14 @@ export default function UserAddress() {
             size="sm"
             onClick={() => setShowAddressModal(true)}
           >
-            <MapPin className="mr-2 w-4 h-4" />
-            Ganti Alamat
+            {selectedAddress ? (
+              <>
+                <MapPin className="mr-2 w-4 h-4" />
+                Ganti Alamat
+              </>
+            ) : (
+              "Tambah Alamat"
+            )}
           </Button>
         </CardContent>
       </Card>
@@ -111,6 +128,7 @@ export default function UserAddress() {
         addresses={addresses ?? []}
         selectedId={selectedAddress?.id ?? ""}
         onSelect={(address: Address) => setSelectedAddressId(address.id)}
+        defaultView={selectedAddress ? "list" : "add"}
       />
     </>
   );

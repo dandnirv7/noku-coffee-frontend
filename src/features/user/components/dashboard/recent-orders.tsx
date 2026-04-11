@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toRupiah } from "@/lib/utils";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, PackageOpen, ShoppingBag } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useGetRecentOrders } from "../../api/use-get-recent-orders";
@@ -38,6 +38,38 @@ export function RecentOrders() {
         <AlertTitle>Terjadi kesalahan</AlertTitle>
         <AlertDescription>Gagal memuat pesanan terbaru.</AlertDescription>
       </Alert>
+    );
+  }
+
+  if (!recentOrders || recentOrders.length === 0) {
+    return (
+      <Card>
+        <CardHeader className="flex flex-row justify-between items-center">
+          <CardTitle className="text-lg font-bold">Pesanan Terbaru</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-8 text-center gap-3">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full blur-3xl bg-primary/10 animate-glow-pulse" />
+              <div className="relative p-4 rounded-full bg-primary/10 text-primary animate-float">
+                <PackageOpen size={32} strokeWidth={1.5} />
+              </div>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-800">Belum ada pesanan</p>
+              <p className="text-sm text-gray-500 mt-1">
+                Yuk, mulai belanja kopi favoritmu!
+              </p>
+            </div>
+            <Button size="sm" asChild>
+              <Link href="/search">
+                <ShoppingBag className="mr-2 w-4 h-4" />
+                Mulai Belanja
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 

@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toRupiah } from "@/lib/utils";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, ShoppingBag } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useGetFrequentlyBought } from "../../api/use-get-frequently-bought";
+import { IconCoffee } from "@tabler/icons-react";
 
 export default function FrequentlyBought() {
   const {
@@ -59,7 +61,39 @@ export default function FrequentlyBought() {
     );
   }
 
-  if (!frequentlyBought || frequentlyBought.length === 0) return null;
+  if (!frequentlyBought || frequentlyBought.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Sering Dibeli</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-6 text-center gap-3">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full blur-3xl bg-primary/10 animate-glow-pulse" />
+              <div className="relative p-3 rounded-full bg-primary/10 text-primary animate-float">
+                <ShoppingBag size={24} strokeWidth={1.5} />
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-700">
+                Belum ada produk favorit
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Jelajahi produk kami dan temukan produk favoritmu.
+              </p>
+            </div>
+            <Button size="sm" asChild className="mt-2">
+              <Link href="/search">
+                <IconCoffee className="mr-2 w-4 h-4" />
+                Cari Produk
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

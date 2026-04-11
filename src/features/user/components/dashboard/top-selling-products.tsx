@@ -3,11 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TrendingUp } from "lucide-react";
 
 import { ProductCard } from "@/components/shared/product-card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Link from "next/link";
 import { useGetTopSelling } from "../../api/use-get-top-selling";
+import { useProductActions } from "@/features/product/hooks/use-product-actions";
 
 export function TopSellingProductsSkeleton() {
   return (
@@ -17,11 +19,11 @@ export function TopSellingProductsSkeleton() {
         <Skeleton className="h-8 w-20 md:w-24" />
       </CardHeader>
       <CardContent>
-        <div className="flex gap-4 overflow-hidden">
-          {Array.from({ length: 3 }).map((_, i) => (
+        <div className="flex gap-4 overflow-hidden pb-4">
+          {Array.from({ length: 5 }).map((_, i) => (
             <div
               key={i}
-              className="min-w-[160px] md:min-w-[200px]  md:max-w-[240px] border border-border rounded-xl p-4 space-y-4"
+              className="min-w-[160px] md:min-w-[200px] md:max-w-[280px] shrink-0 border border-border rounded-xl p-4 space-y-4 w-full"
             >
               <Skeleton className="aspect-square w-full rounded-lg" />
               <div className="space-y-2">
@@ -41,6 +43,17 @@ export function TopSellingProductsSkeleton() {
 
 export function TopSellingProducts() {
   const { data: topProducts, isLoading, isError } = useGetTopSelling();
+  const {
+    getCartQuantity,
+    isInWishlist,
+    updatingQuantityItemId,
+    creatingCartItemId,
+    togglingWishlistItemId,
+    handleAddToCart,
+    handleUpdateQuantity,
+    handleRemoveFromCart,
+    handleToggleWishlist,
+  } = useProductActions();
 
   if (isLoading) {
     return <TopSellingProductsSkeleton />;
@@ -55,7 +68,33 @@ export function TopSellingProducts() {
     );
   }
 
-  if (!topProducts || topProducts.length === 0) return null;
+  if (!topProducts || topProducts.length === 0) {
+    return (
+      <Card>
+        <CardHeader className="flex flex-row justify-between items-center">
+          <CardTitle className="text-lg font-bold">Produk Terlaris</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-8 text-center gap-3">
+            <div className="p-4 rounded-full bg-primary/10">
+              <TrendingUp className="w-8 h-8 text-primary" />
+            </div>
+            <div>
+              <p className="font-semibold text-gray-800">
+                Belum ada produk terlaris
+              </p>
+              <p className="text-sm text-gray-500 mt-1">
+                Jelajahi berbagai pilihan produk kopi terbaik kami!
+              </p>
+            </div>
+            <Button size="sm" asChild className="mt-2">
+              <Link href="/search">Lihat Produk</Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -76,9 +115,21 @@ export function TopSellingProducts() {
             return (
               <div
                 key={product.id}
-                className="min-w-[160px] md:min-w-[200px]  md:max-w-[240px] snap-start shrink-0"
+                className="min-w-[160px] md:min-w-[200px]  md:max-w-[280px] snap-start shrink-0"
               >
-                <ProductCard product={product} viewMode="grid" />
+                <ProductCard
+                  product={product}
+                  viewMode="grid"
+                  onAddToCart={handleAddToCart}
+                  onToggleWishlist={handleToggleWishlist}
+                  onUpdateQuantity={handleUpdateQuantity}
+                  onRemoveFromCart={handleRemoveFromCart}
+                  cartQuantity={getCartQuantity(product.id)}
+                  isInWishlist={isInWishlist(product.id)}
+                  isAddingToCart={creatingCartItemId === product.id}
+                  isUpdatingQuantity={updatingQuantityItemId === product.id}
+                  isTogglingWishlist={togglingWishlistItemId === product.id}
+                />
               </div>
             );
           })}

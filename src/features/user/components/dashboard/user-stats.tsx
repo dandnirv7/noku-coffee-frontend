@@ -4,12 +4,18 @@ import { Clock, Package, ShoppingBag } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toRupiah } from "@/lib/utils";
+import { cn, toRupiah } from "@/lib/utils";
 import { useGetSummary } from "../../api/use-get-summary";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export function UserStats() {
-  const { data: summary, isLoading, isError } = useGetSummary();
+  const { data, isLoading, isError } = useGetSummary();
+
+  const summary = {
+    totalOrders: data?.totalOrders ?? 0,
+    totalSpent: data?.totalSpent ?? 0,
+    activeOrders: data?.activeOrders ?? 0,
+  };
 
   if (isLoading) {
     return (
@@ -43,7 +49,7 @@ export function UserStats() {
                 Total Pesanan
               </p>
               <p className="text-xl font-bold text-gray-900">
-                {summary?.totalOrders ?? 0}
+                {summary.totalOrders}
               </p>
             </div>
           </div>
@@ -61,7 +67,7 @@ export function UserStats() {
                 Total Pengeluaran
               </p>
               <p className="text-xl font-bold text-gray-900 lg:text-xl">
-                {toRupiah(summary?.totalSpent ?? 0)}
+                {toRupiah(summary.totalSpent)}
               </p>
             </div>
           </div>
@@ -80,9 +86,14 @@ export function UserStats() {
               </p>
               <div className="flex flex-col gap-px md:gap-2 items-baseline md:flex-row">
                 <p className="text-xl font-bold text-gray-900">
-                  {summary?.activeOrders ?? 0}
+                  {summary.activeOrders}
                 </p>
-                <span className="text-xs font-medium text-orange-600">
+                <span
+                  className={cn(
+                    "text-xs font-medium text-primary",
+                    summary.activeOrders > 0 ? "block" : "hidden",
+                  )}
+                >
                   Sedang Diproses
                 </span>
               </div>
