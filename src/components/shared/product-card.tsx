@@ -255,7 +255,7 @@ export function ProductCard({
 
             <div
               className={cn(
-                "flex-1 max-w-40",
+                "flex-1 max-w-40 overflow-hidden",
                 isListView && "w-full",
                 pathname?.includes("cart") && "max-w-none w-full",
               )}
@@ -275,12 +275,12 @@ export function ProductCard({
                   {isActuallyAdding ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Menambahkan...
+                      <span className="truncate">Menambahkan...</span>
                     </>
                   ) : isOutOfStock ? (
-                    "Stok Habis"
+                    <span className="truncate">Stok Habis</span>
                   ) : (
-                    "+ Keranjang"
+                    <span className="truncate">+ Keranjang</span>
                   )}
                 </Button>
               ) : (

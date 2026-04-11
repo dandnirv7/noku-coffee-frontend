@@ -27,7 +27,7 @@ export default async function SearchProductPage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const searchParams = await props.searchParams;
-  const parsedParams = searchParamsCache.parse(searchParams);
+  const parsedParams = await searchParamsCache.parse(searchParams);
   const queryClient = getQueryClient();
 
   await queryClient.prefetchQuery({
