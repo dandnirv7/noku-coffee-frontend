@@ -3,31 +3,34 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import z from "zod";
 
 const OrderStatsSchema = z.object({
-  success: z.boolean(),
-  message: z.string(),
-  data: z.object({
-    selesai: z.number(),
-    menunggu: z.number(),
-    gagal: z.number(),
-  }),
+  selesai: z.number(),
+  menunggu: z.number(),
+  gagal: z.number(),
 });
 
-type OrderStats = z.infer<typeof OrderStatsSchema>;
+const OrderStatsResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+  data: OrderStatsSchema,
+});
+
+export type OrderStatsResponse = z.infer<typeof OrderStatsResponseSchema>;
+export type OrderStats = z.infer<typeof OrderStatsSchema>;
 
 export const OrderStatsParamsSchema = z.object({
-  orderPeriod: z.enum(["monthly", "weekly", "daily"]),
+  period: z.enum(["monthly", "weekly", "daily"]),
 });
 
 export type OrderStatsParams = z.infer<typeof OrderStatsParamsSchema>;
 
 export async function getOrderStats(
   params: OrderStatsParams,
-): Promise<OrderStats> {
+): Promise<OrderStatsResponse> {
   const { data } = await api.get("/dashboard/order-stats", {
     params,
   });
 
-  const validated = OrderStatsSchema.safeParse(data);
+  const validated = OrderStatsResponseSchema.safeParse(data);
 
   if (!validated.success) {
     throw new Error("Invalid response from server");
@@ -37,12 +40,12 @@ export async function getOrderStats(
 }
 
 export const useOrderStats = (
-  params: OrderStatsParams = { orderPeriod: "monthly" },
+  params: OrderStatsParams = { period: "monthly" },
 ) => {
   return useQuery({
-    queryKey: ["order-stats", params],
+    queryKey: ["order-stats", params.period],
     queryFn: () => getOrderStats(params),
     placeholderData: keepPreviousData,
-    enabled: !!params.orderPeriod,
+    enabled: !!params.period,
   });
 };

@@ -6,11 +6,13 @@ const topProductsSchema = z.object({
   id: z.string(),
   slug: z.string(),
   name: z.string(),
-  price: z.number(),
+  price: z.union([z.number(), z.string()]).transform(Number),
+  category: z
+    .any()
+    .transform((val) => (typeof val === "string" ? val : (val?.name ?? ""))),
+  image: z.string().nullable().optional(),
   sold: z.number(),
   revenueProduct: z.number(),
-  category: z.string(),
-  image: z.string().nullable(),
 });
 
 const topProductsResponseSchema = z.object({
