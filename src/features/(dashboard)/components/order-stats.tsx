@@ -8,27 +8,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo } from "react";
 import { useOrderStats } from "../api/get-order-stats";
+import { OrderPeriodUI, useOrdersFilter } from "../hooks/use-orders-filter";
 
 export default function OrderStats() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const [period, setPeriod] = useOrdersFilter();
 
-  const period = useMemo(() => {
-    const p = searchParams.get("orderPeriod");
-    if (p === "daily" || p === "weekly" || p === "monthly") return p;
-    return "monthly";
-  }, [searchParams]);
-
-  const { data: orderStats } = useOrderStats({ orderPeriod: period });
+  const { data: orderStats, isLoading, isFetching } = useOrderStats({ period });
 
   const handleChange = (value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("orderPeriod", value);
-    router.push(`?${params.toString()}`);
+    setPeriod(value as OrderPeriodUI);
   };
+
+  if (isLoading) {
+    return (
+      <div className="bg-white px-6 py-4 rounded-xl shadow-sm border flex flex-col w-full h-[430px]">
+        <div className="flex justify-between items-center mb-6">
+          <div className="h-6 w-40 bg-muted animate-pulse rounded" />
+          <div className="h-8 w-24 bg-muted animate-pulse rounded" />
+        </div>
+        <div className="grow flex items-center justify-center py-2">
+          <div className="w-48 h-48 rounded-full bg-muted animate-pulse" />
+        </div>
+        <div className="flex flex-wrap justify-center gap-3 md:gap-4 mt-auto pt-4">
+          <div className="h-4 w-16 bg-muted animate-pulse rounded" />
+          <div className="h-4 w-16 bg-muted animate-pulse rounded" />
+          <div className="h-4 w-16 bg-muted animate-pulse rounded" />
+        </div>
+      </div>
+    );
+  }
 
   const selesai = orderStats?.data.selesai ?? 0;
   const menunggu = orderStats?.data.menunggu ?? 0;
@@ -41,7 +50,15 @@ export default function OrderStats() {
   const gagalPct = total ? (gagal / total) * 100 : 0;
 
   return (
-    <div className="bg-white px-6 py-4 rounded-xl shadow-sm border flex flex-col w-full">
+    <div className="bg-white px-6 py-4 rounded-xl shadow-sm border flex flex-col w-full relative">
+      {isFetching && !isLoading && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/50 backdrop-blur-sm transition-all">
+          <span className="text-sm font-medium text-muted-foreground">
+            Memperbarui data...
+          </span>
+        </div>
+      )}
+
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-bold text-slate-900">Statistik Pesanan</h2>
 

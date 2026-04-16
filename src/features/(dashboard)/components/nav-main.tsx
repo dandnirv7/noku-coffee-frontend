@@ -2,7 +2,6 @@
 
 import { ChevronRight, type LucideIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
-
 import {
   Collapsible,
   CollapsibleContent,
@@ -20,6 +19,11 @@ import {
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
+const isExactPath = (pathname: string, url: string) => pathname === url;
+
+const isSubPath = (pathname: string, url: string) =>
+  pathname.startsWith(url + "/");
+
 export function NavMain({
   items,
 }: {
@@ -27,7 +31,6 @@ export function NavMain({
     title: string;
     url: string;
     icon?: LucideIcon;
-    isActive?: boolean;
     items?: {
       title: string;
       url: string;
@@ -40,14 +43,17 @@ export function NavMain({
     <SidebarGroup>
       <SidebarMenu>
         {items.map((item) => {
-          const hasSubItems = item.items && item.items.length > 0;
+          const hasSubItems = !!item.items?.length;
 
           if (hasSubItems) {
-            const isAnyChildActive = item.items?.some(
-              (subItem) =>
-                pathname === subItem.url ||
-                pathname.startsWith(subItem.url + "/"),
+            const isAnyChildActive = item.items?.some((subItem) =>
+              isSubPath(pathname, subItem.url),
             );
+
+            const isRoot = item.url === "/dashboard";
+            const isParentActive = isRoot
+              ? pathname === item.url
+              : item.items?.some((sub) => isSubPath(pathname, sub.url));
 
             return (
               <Collapsible
@@ -59,21 +65,23 @@ export function NavMain({
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton
-                      size={"md"}
+                      size="md"
                       tooltip={item.title}
-                      className="text-slate-500 hover:text-slate-900 hover:bg-stone-50"
+                      className={cn(
+                        "text-slate-500 hover:text-slate-900 hover:bg-stone-50",
+                        isParentActive && "text-slate-900 font-medium",
+                      )}
                     >
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
                       <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
+
                   <CollapsibleContent>
                     <SidebarMenuSub>
                       {item.items?.map((subItem) => {
-                        const isSubActive =
-                          pathname === subItem.url ||
-                          pathname.startsWith(subItem.url + "/");
+                        const isSubActive = isExactPath(pathname, subItem.url);
 
                         return (
                           <SidebarMenuSubItem key={subItem.title}>
@@ -83,7 +91,7 @@ export function NavMain({
                                 className={cn(
                                   "text-slate-500 hover:text-slate-900",
                                   isSubActive &&
-                                    "bg-stone-100 text-slate-900 font-medium relative before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-1 before:bg-orange-500 before:rounded-md",
+                                    "bg-stone-100 text-slate-900 font-medium relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-orange-500 before:rounded-md",
                                 )}
                               >
                                 <span>{subItem.title}</span>
@@ -99,18 +107,18 @@ export function NavMain({
             );
           }
 
-          const isActive = pathname === item.url;
+          const isActive = isExactPath(pathname, item.url);
 
           return (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
-                size={"md"}
+                size="md"
                 asChild
                 tooltip={item.title}
                 className={cn(
                   "text-slate-500 hover:text-slate-900 hover:bg-stone-50",
                   isActive &&
-                    "bg-stone-100 text-slate-900 font-medium relative before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-1 before:bg-orange-500 before:rounded-md",
+                    "text-slate-900 font-medium relative before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-1 before:bg-orange-500 before:rounded-md",
                 )}
               >
                 <Link href={item.url}>

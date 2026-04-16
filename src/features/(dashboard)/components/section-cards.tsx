@@ -25,6 +25,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useSummary } from "../api/get-summary";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
+import { SectionCardsSkeleton } from "./dashboard-skeleton";
 
 type StatConfig = {
   key: "revenue" | "products" | "orders" | "customers";
@@ -75,10 +76,14 @@ const STATS_CONFIG: StatConfig[] = [
 ];
 
 export function SectionCards() {
-  const { data: summary } = useSummary();
+  const { data: summary, isLoading } = useSummary();
+
+  if (isLoading) {
+    return <SectionCardsSkeleton />;
+  }
 
   return (
-    <div className="flex flex-wrap gap-4 items-center">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-center">
       {STATS_CONFIG.map((stat) => {
         const metric = summary?.[stat.key];
 
@@ -96,15 +101,15 @@ export function SectionCards() {
             : "Minggu Lalu";
 
         return (
-          <Card key={stat.key} className="py-2 w-[230px]">
-            <CardHeader className="flex justify-between px-4">
+          <Card key={stat.key} className="py-2 w-full">
+            <CardHeader className="flex flex-row items-center justify-between px-4">
               <CardDescription className="text-lg font-semibold">
                 {stat.title}
               </CardDescription>
 
               <CardTitle
                 className={cn(
-                  "text-2xl font-semibold p-2 rounded-lg",
+                  "text-xl font-semibold p-2 rounded-lg",
                   stat.iconBg,
                 )}
               >
@@ -113,12 +118,12 @@ export function SectionCards() {
             </CardHeader>
 
             <CardContent className="px-4">
-              <h2 className="text-2xl font-bold">
+              <h2 className="text-2xl font-bold truncate">
                 {stat.isCurrency ? toRupiah(value) : value}
               </h2>
             </CardContent>
 
-            <CardFooter className="flex items-center justify-between px-4 text-sm">
+            <CardFooter className="flex items-center justify-between px-4 text-sm mt-4">
               <div className="flex items-center gap-1">
                 <TrendIcon className={cn("w-4 h-4", trendTextColor)} />
 
@@ -126,14 +131,14 @@ export function SectionCards() {
                   {trend}%
                 </span>
 
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-muted-foreground whitespace-nowrap">
                   {periodLabel}
                 </span>
               </div>
 
               <Link
                 href={stat.href}
-                className="flex items-center text-xs hover:text-orange-500 transition-colors"
+                className="flex items-center text-xs hover:text-orange-500 transition-colors whitespace-nowrap"
               >
                 <span>Detail</span>
                 <IconArrowUpRight className="w-4 h-4" />

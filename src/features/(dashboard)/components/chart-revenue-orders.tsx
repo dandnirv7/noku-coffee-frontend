@@ -1,6 +1,6 @@
+// components/charts/chart-revenue-orders.tsx
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Bar,
   CartesianGrid,
@@ -23,63 +23,45 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn, toRupiah } from "@/lib/utils";
+
 import { useRevenueOrders } from "../api/get-revenue-orders";
+import { useRevenueFilter } from "../hooks/use-revenue-filter";
+import { RevenueOrdersFilter } from "./revenue-orders-filter";
 
 const chartConfig = {
-  revenue: {
-    label: "Pendapatan",
-    color: "#f9a01b",
-  },
-  orders: {
-    label: "Pesanan",
-    color: "#4ade80",
-  },
+  revenue: { label: "Pendapatan", color: "#f9a01b" },
+  orders: { label: "Pesanan", color: "#4ade80" },
 } satisfies ChartConfig;
-
-const timeFrameMap = {
-  daily: "daily",
-  weekly: "weekly",
-  monthly: "monthly",
-} as const;
-
-type TimeFrameUI = keyof typeof timeFrameMap;
 
 export function ChartRevenueOrders() {
   const isMobile = useIsMobile();
+  const [timeFrame] = useRevenueFilter();
 
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  const timeQuery = searchParams.get("periodRevenue");
-  const isValidTimeFrame =
-    timeQuery === "daily" || timeQuery === "weekly" || timeQuery === "monthly";
-  const timeFrame: TimeFrameUI = isValidTimeFrame
-    ? (timeQuery as TimeFrameUI)
-    : "monthly";
-
-  const handleTimeFrameChange = (val: TimeFrameUI) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("periodRevenue", val);
-
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  };
-
-  const { data: revenueOrder, isLoading } = useRevenueOrders({
-    timeFrame: timeFrameMap[timeFrame],
+  const {
+    data: revenueOrder,
+    isLoading,
+    isFetching,
+  } = useRevenueOrders({
+    timeFrame,
   });
 
   const chartData = revenueOrder || [];
+
+  if (isLoading) {
+    return (
+      <Card className="h-[430px]">
+        <CardHeader>
+          <div className="h-6 w-48 bg-muted animate-pulse rounded mb-2" />
+          <div className="h-4 w-64 bg-muted animate-pulse rounded" />
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] w-full bg-muted animate-pulse rounded" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="@container/card">
@@ -99,46 +81,15 @@ export function ChartRevenueOrders() {
         </div>
 
         <CardAction>
-          <ToggleGroup
-            type="single"
-            value={timeFrame}
-            onValueChange={(val) =>
-              val && handleTimeFrameChange(val as TimeFrameUI)
-            }
-            variant="outline"
-            className="hidden *:data-[slot=toggle-group-item]:px-4! @[767px]/card:flex"
-            disabled={isLoading}
-          >
-            <ToggleGroupItem value="daily">Harian</ToggleGroupItem>
-            <ToggleGroupItem value="weekly">Mingguan</ToggleGroupItem>
-            <ToggleGroupItem value="monthly">Bulanan</ToggleGroupItem>
-          </ToggleGroup>
-
-          <Select
-            value={timeFrame}
-            onValueChange={handleTimeFrameChange}
-            disabled={isLoading}
-          >
-            <SelectTrigger
-              className="flex w-32 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden"
-              size="sm"
-            >
-              <SelectValue placeholder="Pilih..." />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectItem value="daily">Harian</SelectItem>
-              <SelectItem value="weekly">Mingguan</SelectItem>
-              <SelectItem value="monthly">Bulanan</SelectItem>
-            </SelectContent>
-          </Select>
+          <RevenueOrdersFilter disabled={isLoading} />
         </CardAction>
       </CardHeader>
 
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6 relative">
-        {isLoading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/50 backdrop-blur-sm">
+        {isFetching && !isLoading && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/50 backdrop-blur-sm transition-all">
             <span className="text-sm font-medium text-muted-foreground">
-              Memuat data...
+              Memperbarui data...
             </span>
           </div>
         )}

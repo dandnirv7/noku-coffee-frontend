@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  IconCashBanknote,
   IconCoffee,
   IconDashboard,
   IconFolder,
@@ -8,6 +9,7 @@ import {
   IconListDetails,
   IconLogout,
   IconSettings,
+  IconTicket,
   IconUsers,
 } from "@tabler/icons-react";
 import Link from "next/link";
@@ -31,7 +33,7 @@ import { Button } from "@/components/ui/button";
 export const data = {
   navMain: [
     {
-      title: "Overview",
+      title: "Dashboard",
       url: "/dashboard",
       icon: IconDashboard,
     },
@@ -40,9 +42,9 @@ export const data = {
       url: "/dashboard/products",
       icon: IconCoffee,
       items: [
-        { title: "Semua Produk", url: "/dashboard/products" },
+        { title: "Katalog", url: "/dashboard/products" },
         { title: "Kategori", url: "/dashboard/products/categories" },
-        { title: "Tambah Produk", url: "/dashboard/products/create" },
+        { title: "Stok", url: "/dashboard/products/stock" },
       ],
     },
     {
@@ -51,9 +53,9 @@ export const data = {
       icon: IconFolder,
       items: [
         { title: "Semua Pesanan", url: "/dashboard/orders" },
-        { title: "Menunggu", url: "/dashboard/orders/pending" },
-        { title: "Proses", url: "/dashboard/orders/process" },
-        { title: "Selesai", url: "/dashboard/orders/completed" },
+        { title: "Menunggu", url: "/dashboard/orders?status=PENDING" },
+        { title: "Proses", url: "/dashboard/orders?status=PAID" },
+        { title: "Selesai", url: "/dashboard/orders?status=COMPLETED" },
       ],
     },
     {
@@ -62,26 +64,28 @@ export const data = {
       icon: IconListDetails,
       items: [
         { title: "Semua Invoice", url: "/dashboard/invoices" },
-        { title: "Belum Dibayar", url: "/dashboard/invoices/unpaid" },
-      ],
-    },
-    {
-      title: "Roles",
-      url: "/roles",
-      icon: IconUsers,
-      items: [
-        { title: "Semua Roles", url: "/roles" },
-        { title: "Hak Akses", url: "/roles/permissions" },
+        { title: "Belum Dibayar", url: "/dashboard/invoices?status=PENDING" },
       ],
     },
     {
       title: "Pelanggan",
-      url: "/customers",
+      url: "/dashboard/customers",
       icon: IconUsers,
       items: [
-        { title: "Semua Pelanggan", url: "/customers" },
-        { title: "Ulasan", url: "/customers/reviews" },
+        { title: "Semua Pelanggan", url: "/dashboard/customers" },
+        { title: "Ulasan", url: "/dashboard/customers?tab=reviews" },
       ],
+    },
+    {
+      title: "Promo & Diskon",
+      url: "/dashboard/promos",
+      icon: IconTicket,
+      items: [{ title: "Semua Promo", url: "/dashboard/promos" }],
+    },
+    {
+      title: "Laporan",
+      url: "/dashboard/earnings",
+      icon: IconCashBanknote,
     },
   ],
   navSecondary: [
@@ -118,12 +122,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="hover:bg-transparent"
             >
               <Link href="#">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-xl bg-orange-500 text-white shadow-sm">
+                {/* <div className="flex aspect-square size-8 items-center justify-center rounded-xl bg-orange-500 text-white shadow-sm">
                   <IconCoffee className="size-5" />
-                </div>
-                <span className="text-xl font-bold font-sans text-slate-900 uppercase">
+                </div> */}
+                <h1 className="text-2xl font-extrabold font-sans text-slate-900 uppercase">
                   Noku
-                </span>
+                </h1>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

@@ -1,15 +1,21 @@
 "use client";
 
-import * as React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -18,25 +24,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toRupiah } from "@/lib/utils";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { SortBy, useRecentOrders } from "../api/get-recent-orders";
 import { formatDate } from "@/features/user/hooks/formatDate";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
-
-const statusVariantMap: Record<string, "default" | "destructive" | "outline"> =
-  {
-    CANCELLED: "destructive",
-  };
+import { cn, toRupiah } from "@/lib/utils";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { useRecentOrders } from "../api/get-recent-orders";
+import {
+  useOrderSort,
+  useOrderStatusFilter,
+  type OrderStatusFilter,
+} from "../hooks/use-recent-orders-filter";
+import { RecentOrdersSkeleton } from "./dashboard-skeleton";
 
 const statusClassMap: Record<string, string> = {
   PENDING: "bg-amber-100 text-amber-800 hover:bg-amber-100 border-amber-300",
@@ -52,83 +51,35 @@ const statusLabelMap: Record<string, string> = {
 };
 
 export function RecentOrdersTable() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const [statusFilter, setStatusFilter] = useOrderStatusFilter();
+  const [sortBy, setSortBy] = useOrderSort();
 
-  const statusQuery = searchParams.get("status");
-  const sortQuery = searchParams.get("sort");
+  const { data: orders = [], isLoading } = useRecentOrders(sortBy);
 
-  const filter =
-    statusQuery === "COMPLETED" ||
-    statusQuery === "PENDING" ||
-    statusQuery === "CANCELLED"
-      ? statusQuery
-      : "all";
-
-  const sortBy: SortBy =
-    sortQuery === "latest" || sortQuery === "oldest" || sortQuery === "highest"
-      ? (sortQuery as SortBy)
-      : "latest";
-
-  const handleFilterChange = (val: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (val === "all") {
-      params.delete("status");
-    } else {
-      params.set("status", val);
-    }
-
-    if (sortBy === "latest") {
-      params.delete("sort");
-    }
-
-    const queryString = params.toString();
-    router.replace(`${pathname}${queryString ? `?${queryString}` : ""}`, {
-      scroll: false,
-    });
-  };
-
-  const handleSortChange = (val: SortBy) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (val === "latest") {
-      params.delete("sort");
-    } else {
-      params.set("sort", val);
-    }
-    if (filter === "all") {
-      params.delete("status");
-    }
-
-    const queryString = params.toString();
-    router.replace(`${pathname}${queryString ? `?${queryString}` : ""}`, {
-      scroll: false,
-    });
-  };
-
-  const { data: orders = [] } = useRecentOrders(sortBy);
+  if (isLoading) {
+    return <RecentOrdersSkeleton />;
+  }
 
   const filteredOrders =
-    filter === "all"
+    statusFilter === "all"
       ? orders
-      : orders.filter((order) => order.status === filter);
+      : orders.filter((order) => order.status === statusFilter);
 
   return (
-    <Card className="flex flex-col h-full w-full">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
+    <Card className="flex flex-col h-full w-full overflow-hidden">
+      <CardHeader className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between pb-2">
         <div className="flex flex-col space-y-1">
           <CardTitle>Pesanan Terbaru</CardTitle>
           <CardDescription>Menampilkan 5 pesanan terakhir</CardDescription>
         </div>
-        <div className="flex items-center gap-4">
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto overflow-hidden">
           <Tabs
-            value={filter}
-            onValueChange={handleFilterChange}
-            className="w-[400px]"
+            value={statusFilter}
+            onValueChange={(val) => setStatusFilter(val as OrderStatusFilter)}
+            className="w-full sm:w-[400px]"
           >
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="flex w-full justify-start overflow-x-auto sm:grid sm:grid-cols-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               <TabsTrigger value="all">Semua</TabsTrigger>
               <TabsTrigger value="COMPLETED">Selesai</TabsTrigger>
               <TabsTrigger value="PENDING">Pending</TabsTrigger>
@@ -136,8 +87,11 @@ export function RecentOrdersTable() {
             </TabsList>
           </Tabs>
 
-          <Select value={sortBy} onValueChange={handleSortChange}>
-            <SelectTrigger className="w-[180px]">
+          <Select
+            value={sortBy}
+            onValueChange={(val) => setSortBy(val as typeof sortBy)}
+          >
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Urutkan" />
             </SelectTrigger>
             <SelectContent>
@@ -148,52 +102,55 @@ export function RecentOrdersTable() {
           </Select>
         </div>
       </CardHeader>
-      <CardContent className="flex flex-1 flex-col pt-0 pb-0">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[150px]">No. Pesanan</TableHead>
-              <TableHead>Pelanggan</TableHead>
-              <TableHead>Tanggal</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead className="text-right">Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredOrders.length > 0 ? (
-              filteredOrders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell className="font-medium">
-                    {order.orderNumber}
-                  </TableCell>
-                  <TableCell>{order.customerName}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {formatDate(order.date)}
-                  </TableCell>
-                  <TableCell>{toRupiah(order.totalAmount)}</TableCell>
-                  <TableCell className="text-right">
-                    <Badge
-                      variant={statusVariantMap[order.status] ?? "outline"}
-                      className={statusClassMap[order.status] ?? ""}
-                    >
-                      {statusLabelMap[order.status]}
-                    </Badge>
+
+      <CardContent className="flex flex-1 flex-col pt-0">
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[120px]">No. Pesanan</TableHead>
+                <TableHead>Pelanggan</TableHead>
+                <TableHead>Tanggal</TableHead>
+                <TableHead>Total</TableHead>
+                <TableHead className="text-right">Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredOrders.length > 0 ? (
+                filteredOrders.map((order) => (
+                  <TableRow key={order.id}>
+                    <TableCell className="font-medium">
+                      {order.orderNumber}
+                    </TableCell>
+                    <TableCell>{order.customerName}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {formatDate(order.date)}
+                    </TableCell>
+                    <TableCell>{toRupiah(order.totalAmount)}</TableCell>
+                    <TableCell className="text-right">
+                      <Badge
+                        variant="outline"
+                        className={cn(statusClassMap[order.status] ?? "")}
+                      >
+                        {statusLabelMap[order.status] ?? order.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="h-24 text-center text-muted-foreground"
+                  >
+                    Tidak ada pesanan
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="h-24 text-center text-muted-foreground"
-                >
-                  Tidak ada pesanan
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        <div className="mt-4 mb-4 flex justify-end">
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        <div className="mt-4 flex justify-end">
           <Button asChild variant="outline" size="sm" className="gap-2">
             <Link href="/dashboard/orders">
               Lihat semua pesanan

@@ -10,27 +10,15 @@ import {
 import { toRupiah, cn } from "@/lib/utils";
 import { Trophy, Medal } from "lucide-react";
 import { useTopProducts } from "../api/get-top-products";
+import { TopProductsSkeleton } from "./dashboard-skeleton";
 
 export function TopProducts() {
-  // Gunakan loading, error, dan data dari query
   const { data: topProducts, isLoading, isError, error } = useTopProducts();
 
-  // Loading state
   if (isLoading) {
-    return (
-      <Card className="flex h-full w-full flex-col">
-        <CardHeader>
-          <CardTitle>Produk Terlaris</CardTitle>
-          <CardDescription>Berdasarkan penjualan bulan ini</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-1 justify-center items-center">
-          <div>Loading...</div>
-        </CardContent>
-      </Card>
-    );
+    return <TopProductsSkeleton />;
   }
 
-  // Error state
   if (isError) {
     return (
       <Card className="flex h-full w-full flex-col">
@@ -48,7 +36,6 @@ export function TopProducts() {
     );
   }
 
-  // Jika data ada, render produk
   return (
     <Card className="flex h-full w-full flex-col">
       <CardHeader>

@@ -16,7 +16,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         }
       >
         <AppSidebar variant="floating" />
-        <SidebarInset className="px-4 bg-stone-50">
+        <SidebarInset className="px-4 bg-stone-50 pb-4">
           <SiteHeader />
           {children}
         </SidebarInset>

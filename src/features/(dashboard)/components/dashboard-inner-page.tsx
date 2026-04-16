@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartRevenueOrders } from "@/features/(dashboard)/components/chart-area-interactive";
+import { ChartRevenueOrders } from "@/features/(dashboard)/components/chart-revenue-orders";
 import { LowStockAlert } from "@/features/(dashboard)/components/low-stock-alert";
 import { RecentOrdersTable } from "@/features/(dashboard)/components/recent-orders-table";
 import { SectionCards } from "@/features/(dashboard)/components/section-cards";
@@ -9,7 +9,7 @@ import OrderStats from "../components/order-stats";
 
 export default function DashboardInnerPage() {
   return (
-    <div className="flex flex-1 flex-col pb-8">
+    <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
         <SectionCards />
 
