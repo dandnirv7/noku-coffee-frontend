@@ -25,6 +25,10 @@ export const api = axios.create({
 let sessionPromise: Promise<AuthSessionResponse | null> | null = null;
 
 api.interceptors.request.use(async (config) => {
+  if (config.data instanceof FormData && config.headers) {
+    delete config.headers["Content-Type"];
+  }
+
   if (typeof window === "undefined") return config;
 
   if (!sessionPromise) {

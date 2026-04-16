@@ -5,7 +5,7 @@ export const ProductSchema = z.object({
   name: z.string(),
   slug: z.string(),
   description: z.string().nullable(),
-  price: z.string().transform((val) => Number(val)),
+  price: z.coerce.number(),
   sku: z.string(),
   type: z.array(z.string()),
   images: z.array(z.string()),
@@ -17,10 +17,12 @@ export const ProductSchema = z.object({
   category: z.object({
     name: z.string(),
   }),
+  categoryId: z.string(),
+  deletedAt: z.string().nullable(),
 });
 
 export const ProductResponseSchema = z.object({
-  success: z.boolean(),
+  success: z.boolean().optional(),
   message: z.string(),
   data: z.object({
     data: z.array(ProductSchema),
