@@ -1,24 +1,26 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DataTable } from "@/features/(dashboard)/components/data-table";
 import { useDataTable } from "@/features/(dashboard)/hooks/use-data-table";
-import { getCategoriesColumns } from "../components/columns/categories-columns";
-import { useCategories, Category } from "../api/get-categories";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/axios";
-import { toast } from "sonner";
-import { useState, useMemo } from "react";
 import { IconPlus } from "@tabler/icons-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { RowSelectionState } from "@tanstack/react-table";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import { Category, useCategories } from "../api/get-categories";
+import { getCategoriesColumns } from "../components/columns/categories-columns";
+import { useSearchFilters } from "../hooks/use-search-filters";
 
 function useCreateCategory() {
   const queryClient = useQueryClient();
@@ -45,10 +47,17 @@ function useDeleteCategory() {
 }
 
 export function CategoriesPage() {
+  const { params, setPage, setPerPage } = useSearchFilters();
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  const { data: categories = [] } = useCategories();
+  const { data, isLoading } = useCategories(params);
+
+  const categories = data?.items ?? [];
+  const total = data?.total ?? 0;
+
   const { mutate: createCategory, isPending: isCreating } = useCreateCategory();
   const { mutate: deleteCategory } = useDeleteCategory();
 
@@ -68,7 +77,18 @@ export function CategoriesPage() {
     [deleteCategory],
   );
 
-  const { table } = useDataTable({ data: categories, columns, pageSize: 20 });
+  const { table } = useDataTable({
+    data: categories,
+    columns,
+    pageIndex: params.page - 1,
+    pageSize: params.perPage,
+    onPageChange: (index) => setPage(index + 1),
+    onPageSizeChange: (size) => setPerPage(size),
+    rowSelection,
+    onRowSelectionChange: setRowSelection,
+    manualPagination: true,
+    rowCount: total,
+  });
 
   const handleCreate = () => {
     if (!newCategoryName.trim()) return;
@@ -97,6 +117,7 @@ export function CategoriesPage() {
 
       <DataTable
         table={table}
+        isLoading={isLoading}
         columnCount={columns.length}
         emptyMessage="Belum ada kategori"
         showPagination={false}
@@ -111,7 +132,7 @@ export function CategoriesPage() {
             <Label htmlFor="category-name">Nama Kategori</Label>
             <Input
               id="category-name"
-              placeholder="Contoh: Seasonal"
+              placeholder="Contoh: Single Origin"
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleCreate()}

@@ -66,8 +66,9 @@ export function AdminProductsPage() {
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  const { data: categoriesData = [], isLoading: loadingCategories } =
-    useCategories();
+  const { data: categories, isLoading: loadingCategories } = useCategories();
+
+  const categoriesData = categories?.items ?? [];
 
   const formatFilterParam = (
     value: string | string[] | undefined | null,

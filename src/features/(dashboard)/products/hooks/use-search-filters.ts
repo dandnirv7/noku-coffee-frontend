@@ -10,7 +10,7 @@ export function useSearchFilters() {
       type: parseAsString.withDefault("all"),
       sort: parseAsString.withDefault("newest"),
     },
-    { shallow: true, history: "replace" },
+    { shallow: true, history: "replace", clearOnDefault: true },
   );
 
   return {

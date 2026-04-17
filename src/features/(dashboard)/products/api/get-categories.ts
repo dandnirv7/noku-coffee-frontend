@@ -6,6 +6,7 @@ const CategorySchema = z.object({
   id: z.string(),
   name: z.string(),
   slug: z.string(),
+  createdAt: z.string(),
 });
 
 export const CategoryResponseSchema = z.object({
@@ -24,8 +25,28 @@ export const CategoryResponseSchema = z.object({
 
 export type Category = z.infer<typeof CategorySchema>;
 
-export const getCategories = async () => {
-  const { data } = await api.get("/categories");
+export interface GetCategoriesParams {
+  page?: number;
+  perPage?: number;
+  search?: string;
+  sort?: string;
+}
+
+export const getCategories = async (
+  params: GetCategoriesParams = {},
+): Promise<{ items: Category[]; total: number }> => {
+  const queryParams: Record<string, string | number | string[]> = {
+    page: params.page ?? 1,
+    perPage: params.perPage ?? 10,
+  };
+
+  if (params.search) queryParams.search = params.search;
+  if (params.sort) queryParams.sort = params.sort;
+
+  const { data } = await api.get("/categories", {
+    params: queryParams,
+    paramsSerializer: { indexes: null },
+  });
 
   const validated = CategoryResponseSchema.safeParse(data);
 
@@ -34,12 +55,15 @@ export const getCategories = async () => {
     throw new Error("Failed to fetch categories");
   }
 
-  return validated.data.data.data;
+  return {
+    items: validated.data.data.data,
+    total: validated.data.data.meta.total,
+  };
 };
 
-export const useCategories = () => {
+export const useCategories = (params?: GetCategoriesParams) => {
   return useQuery({
-    queryKey: ["categories"],
-    queryFn: () => getCategories(),
+    queryKey: ["categories", params],
+    queryFn: () => getCategories(params),
   });
 };

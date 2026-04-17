@@ -13,6 +13,7 @@ import {
 import { IconDots, IconTrash } from "@tabler/icons-react";
 import { Category } from "../../api/get-categories";
 import { formatDate } from "@/features/user/hooks/formatDate";
+import { Badge } from "@/components/ui/badge";
 
 interface CategoryActionsProps {
   category: Category;
@@ -55,14 +56,36 @@ export function getCategoriesColumns(handlers?: {
       ),
     },
     {
+      accessorKey: "slug",
+      header: "Slug",
+      cell: ({ row }) => (
+        <span className="font-medium">{row.getValue("slug")}</span>
+      ),
+    },
+    {
       accessorKey: "createdAt",
       header: "Dibuat",
       cell: ({ row }) => {
-        const val = row.getValue<string | undefined>("createdAt");
+        const val = row.getValue("createdAt") as string | undefined;
         return (
           <span className="text-muted-foreground text-sm">
             {val ? formatDate(val) : "-"}
           </span>
+        );
+      },
+    },
+    {
+      accessorKey: "deletedAt",
+      header: "Status",
+      cell: ({ row }) => {
+        const val = row.getValue("deletedAt") as string | undefined;
+        return (
+          <Badge
+            variant={val ? "inactiveOutline" : "activeOutline"}
+            className="rounded-md"
+          >
+            {val ? "Tidak Aktif" : "Aktif"}
+          </Badge>
         );
       },
     },

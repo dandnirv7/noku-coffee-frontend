@@ -118,6 +118,16 @@ export function getProductsColumns(handlers?: {
       },
     },
     {
+      accessorKey: "sku",
+      header: "SKU",
+      cell: ({ row }) => {
+        const sku = row.original.sku;
+        return (
+          <span className="text-sm text-muted-foreground">{sku || "-"}</span>
+        );
+      },
+    },
+    {
       accessorKey: "category",
       header: "Kategori",
       cell: ({ row }) => {
@@ -171,6 +181,21 @@ export function getProductsColumns(handlers?: {
           >
             {stock}
           </span>
+        );
+      },
+    },
+    {
+      accessorKey: "deletedAt",
+      header: "Status",
+      cell: ({ row }) => {
+        const deletedAt: Date | null = row.getValue("deletedAt");
+        return (
+          <Badge
+            variant={deletedAt ? "inactiveOutline" : "activeOutline"}
+            className="rounded-md"
+          >
+            {deletedAt ? "Tidak Aktif" : "Aktif"}
+          </Badge>
         );
       },
     },
