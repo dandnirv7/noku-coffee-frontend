@@ -1,6 +1,13 @@
 "use client";
 
-import { ChartRevenueOrders } from "@/features/(dashboard)/components/chart-revenue-orders";
+import dynamic from "next/dynamic";
+const ChartRevenueOrders = dynamic(
+  () =>
+    import("@/features/(dashboard)/components/chart-revenue-orders").then(
+      (mod) => mod.ChartRevenueOrders,
+    ),
+  { ssr: false },
+);
 import { LowStockAlert } from "@/features/(dashboard)/components/low-stock-alert";
 import { RecentOrdersTable } from "@/features/(dashboard)/components/recent-orders-table";
 import { SectionCards } from "@/features/(dashboard)/components/section-cards";

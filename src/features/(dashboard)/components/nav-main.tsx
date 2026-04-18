@@ -2,6 +2,13 @@
 
 import { ChevronRight, type LucideIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { getAdminProducts } from "@/features/(dashboard)/products/api/get-admin-products";
+import { getCategories } from "@/features/(dashboard)/products/api/get-categories";
+import { getAdminOrders } from "@/features/(dashboard)/orders/api/get-admin-orders";
+import { getAdminInvoices } from "@/features/(dashboard)/invoices/api/get-admin-invoices";
+import { getAdminCustomers } from "@/features/(dashboard)/customers/api/get-customers";
+import { getAdminPromos } from "@/features/(dashboard)/promos/api/promos-api";
 import {
   Collapsible,
   CollapsibleContent,
@@ -38,6 +45,49 @@ export function NavMain({
   }[];
 }) {
   const pathname = usePathname();
+  const queryClient = useQueryClient();
+
+  const handlePrefetch = (url: string) => {
+    try {
+      if (url === "/dashboard/products") {
+        queryClient.prefetchQuery({
+          queryKey: ["admin-products", {}],
+          queryFn: () => getAdminProducts(),
+        });
+      } else if (url === "/dashboard/products/categories") {
+        queryClient.prefetchQuery({
+          queryKey: ["categories", {}],
+          queryFn: () => getCategories(),
+        });
+      } else if (
+        url === "/dashboard/orders" ||
+        url.startsWith("/dashboard/orders?")
+      ) {
+        queryClient.prefetchQuery({
+          queryKey: ["admin-orders", {}],
+          queryFn: () => getAdminOrders(),
+        });
+      } else if (
+        url === "/dashboard/invoices" ||
+        url.startsWith("/dashboard/invoices?")
+      ) {
+        queryClient.prefetchQuery({
+          queryKey: ["admin-invoices", {}],
+          queryFn: () => getAdminInvoices(),
+        });
+      } else if (url === "/dashboard/customers") {
+        queryClient.prefetchQuery({
+          queryKey: ["admin-customers", {}],
+          queryFn: () => getAdminCustomers(),
+        });
+      } else if (url === "/dashboard/promos") {
+        queryClient.prefetchQuery({
+          queryKey: ["admin-promos", {}],
+          queryFn: () => getAdminPromos(),
+        });
+      }
+    } catch (e) {}
+  };
 
   return (
     <SidebarGroup>
@@ -67,6 +117,7 @@ export function NavMain({
                     <SidebarMenuButton
                       size="md"
                       tooltip={item.title}
+                      onMouseEnter={() => handlePrefetch(item.url)}
                       className={cn(
                         "text-slate-500 hover:text-slate-900 hover:bg-stone-50",
                         isParentActive && "text-slate-900 font-medium",
@@ -88,6 +139,7 @@ export function NavMain({
                             <SidebarMenuSubButton size="md" asChild>
                               <Link
                                 href={subItem.url}
+                                onMouseEnter={() => handlePrefetch(subItem.url)}
                                 className={cn(
                                   "text-slate-500 hover:text-slate-900",
                                   isSubActive &&
@@ -115,6 +167,7 @@ export function NavMain({
                 size="md"
                 asChild
                 tooltip={item.title}
+                onMouseEnter={() => handlePrefetch(item.url)}
                 className={cn(
                   "text-slate-500 hover:text-slate-900 hover:bg-stone-50",
                   isActive &&

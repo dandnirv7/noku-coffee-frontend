@@ -1,5 +1,5 @@
 import { api } from "@/lib/axios";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { z } from "zod";
 
 const topProductsSchema = z.object({
@@ -40,5 +40,7 @@ export const useTopProducts = () => {
   return useQuery({
     queryKey: ["top-products"],
     queryFn: getTopProducts,
+    placeholderData: keepPreviousData,
+    staleTime: 5 * 60 * 1000,
   });
 };

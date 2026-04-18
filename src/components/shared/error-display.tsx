@@ -14,6 +14,7 @@ interface ErrorDisplayProps {
   message: string;
   actionText?: string;
   actionUrl?: string;
+  onAction?: () => void;
 }
 
 export function ErrorDisplay({
@@ -23,6 +24,7 @@ export function ErrorDisplay({
   message,
   actionText = "Kembali ke Beranda",
   actionUrl = "/",
+  onAction,
 }: ErrorDisplayProps) {
   return (
     <div className="flex flex-col items-center justify-center max-w-xs md:max-w-2xl lg:max-w-6xl mx-auto my-8 p-8 md:p-12 text-center border-3 border-dashed rounded-[2rem] bg-muted/5 border-muted-foreground/10 min-h-[80vh] gap-4">
@@ -46,12 +48,21 @@ export function ErrorDisplay({
         </p>
       </div>
 
-      <Button
-        asChild
-        className="px-8 h-12 font-bold rounded-xl shadow-none transition-all active:scale-95"
-      >
-        <Link href={actionUrl}>{actionText}</Link>
-      </Button>
+      {onAction ? (
+        <Button
+          onClick={onAction}
+          className="px-8 h-12 font-bold rounded-xl shadow-none transition-all active:scale-95"
+        >
+          {actionText}
+        </Button>
+      ) : (
+        <Button
+          asChild
+          className="px-8 h-12 font-bold rounded-xl shadow-none transition-all active:scale-95"
+        >
+          <Link href={actionUrl}>{actionText}</Link>
+        </Button>
+      )}
 
       <div className="px-3 py-1 rounded-full border bg-muted/50 border-border">
         <span className="text-[10px] font-mono font-bold text-muted-foreground/60 uppercase tracking-widest">

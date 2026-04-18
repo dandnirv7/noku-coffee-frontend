@@ -25,6 +25,8 @@ import {
   IconChevronsRight,
   IconLoader2,
 } from "@tabler/icons-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { DatabaseBackup } from "lucide-react";
 
 interface DataTableProps<TData> {
   table: TanstackTable<TData>;
@@ -63,17 +65,15 @@ export function DataTable<TData>({
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={columnCount}
-                  className="h-24 text-center text-muted-foreground"
-                >
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <IconLoader2 className="h-5 w-5 animate-spin" />
-                    <span>Memuat data...</span>
-                  </div>
-                </TableCell>
-              </TableRow>
+              Array.from({ length: 5 }).map((_, rowIndex) => (
+                <TableRow key={`skeleton-row-${rowIndex}`}>
+                  {Array.from({ length: columnCount }).map((_, colIndex) => (
+                    <TableCell key={`skeleton-cell-${colIndex}`}>
+                      <Skeleton className="h-5 w-full max-w-[200px]" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
             ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
@@ -92,11 +92,25 @@ export function DataTable<TData>({
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columnCount}
-                  className="h-24 text-center text-muted-foreground"
-                >
-                  {emptyMessage}
+                <TableCell colSpan={columnCount} className="h-64 text-center">
+                  <div className="flex flex-col items-center justify-center p-8 text-muted-foreground w-full h-full max-w-sm mx-auto">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 mb-6 relative">
+                      <div
+                        className="absolute inset-0 bg-slate-200/50 rounded-full animate-ping"
+                        style={{ animationDuration: "3s" }}
+                      />
+                      <DatabaseBackup
+                        className="h-10 w-10 text-slate-400 z-10"
+                        strokeWidth={1.5}
+                      />
+                    </div>
+                    <p className="text-xl font-semibold text-slate-700 mb-2">
+                      Belum Ada Data
+                    </p>
+                    <p className="text-sm text-slate-500 mb-6 text-balance">
+                      {emptyMessage}
+                    </p>
+                  </div>
                 </TableCell>
               </TableRow>
             )}

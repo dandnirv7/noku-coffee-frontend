@@ -48,6 +48,7 @@ export const useRevenueOrders = (
     queryKey: ["revenue-order", params],
     queryFn: () => getRevenueOrders(params),
     placeholderData: keepPreviousData,
+    staleTime: 5 * 60 * 1000,
     enabled: !!params.timeFrame,
   });
 };

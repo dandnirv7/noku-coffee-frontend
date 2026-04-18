@@ -95,9 +95,6 @@ export function createProductSchema(product: ProductSchemaInput) {
   };
 }
 
-// ---------------------------------------------------------------------------
-// BreadcrumbList Schema
-// ---------------------------------------------------------------------------
 type BreadcrumbItem = {
   name: string;
   url: string;

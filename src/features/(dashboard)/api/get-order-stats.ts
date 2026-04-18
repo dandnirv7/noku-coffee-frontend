@@ -46,6 +46,7 @@ export const useOrderStats = (
     queryKey: ["order-stats", params.period],
     queryFn: () => getOrderStats(params),
     placeholderData: keepPreviousData,
+    staleTime: 5 * 60 * 1000,
     enabled: !!params.period,
   });
 };

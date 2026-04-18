@@ -1,6 +1,6 @@
 import { isAxiosError } from "axios";
 import { Summary, SummaryResponseSchema } from "../lib/summary-schema";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { api as clientApi } from "@/lib/axios";
 
 export const getSummary = async (): Promise<Summary> => {
@@ -31,6 +31,8 @@ export const getSummary = async (): Promise<Summary> => {
 export const useSummary = () => {
   return useQuery({
     queryKey: ["summary"],
-    queryFn: getSummary,
+    queryFn: () => getSummary(),
+    placeholderData: keepPreviousData,
+    staleTime: 5 * 60 * 1000,
   });
 };

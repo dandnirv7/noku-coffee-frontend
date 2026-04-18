@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 
 interface CountdownTimerProps {
-  targetDate: Date; // sudah dalam Jakarta time
+  targetDate: Date;
 }
 
 export function CountdownTimer({ targetDate }: CountdownTimerProps) {
@@ -15,7 +15,7 @@ export function CountdownTimer({ targetDate }: CountdownTimerProps) {
 
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const difference = targetDate.getTime() - new Date().getTime(); // no offset
+      const difference = targetDate.getTime() - new Date().getTime();
 
       if (difference <= 0) {
         setTimeLeft({ hours: 0, minutes: 0, seconds: 0 });

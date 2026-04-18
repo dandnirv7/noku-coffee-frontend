@@ -6,15 +6,18 @@ import {
   IconDashboard,
   IconFolder,
   IconHelp,
-  IconListDetails,
+  IconHistory,
   IconLogout,
+  IconPlug,
   IconSettings,
   IconTicket,
   IconUsers,
+  IconWebhook,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import * as React from "react";
 
+import { Button } from "@/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
@@ -28,15 +31,10 @@ import { NavMain } from "@/features/(dashboard)/components/nav-main";
 import { NavSecondary } from "@/features/(dashboard)/components/nav-secondary";
 import { authClient } from "@/features/auth/lib/auth-client";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 
 export const data = {
   navMain: [
-    {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: IconDashboard,
-    },
+    { title: "Dashboard", url: "/dashboard", icon: IconDashboard },
     {
       title: "Produk",
       url: "/dashboard/products",
@@ -44,7 +42,6 @@ export const data = {
       items: [
         { title: "Katalog", url: "/dashboard/products" },
         { title: "Kategori", url: "/dashboard/products/categories" },
-        { title: "Stok", url: "/dashboard/products/stock" },
       ],
     },
     {
@@ -53,52 +50,27 @@ export const data = {
       icon: IconFolder,
       items: [
         { title: "Semua Pesanan", url: "/dashboard/orders" },
-        { title: "Menunggu", url: "/dashboard/orders?status=PENDING" },
-        { title: "Proses", url: "/dashboard/orders?status=PAID" },
-        { title: "Selesai", url: "/dashboard/orders?status=COMPLETED" },
+        { title: "Retur / Komplain", url: "/dashboard/orders/returns" },
       ],
     },
-    {
-      title: "Invoice",
-      url: "/dashboard/invoices",
-      icon: IconListDetails,
-      items: [
-        { title: "Semua Invoice", url: "/dashboard/invoices" },
-        { title: "Belum Dibayar", url: "/dashboard/invoices?status=PENDING" },
-      ],
-    },
-    {
-      title: "Pelanggan",
-      url: "/dashboard/customers",
-      icon: IconUsers,
-      items: [
-        { title: "Semua Pelanggan", url: "/dashboard/customers" },
-        { title: "Ulasan", url: "/dashboard/customers?tab=reviews" },
-      ],
-    },
-    {
-      title: "Promo & Diskon",
-      url: "/dashboard/promos",
-      icon: IconTicket,
-      items: [{ title: "Semua Promo", url: "/dashboard/promos" }],
-    },
+    { title: "Pelanggan", url: "/dashboard/customers", icon: IconUsers },
+    { title: "Promo & Diskon", url: "/dashboard/promos", icon: IconTicket },
     {
       title: "Laporan",
       url: "/dashboard/earnings",
       icon: IconCashBanknote,
+      items: [
+        { title: "Pendapatan", url: "/dashboard/earnings" },
+        { title: "Produk Terjual", url: "/dashboard/earnings/products" },
+      ],
     },
+    { title: "Webhook Logs", url: "/dashboard/webhooks", icon: IconWebhook },
+    { title: "Aktivitas", url: "/dashboard/activity", icon: IconHistory },
+    { title: "Integrasi", url: "/dashboard/integrations", icon: IconPlug },
   ],
   navSecondary: [
-    {
-      title: "Pusat Bantuan",
-      url: "/help",
-      icon: IconHelp,
-    },
-    {
-      title: "Pengaturan",
-      url: "/settings",
-      icon: IconSettings,
-    },
+    { title: "Pengaturan", url: "/dashboard/settings", icon: IconSettings },
+    { title: "Pusat Bantuan", url: "/help", icon: IconHelp },
   ],
 };
 
@@ -122,9 +94,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="hover:bg-transparent"
             >
               <Link href="#">
-                {/* <div className="flex aspect-square size-8 items-center justify-center rounded-xl bg-orange-500 text-white shadow-sm">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-xl bg-orange-500 text-white shadow-sm">
                   <IconCoffee className="size-5" />
-                </div> */}
+                </div>
                 <h1 className="text-2xl font-extrabold font-sans text-slate-900 uppercase">
                   Noku
                 </h1>

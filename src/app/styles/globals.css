@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -139,6 +140,21 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-plus-jakarta-sans);
+  }
+
+  .tiptap p.is-editor-empty:first-child::before,
+  .tiptap p.is-empty:first-child::before {
+    color: var(--muted-foreground);
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+    font-style: italic;
+  }
+
+  .prose.tiptap p.is-editor-empty:first-child::before,
+  .prose.tiptap p.is-empty:first-child::before {
+    content: attr(data-placeholder);
   }
 }
 

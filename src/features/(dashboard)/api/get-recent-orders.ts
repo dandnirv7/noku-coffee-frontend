@@ -45,5 +45,6 @@ export const useRecentOrders = (sortBy: SortBy = "latest") => {
       return data;
     },
     placeholderData: keepPreviousData,
+    staleTime: 30 * 1000,
   });
 };
