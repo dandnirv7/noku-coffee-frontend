@@ -28,8 +28,10 @@ import { useDeleteAddress } from "@/features/user/api/use-delete-address";
 import { useSetDefaultAddress } from "@/features/user/api/use-update-address";
 import { AddressForm } from "@/features/user/components/address-form";
 import { User, Address } from "@/features/user/types";
+import { useConfirm } from "@/hooks/use-confirm";
 
 export function AccountTab() {
+  const [ConfirmDialog, confirm] = useConfirm();
   const { data: session, isPending: isSessionPending } =
     authClient.useSession();
   const user = session?.user as User;
@@ -79,8 +81,14 @@ export function AccountTab() {
     }
   };
 
-  const handleDeleteAddress = (id: string) => {
-    if (confirm("Apakah Anda yakin ingin menghapus alamat ini?")) {
+  const handleDeleteAddress = async (id: string) => {
+    const ok = await confirm({
+      title: "Hapus Alamat",
+      description: "Apakah Anda yakin ingin menghapus alamat ini?",
+      variant: "destructive",
+      confirmText: "Hapus",
+    });
+    if (ok) {
       deleteAddress(id, {
         onSuccess: () => toast.success("Alamat berhasil dihapus"),
         onError: () => toast.error("Gagal menghapus alamat"),
@@ -97,6 +105,7 @@ export function AccountTab() {
 
   return (
     <div className="m-0 space-y-6">
+      <ConfirmDialog />
       <Card>
         <CardHeader>
           <CardTitle>Informasi Biodata</CardTitle>

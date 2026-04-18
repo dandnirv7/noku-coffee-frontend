@@ -26,8 +26,10 @@ import {
 } from "lucide-react";
 import { Session } from "better-auth";
 import { ChangePasswordDialog } from "@/features/user/components/change-password-dialog";
+import { useConfirm } from "@/hooks/use-confirm";
 
 export function SecurityTab() {
+  const [ConfirmDialog, confirm] = useConfirm();
   const { data: session } = authClient.useSession();
   const currentToken = session?.session?.token;
 
@@ -94,11 +96,15 @@ export function SecurityTab() {
   };
 
   const handleDeleteAccount = async () => {
-    if (
-      confirm(
+    const ok = await confirm({
+      title: "Hapus Akun Permanen",
+      description:
         "TINDAKAN INI TIDAK DAPAT DIBATALKAN. Apakah Anda sangat yakin ingin menghapus akun Anda secara permanen beserta seluruh datanya?",
-      )
-    ) {
+      variant: "destructive",
+      confirmText: "Hapus Akun",
+    });
+
+    if (ok) {
       try {
         const { error } = await authClient.deleteUser();
         if (error) {
@@ -128,6 +134,7 @@ export function SecurityTab() {
 
   return (
     <div className="m-0 space-y-6">
+      <ConfirmDialog />
       <Card>
         <CardHeader>
           <div className="flex gap-2 items-center">
