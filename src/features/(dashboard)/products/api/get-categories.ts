@@ -1,5 +1,5 @@
 import { api } from "@/lib/axios";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 
 const CategorySchema = z.object({
@@ -65,5 +65,7 @@ export const useCategories = (params?: GetCategoriesParams) => {
   return useQuery({
     queryKey: ["categories", params],
     queryFn: () => getCategories(params),
+    placeholderData: keepPreviousData,
+    staleTime: 30 * 1000,
   });
 };

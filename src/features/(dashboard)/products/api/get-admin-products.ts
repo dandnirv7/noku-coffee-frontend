@@ -3,7 +3,7 @@ import {
   ProductResponseSchema,
 } from "@/features/product/lib/products-schema";
 import { api } from "@/lib/axios";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export interface GetAdminProductsParams {
   search?: string;
@@ -68,5 +68,7 @@ export const useAdminProducts = (params?: GetAdminProductsParams) => {
   return useQuery({
     queryKey: ["admin-products", params],
     queryFn: () => getAdminProducts(params),
+    placeholderData: keepPreviousData,
+    staleTime: 30 * 1000,
   });
 };

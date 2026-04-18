@@ -47,7 +47,7 @@ export default function ProductEditPage({ slug }: ProductEditPageProps) {
         initialData={{
           id: product.id,
           name: product.name,
-          categoryId: product.categoryId,
+          categoryId: product.categoryId!,
           type: product.type?.[0] || "",
           sku: product.sku,
           price: Number(product.price),

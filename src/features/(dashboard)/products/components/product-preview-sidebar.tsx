@@ -55,9 +55,16 @@ export function ProductPreviewSidebar({
           </span>
         </div>
 
-        <p className="text-sm text-slate-500 mb-6 line-clamp-3 min-h-[60px] whitespace-pre-wrap">
-          {previewData.description || "Deskripsi produk akan tampil di sini."}
-        </p>
+        {previewData.description ? (
+          <div
+            className="text-sm text-slate-500 mb-6 line-clamp-3 min-h-[60px] prose prose-sm dark:prose-invert max-w-none prose-p:my-0 prose-headings:my-0"
+            dangerouslySetInnerHTML={{ __html: previewData.description }}
+          />
+        ) : (
+          <p className="text-sm text-slate-500 mb-6 line-clamp-3 min-h-[60px] whitespace-pre-wrap">
+            Deskripsi produk akan tampil di sini.
+          </p>
+        )}
 
         <div className="bg-stone-50 rounded-xl p-4 mb-8 space-y-3 border border-stone-100">
           <div className="flex justify-between items-center text-xs">

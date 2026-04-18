@@ -16,7 +16,7 @@ import { ProductPreviewSidebar } from "./product-preview-sidebar";
 
 import { FormSelectField } from "@/features/(dashboard)/products/components/form/form-select-field";
 import { FormTextField } from "@/features/(dashboard)/products/components/form/form-text-field";
-import { FormTextAreaField } from "@/features/(dashboard)/products/components/form/form-textarea-field";
+import { FormRichTextField } from "@/features/(dashboard)/products/components/form/form-rich-text-field";
 import { ProductImageUploader } from "./product-image-uploader";
 
 const CATEGORY_OPTIONS = PRODUCT_CATEGORIES.map((c) => ({
@@ -174,11 +174,10 @@ export default function ProductForm(props: UseProductFormProps) {
                   {isGenerating ? "Sedang Menulis..." : "Generate AI"}
                 </Button>
               </div>
-              <FormTextAreaField
+              <FormRichTextField
                 control={form.control}
                 name="description"
                 placeholder="Deskripsikan rasa, rekomendasi seduhan, dan cerita di balik produk ini..."
-                rows={6}
                 disabled={isPending}
                 className={isGenerating ? "opacity-50 animate-pulse" : ""}
               />

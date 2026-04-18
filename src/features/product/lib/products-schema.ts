@@ -17,8 +17,8 @@ export const ProductSchema = z.object({
   category: z.object({
     name: z.string(),
   }),
-  categoryId: z.string(),
-  deletedAt: z.string().nullable(),
+  categoryId: z.string().optional(),
+  deletedAt: z.string().nullable().optional(),
 });
 
 export const ProductResponseSchema = z.object({

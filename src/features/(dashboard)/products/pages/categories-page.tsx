@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { Category, useCategories } from "../api/get-categories";
 import { getCategoriesColumns } from "../components/columns/categories-columns";
 import { useSearchFilters } from "../hooks/use-search-filters";
+import { useConfirm } from "@/hooks/use-confirm";
 
 function useCreateCategory() {
   const queryClient = useQueryClient();
@@ -38,15 +39,39 @@ function useDeleteCategory() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete(`/categories/${id}`),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ["categories"] });
+      const previousQueries = queryClient.getQueriesData({ queryKey: ["categories"] });
+
+      queryClient.setQueriesData({ queryKey: ["categories"] }, (old: any) => {
+        if (!old || !old.items) return old;
+        return {
+          ...old,
+          items: old.items.filter((item: any) => item.id !== id),
+        };
+      });
+
+      return { previousQueries };
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
       toast.success("Kategori berhasil dihapus");
     },
-    onError: () => toast.error("Gagal menghapus kategori"),
+    onError: (_err, _id, context) => {
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(([queryKey, oldData]) => {
+          queryClient.setQueryData(queryKey, oldData);
+        });
+      }
+      toast.error("Gagal menghapus kategori");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
   });
 }
 
 export function CategoriesPage() {
+  const [ConfirmDialog, confirm] = useConfirm();
   const { params, setPage, setPerPage } = useSearchFilters();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -64,17 +89,19 @@ export function CategoriesPage() {
   const columns = useMemo(
     () =>
       getCategoriesColumns({
-        onDelete: (category: Category) => {
-          if (
-            confirm(
-              `Yakin hapus kategori "${category.name}"? Aksi ini tidak dapat dibatalkan.`,
-            )
-          ) {
+        onDelete: async (category: Category) => {
+          const ok = await confirm({
+            title: "Hapus Kategori",
+            description: `Yakin hapus kategori "${category.name}"? Aksi ini tidak dapat dibatalkan.`,
+            variant: "destructive",
+            confirmText: "Hapus",
+          });
+          if (ok) {
             deleteCategory(category.id);
           }
         },
       }),
-    [deleteCategory],
+    [deleteCategory, confirm],
   );
 
   const { table } = useDataTable({
@@ -102,6 +129,7 @@ export function CategoriesPage() {
 
   return (
     <div className="space-y-6">
+      <ConfirmDialog />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Kategori</h1>

@@ -31,11 +31,36 @@ function useDeleteProduct() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete(`/products/${id}`),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ["admin-products"] });
+      const previousQueries = queryClient.getQueriesData({ queryKey: ["admin-products"] });
+
+      queryClient.setQueriesData({ queryKey: ["admin-products"] }, (old: any) => {
+        if (!old || !old.items) return old;
+        return {
+          ...old,
+          items: old.items.map((item: any) =>
+            item.id === id ? { ...item, status: "DRAFT" } : item
+          ),
+        };
+      });
+
+      return { previousQueries };
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       toast.success("Produk berhasil dinonaktifkan");
     },
-    onError: () => toast.error("Gagal menonaktifkan produk"),
+    onError: (_err, _newProduct, context) => {
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(([queryKey, oldData]) => {
+          queryClient.setQueryData(queryKey, oldData);
+        });
+      }
+      toast.error("Gagal menonaktifkan produk");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+    },
   });
 }
 
@@ -43,11 +68,36 @@ function useRestoreProduct() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.patch(`/products/${id}/restore`),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ["admin-products"] });
+      const previousQueries = queryClient.getQueriesData({ queryKey: ["admin-products"] });
+
+      queryClient.setQueriesData({ queryKey: ["admin-products"] }, (old: any) => {
+        if (!old || !old.items) return old;
+        return {
+          ...old,
+          items: old.items.map((item: any) =>
+            item.id === id ? { ...item, status: "ACTIVE" } : item
+          ),
+        };
+      });
+
+      return { previousQueries };
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       toast.success("Produk berhasil dipulihkan");
     },
-    onError: () => toast.error("Gagal memulihkan produk"),
+    onError: (_err, _newProduct, context) => {
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(([queryKey, oldData]) => {
+          queryClient.setQueryData(queryKey, oldData);
+        });
+      }
+      toast.error("Gagal memulihkan produk");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+    },
   });
 }
 
